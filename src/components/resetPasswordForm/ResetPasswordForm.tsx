@@ -11,15 +11,13 @@ import {
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/app/store/store";
 import { resetPassword } from "@/app/asyncThunk/authThunk";
-import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useQueryParams } from "@/hooks/useQueryParams";
 
 const ResetPasswordForm = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const token: string | null = searchParams.get("token");
-  const email: string | null = searchParams.get("email");
+  const {token, email} = useQueryParams();
   const {
     register,
     handleSubmit,

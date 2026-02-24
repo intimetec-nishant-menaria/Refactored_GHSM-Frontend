@@ -1,10 +1,9 @@
 import ResetPasswordForm from "@/components/resetPasswordForm/ResetPasswordForm";
 import AuthLayout from "@/components/layouts/AuthLayout";
-import { useSearchParams } from "react-router-dom";
+import { useQueryParams } from "@/hooks/useQueryParams";
 
 const ResetPassword = () => {
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get("token");
+  const { token } = useQueryParams();
 
   if (!token) {
     return <p className="text-red-500">Invalid or missing reset token.</p>;
