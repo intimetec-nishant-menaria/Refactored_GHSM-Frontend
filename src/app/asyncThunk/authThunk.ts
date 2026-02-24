@@ -13,7 +13,7 @@ export const loginUser = createAsyncThunk(
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Login failed");
     }
-  }
+  },
 );
 
 export const forgotPassword = createAsyncThunk(
@@ -25,7 +25,7 @@ export const forgotPassword = createAsyncThunk(
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Failed to send reset link");
     }
-  }
+  },
 );
 
 export const resetPassword = createAsyncThunk(
@@ -42,5 +42,5 @@ export const resetPassword = createAsyncThunk(
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Reset failed");
     }
-  }
+  },
 );

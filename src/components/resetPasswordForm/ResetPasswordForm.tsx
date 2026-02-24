@@ -17,7 +17,7 @@ import { useQueryParams } from "@/hooks/useQueryParams";
 const ResetPasswordForm = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const {token, email} = useQueryParams();
+  const { token, email } = useQueryParams();
   const {
     register,
     handleSubmit,

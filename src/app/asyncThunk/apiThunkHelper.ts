@@ -3,7 +3,7 @@ const BASE_URL = "https://localhost:7188/api";
 const apiThunk = async <T>(
   endpoint: string,
   body: unknown,
-  options?: { withCredentials?: boolean }
+  options?: { withCredentials?: boolean },
 ): Promise<T> => {
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     method: "POST",
