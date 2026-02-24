@@ -18,14 +18,15 @@ const LoginForm = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: LoginInput) => {
-    const resultAction = await dispatch(loginUser(data));
-    if (loginUser.fulfilled.match(resultAction)) {
-      toast.success("Logged in successfully!");
-      navigate("/dashboard");
-    } else {
-      toast.error(resultAction.payload as string);
-    }
+  const onSubmit = (data: LoginInput) => {
+    dispatch(loginUser(data)).then((resultAction) => {
+      if (loginUser.fulfilled.match(resultAction)) {
+        toast.success("Logged in successfully!");
+        navigate("/dashboard");
+      } else {
+        toast.error(resultAction.payload as string);
+      }
+    });
   };
 
   return (
@@ -40,7 +41,7 @@ const LoginForm = () => {
 
       <div>
         <Label htmlFor="password">Password:</Label>
-        <Input id="password" type="password" placeholder="Password" {...register("password")}/>
+        <Input id="password" type="password" placeholder="Password" {...register("password")} />
         {errors.password && (
           <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
         )}
