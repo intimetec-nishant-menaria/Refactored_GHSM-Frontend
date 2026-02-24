@@ -1,7 +1,7 @@
 import Label from "@/components/common/label";
 import Input from "@/components/common/input";
 import Button from "@/components/common/button";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { LoginInput } from "@/utils/schemas/loginSchema";
@@ -41,7 +41,7 @@ const LoginForm = () => {
 
       <div>
         <Label htmlFor="password">Password:</Label>
-        <Input id="password" type="password" placeholder="Password" {...register("password")} />
+        <Input id="password" type="password" placeholder="Password" {...register("password")}/>
         {errors.password && (
           <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
         )}
@@ -52,9 +52,9 @@ const LoginForm = () => {
           <Input type="checkbox" {...register("rememberMe")} />
           Remember me
         </Label>
-        <Link to="/forgot-password" className="text-blue-600 hover:underline">
+        <span onClick={() => navigate("/forgot-password")} className="text-blue-600 hover:underline cursor-pointer" >
           Forgot password?
-        </Link>
+        </span>
       </div>
       <Button type="submit" label="Login"></Button>
     </form>
