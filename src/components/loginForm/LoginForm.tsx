@@ -1,6 +1,6 @@
-import Label from "@/components/common/Label";
-import Input from "@/components/common/Input";
-import Button from "@/components/common/Button";
+import Label from "@/components/common/label";
+import Input from "@/components/common/input";
+import Button from "@/components/common/button";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,12 +14,7 @@ import { loginUser } from "@/app/asyncThunk/authThunk";
 const LoginForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
- 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LoginInput>({
+  const { register, handleSubmit, formState: { errors },} = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
   });
 
@@ -37,12 +32,7 @@ const LoginForm = () => {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div>
         <Label htmlFor="email">Email:</Label>
-        <Input
-          id="email"
-          type="text"
-          placeholder="Email"
-          {...register("email")}
-        />
+        <Input id="email" type="text" placeholder="Email" {...register("email")} />
         {errors.email && (
           <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
         )}
@@ -50,12 +40,7 @@ const LoginForm = () => {
 
       <div>
         <Label htmlFor="password">Password:</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder="Password"
-          {...register("password")}
-        />
+        <Input id="password" type="password" placeholder="Password" {...register("password")}/>
         {errors.password && (
           <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
         )}
@@ -66,13 +51,11 @@ const LoginForm = () => {
           <Input type="checkbox" {...register("rememberMe")} />
           Remember me
         </Label>
-
         <Link to="/forgot-password" className="text-blue-600 hover:underline">
           Forgot password?
         </Link>
       </div>
-
-      <Button type="submit">Login</Button>
+      <Button type="submit" label="Login"></Button>
     </form>
   );
 };
