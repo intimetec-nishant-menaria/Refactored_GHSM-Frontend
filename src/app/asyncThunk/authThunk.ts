@@ -8,7 +8,7 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (data: LoginInput, { rejectWithValue }) => {
     try {
-      return await apiThunk("/auth/loginUser", data);
+      return await apiThunk("/auth/login", data);
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Login failed");
@@ -20,7 +20,7 @@ export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
   async (data: ForgotPasswordInput, { rejectWithValue }) => {
     try {
-      return await apiThunk("/auth/forgetPassword", data);
+      return await apiThunk("/auth/forgotPassword", data);
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Failed to send reset link");

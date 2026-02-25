@@ -11,7 +11,15 @@ const initialState: AuthState = {
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+    clearMessage: (state) => {
+      state.message = null;
+    },
+  },
 });
 
+export const { clearError, clearMessage } = authSlice.actions;
 export default authSlice.reducer;

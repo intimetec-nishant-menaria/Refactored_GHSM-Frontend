@@ -14,7 +14,6 @@ import { loginUser } from "@/app/asyncThunk/authThunk";
 const LoginForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-
   const {
     register,
     handleSubmit,
@@ -23,15 +22,14 @@ const LoginForm = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = (data: LoginInput) => {
-    dispatch(loginUser(data)).then((resultAction) => {
-      if (loginUser.fulfilled.match(resultAction)) {
-        toast.success("Logged in successfully!");
-        navigate("/dashboard");
-      } else {
-        toast.error(resultAction.payload as string);
-      }
-    });
+  const onSubmit = async (data: LoginInput) => {
+    const resultAction = await dispatch(loginUser(data));
+    if (loginUser.fulfilled.match(resultAction)) {
+      toast.success("Logged in successfully!");
+      navigate("/dashboard");
+    } else {
+      toast.error(resultAction.payload as string);
+    }
   };
 
   return (

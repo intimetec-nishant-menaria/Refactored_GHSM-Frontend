@@ -1,14 +1,10 @@
 const BASE_URL = "https://localhost:7188/api";
 
-const apiThunk = async <T>(
-  endpoint: string,
-  body: unknown,
-  options?: { withCredentials?: boolean },
-): Promise<T> => {
+const apiThunk = async <T>(endpoint: string, body: unknown): Promise<T> => {
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    credentials: options?.withCredentials ? "include" : "same-origin",
+    credentials: "include",
     body: JSON.stringify(body),
   });
 
