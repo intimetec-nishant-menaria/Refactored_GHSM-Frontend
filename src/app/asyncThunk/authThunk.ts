@@ -1,7 +1,7 @@
 import type { LoginInput } from "@/utils/schemas/loginSchema";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { ForgotPasswordInput } from "@/utils/schemas/forgotPasswordSchema";
-import type { ResetPasswordPayload } from "@/utils/interfaces/ResetPasswordPayload";
+import type { ResetPasswordPayload } from "@/utils/interfaces/resetPassword";
 import apiThunk from "./apiThunkHelper";
 import type { User } from "@/utils/interfaces/user";
 
