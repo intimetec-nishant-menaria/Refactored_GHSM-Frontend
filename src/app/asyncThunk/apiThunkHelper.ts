@@ -11,7 +11,7 @@ const fetchApi = async <T>(
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     method,
     headers: { "Content-Type": "application/json" },
-    credentials: options?.withCredentials ? "include" : "same-origin",
+    credentials: "include",
     body: JSON.stringify(body),
   });
 
