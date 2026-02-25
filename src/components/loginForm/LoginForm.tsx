@@ -1,7 +1,7 @@
 import Label from "@/components/common/Label";
 import Input from "@/components/common/Input";
 import Button from "@/components/common/Button";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { LoginInput } from "@/utils/schemas/loginSchema";
@@ -14,7 +14,7 @@ import { loginUser } from "@/app/asyncThunk/authThunk";
 const LoginForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
- 
+
   const {
     register,
     handleSubmit,
@@ -67,9 +67,11 @@ const LoginForm = () => {
           Remember me
         </Label>
 
-        <Link to="/forgot-password" className="text-blue-600 hover:underline">
-          Forgot password?
-        </Link>
+        <span
+          onClick={() => navigate("/forgot-password")}
+          className="text-blue-600 hover:underline cursor-pointer"
+        />
+
       </div>
 
       <Button type="submit">Login</Button>
