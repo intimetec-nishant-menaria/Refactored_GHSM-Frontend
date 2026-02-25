@@ -1,9 +1,9 @@
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Input from "@/components/common/Input";
-import Label from "@/components/common/Label";
-import Button from "@/components/common/Button";
+import Input from "@/components/common/input/Input";
+import Label from "@/components/common/label/Label";
+import Button from "@/components/common/button/Button";
 import {
   resetPasswordSchema,
   type ResetPasswordInput,
@@ -11,17 +11,13 @@ import {
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/app/store/store";
 import { resetPassword } from "@/app/asyncThunk/authThunk";
-import { useSearchParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { useQueryParams } from "@/hooks/useQueryParams";
 
 const ResetPasswordForm = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
-  const token: string | null = searchParams.get("token");
-  const email: string | null = searchParams.get("email");
-
+  const { token, email } = useQueryParams();
   const {
     register,
     handleSubmit,
@@ -30,22 +26,24 @@ const ResetPasswordForm = () => {
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  const onSubmit = async (data: ResetPasswordInput) => {
-    const resultAction = await dispatch(
+  const onSubmit = (data: ResetPasswordInput) => {
+    dispatch(
       resetPassword({
         email,
         token,
         password: data.password,
-        confirmPassword : data.confirmPassword,
+        confirmPassword: data.confirmPassword,
       }),
-    );
-
-    if (resetPassword.fulfilled.match(resultAction)) {
-      toast.success("Password reset successful!");
-      navigate('/');
-    } else {
-      toast.error(resultAction.payload as string);
-    }
+    ).then((resultAction) => {
+      if (resetPassword.fulfilled.match(resultAction)) {
+        toast.success("Password reset successful!");
+        navigate("/");
+      } else {
+        toast.error(
+          (resultAction.payload as string) || "Failed to reset password",
+        );
+      }
+    });
   };
 
   return (
@@ -62,7 +60,6 @@ const ResetPasswordForm = () => {
           <p className="text-red-500 text-sm">{errors.password.message}</p>
         )}
       </div>
-
       <div>
         <Label htmlFor="confirmPassword">Confirm Password</Label>
         <Input
@@ -77,8 +74,7 @@ const ResetPasswordForm = () => {
           </p>
         )}
       </div>
-
-      <Button type="submit">Reset Password</Button>
+      <Button type="submit" label="Reset Password"></Button>
     </form>
   );
 };

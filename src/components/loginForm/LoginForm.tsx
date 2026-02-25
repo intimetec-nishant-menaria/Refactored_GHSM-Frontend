@@ -1,6 +1,6 @@
-import Label from "@/components/common/Label";
-import Input from "@/components/common/Input";
-import Button from "@/components/common/Button";
+import Label from "@/components/common/label/Label";
+import Input from "@/components/common/input/Input";
+import Button from "@/components/common/button/Button";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,14 +23,15 @@ const LoginForm = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: LoginInput) => {
-    const resultAction = await dispatch(loginUser(data));
-    if (loginUser.fulfilled.match(resultAction)) {
-      toast.success("Logged in successfully!");
-      navigate("/dashboard");
-    } else {
-      toast.error(resultAction.payload as string);
-    }
+  const onSubmit = (data: LoginInput) => {
+    dispatch(loginUser(data)).then((resultAction) => {
+      if (loginUser.fulfilled.match(resultAction)) {
+        toast.success("Logged in successfully!");
+        navigate("/dashboard");
+      } else {
+        toast.error(resultAction.payload as string);
+      }
+    });
   };
 
   return (
@@ -71,10 +72,8 @@ const LoginForm = () => {
           onClick={() => navigate("/forgot-password")}
           className="text-blue-600 hover:underline cursor-pointer"
         />
-
       </div>
-
-      <Button type="submit">Login</Button>
+      <Button type="submit" label="Login"></Button>
     </form>
   );
 };

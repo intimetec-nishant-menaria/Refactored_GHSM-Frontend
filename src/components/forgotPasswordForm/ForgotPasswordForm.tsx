@@ -1,9 +1,9 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Input from "@/components/common/Input";
-import Label from "@/components/common/Label";
-import Button from "@/components/common/Button";
-import { Link } from "react-router-dom";
+import Input from "@/components/common/input/Input";
+import Label from "@/components/common/label/Label";
+import Button from "@/components/common/button/Button";
+import { useNavigate } from "react-router-dom";
 import {
   forgotPasswordSchema,
   type ForgotPasswordInput,
@@ -14,8 +14,8 @@ import { forgotPassword } from "@/app/asyncThunk/authThunk";
 import toast from "react-hot-toast";
 
 const ForgotPasswordForm = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-
   const {
     register,
     handleSubmit,
@@ -24,14 +24,16 @@ const ForgotPasswordForm = () => {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = async (data: ForgotPasswordInput) => {
-    const resultAction = await dispatch(forgotPassword(data));
-
-    if (forgotPassword.fulfilled.match(resultAction)) {
-      toast.success("Reset link sent to your email!");
-    } else {
-      toast.error(resultAction.payload as string);
-    }
+  const onSubmit = (data: ForgotPasswordInput) => {
+    dispatch(forgotPassword(data)).then((resultAction) => {
+      if (forgotPassword.fulfilled.match(resultAction)) {
+        toast.success("Reset link sent to your email!");
+      } else {
+        toast.error(
+          (resultAction.payload as string) || "Failed to send reset link",
+        );
+      }
+    });
   };
 
   return (
@@ -48,13 +50,14 @@ const ForgotPasswordForm = () => {
           <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
         )}
       </div>
-
-      <Button type="submit">Reset Password</Button>
-
+      <Button type="submit" label="Reset Password"></Button>
       <div className="text-center">
-        <Link to="/" className="text-sm text-gray-600 hover:text-gray-900">
+        <span
+          onClick={() => navigate("/")}
+          className="text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
+        >
           ← Back to login
-        </Link>
+        </span>
       </div>
     </form>
   );

@@ -10,9 +10,7 @@ export const loginUser = createAsyncThunk(
     try {
       return await apiThunk("/auth/loginUser", data);
     } catch (error) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
+      if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Login failed");
     }
   },
@@ -24,9 +22,7 @@ export const forgotPassword = createAsyncThunk(
     try {
       return await apiThunk("/auth/forgetPassword", data);
     } catch (error) {
-      if (error instanceof Error) {
-        return rejectWithValue(error.message);
-      }
+      if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Failed to send reset link");
     }
   },
@@ -35,10 +31,9 @@ export const forgotPassword = createAsyncThunk(
 export const resetPassword = createAsyncThunk(
   "auth/resetPassword",
   async (data: ResetPasswordPayload, { rejectWithValue }) => {
-    try{
+    try {
       return await apiThunk("/auth/resetPassword", data);
-    }
-    catch (error) {
+    } catch (error) {
       if (error instanceof Error) {
         return rejectWithValue(error.message);
       }

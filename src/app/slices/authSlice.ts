@@ -1,4 +1,4 @@
-import type { AuthState } from "@/utils/interfaces/authState";
+import type { AuthState } from "@/utils/interfaces/authLayout";
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState: AuthState = {
@@ -11,7 +11,7 @@ const initialState: AuthState = {
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {}
+  reducers: {},
 });
 
 export default authSlice.reducer;
