@@ -74,7 +74,7 @@ const ResetPasswordForm = () => {
           </p>
         )}
       </div>
-      <Button type="submit" label="Reset Password"></Button>
+      <Button type="submit" label="Reset Password" className="w-full"></Button>
     </form>
   );
 };

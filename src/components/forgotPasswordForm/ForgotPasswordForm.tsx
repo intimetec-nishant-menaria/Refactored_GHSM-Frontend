@@ -50,7 +50,7 @@ const ForgotPasswordForm = () => {
           <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
         )}
       </div>
-      <Button type="submit" label="Reset Password"></Button>
+      <Button type="submit" label="Reset Password" className="w-full"></Button>
       <div className="text-center">
         <span
           onClick={() => navigate("/")}

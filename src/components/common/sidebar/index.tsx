@@ -1,10 +1,10 @@
 import { useState } from "react";
-import menu_icon from "@/assets/menu_icon.png";
-import cross_icon from "@/assets/cross_icon.png";
+import menuIcon from "@/assets/menuIcon.png";
+import crossIcon from "@/assets/crossIcon.png";
 import SidebarItem from "./SidebarItem";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import { menuByRole } from "./menuConfig";
-import type { RootState } from "@/app/store/store";
+// import type { RootState } from "@/app/store/store";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "@/app/asyncThunk/authThunk";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
@@ -12,13 +12,17 @@ import { useAppDispatch } from "@/hooks/useAppDispatch";
 const Sidebar = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const role = useSelector((state: RootState) => state.auth.user?.role);
-  const menuItems = role ? menuByRole[role] : [];
+  const role = "admin";
+  const menuItems = menuByRole[role];
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
-    dispatch(logoutUser());
-    navigate("/login");
+    try {
+      dispatch(logoutUser()).unwrap();
+      navigate("/");
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
   return (
@@ -26,7 +30,7 @@ const Sidebar = () => {
       <div className="md:hidden p-4 bg-slate-500 text-white flex flex-col gap-3 items-center">
         <h2 className="font-semibold">Guesthouse</h2>
         <button onClick={() => setIsOpen(true)}>
-          <img src={menu_icon} alt="menu" className="w-6 h-6" />
+          <img src={menuIcon} alt="menu" className="w-6 h-6" />
         </button>
       </div>
 
@@ -48,7 +52,7 @@ const Sidebar = () => {
           </div>
           <button className="md:hidden" onClick={() => setIsOpen(false)}>
             <img
-              src={cross_icon}
+              src={crossIcon}
               alt="cross"
               className="w-6 h-6 cursor-pointer"
             />

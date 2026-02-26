@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/app/store/store";
 import { loginUser } from "@/app/asyncThunk/authThunk";
+import { useEffect } from "react";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -17,16 +18,34 @@ const LoginForm = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      rememberMe: false,
+    },
   });
 
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+
+    if (savedEmail) {
+      setValue("email", savedEmail);
+      setValue("rememberMe", true);
+    }
+  }, [setValue]);
+
   const onSubmit = async (data: LoginInput) => {
+    if (data.rememberMe) {
+      localStorage.setItem("rememberedEmail", data.email);
+    } else {
+      localStorage.removeItem("rememberedEmail");
+    }
     const resultAction = await dispatch(loginUser(data));
     if (loginUser.fulfilled.match(resultAction)) {
       toast.success("Logged in successfully!");
-      navigate("/dashboard");
+      navigate("/admin");
     } else {
       toast.error(resultAction.payload as string);
     }
@@ -69,9 +88,11 @@ const LoginForm = () => {
         <span
           onClick={() => navigate("/forgot-password")}
           className="text-blue-600 hover:underline cursor-pointer"
-        />
+        >
+          Forgot Password
+        </span>
       </div>
-      <Button type="submit" label="Login"></Button>
+      <Button type="submit" label="Login" className="w-full"></Button>
     </form>
   );
 };
