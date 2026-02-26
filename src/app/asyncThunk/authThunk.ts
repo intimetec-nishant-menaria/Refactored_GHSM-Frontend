@@ -38,6 +38,15 @@ interface LoginResponse {
   };
 }
 
+interface LoginResponse {
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    role: string;
+  };
+}
+
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (data: LoginInput, {rejectWithValue }) => {
