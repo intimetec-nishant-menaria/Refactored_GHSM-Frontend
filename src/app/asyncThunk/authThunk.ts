@@ -4,6 +4,15 @@ import type { ForgotPasswordInput } from "@/utils/schemas/forgotPasswordSchema";
 import type { ResetPasswordPayload } from "@/utils/interfaces/ResetPasswordPayload";
 import fetchApi from "@/app/asyncThunk/apiThunkHelper";
 
+interface LoginResponse {
+  token: string;
+  user: {
+    id: string;
+    email: string;
+    role: string;
+  };
+}
+
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (data: LoginInput, { rejectWithValue }) => {

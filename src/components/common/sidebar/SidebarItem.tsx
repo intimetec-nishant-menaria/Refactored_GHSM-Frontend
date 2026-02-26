@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface SidebarItemProps {
   label: string;
@@ -13,18 +13,30 @@ const SidebarItem = ({
   onClick,
   className = "",
 }: SidebarItemProps) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActive = location.pathname.startsWith(path);
+
+  const handleClick = () => {
+    if (location.pathname !== path) {
+      navigate(path);
+    }
+    onClick?.();
+  };
+
   return (
-    <NavLink
-      to={path}
-      onClick={onClick}
-      className={({ isActive }) =>
-        `block px-4 py-2 rounded-lg transition duration-200 
-        ${isActive ? "bg-blue-600 text-white" : "text-slate-300 hover:bg-slate-500 hover:text-white"}
-        ${className}`
-      }
+    <div
+      onClick={handleClick}
+      className={`cursor-pointer px-4 py-2 rounded-lg transition-colors duration-200
+        ${
+          isActive
+            ? "bg-blue-600 text-white"
+            : "text-gray-300 hover:bg-gray-500 hover:text-white"
+        } ${className}`}
     >
       {label}
-    </NavLink>
+    </div>
   );
 };
 
