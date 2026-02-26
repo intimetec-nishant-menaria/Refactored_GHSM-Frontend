@@ -1,6 +1,6 @@
 const BASE_URL = import.meta.env.BASE_URL;
 
-const apiThunk = async <T>(
+const fetchApi = async <T>(
   endpoint: string,
   body: unknown,
   options?: { withCredentials?: boolean },
@@ -21,4 +21,4 @@ const apiThunk = async <T>(
   return result;
 };
 
-export default apiThunk;
+export default fetchApi;
