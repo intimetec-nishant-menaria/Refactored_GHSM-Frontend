@@ -1,11 +1,12 @@
 import AuthLayout from "@/components/layouts/AuthLayout";
 import ForgotPasswordForm from "@/components/forgotPasswordForm/ForgotPasswordForm";
+import questionSign from "@/assets/questionSign.png";
 
 const ForgotPassword = () => {
   return (
     <AuthLayout
       title="Forgot Password?"
-      iconSrc="/src/assets/question_sign.png"
+      iconSrc={questionSign}
       iconAlt="Forgot password"
     >
       <div className="text-center">
