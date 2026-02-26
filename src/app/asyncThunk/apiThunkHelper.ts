@@ -1,4 +1,4 @@
-const BASE_URL = "https://localhost:7188/api";
+const BASE_URL = import.meta.env.BASE_URL;
 
 const apiThunk = async <T>(
   endpoint: string,
