@@ -29,6 +29,10 @@ const ResetPasswordForm = () => {
   });
 
   const onSubmit = (data: ResetPasswordInput) => {
+    if (!token || !email) {
+      toast.error("Invalid or expired reset link");
+      return;
+    }
     dispatch(
       resetPassword({
         email,

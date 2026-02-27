@@ -18,17 +18,20 @@ export const loginUser = createAsyncThunk(
   },
 );
 
-export const forgotPassword = createAsyncThunk(
-  "auth/forgotPassword",
-  async (data: ForgotPasswordInput, { rejectWithValue }) => {
-    try {
-      return await fetchApi("POST", "/auth/forgetPassword", data);
-    } catch (error) {
-      if (error instanceof Error) return rejectWithValue(error.message);
-      return rejectWithValue("Failed to send reset link");
+export const forgotPassword = createAsyncThunk<
+  string,
+  ForgotPasswordInput,
+  { rejectValue: string }
+>("auth/forgotPassword", async (data, { rejectWithValue }) => {
+  try {
+    return await fetchApi<string>("POST", "/auth/forgetPassword", data);
+  } catch (error) {
+    if (error instanceof Error) {
+      return rejectWithValue(error.message);
     }
-  },
-);
+    return rejectWithValue("Failed to send reset link");
+  }
+});
 
 export const resetPassword = createAsyncThunk(
   "auth/resetPassword",

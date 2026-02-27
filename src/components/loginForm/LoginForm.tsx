@@ -65,7 +65,7 @@ const LoginForm = () => {
 
       <div className="flex items-center justify-between text-sm">
         <Label className="flex items-center gap-2 cursor-pointer">
-          <Input type="checkbox" {...register("rememberMe")} />
+          <Input id="rememberMe" type="checkbox" {...register("rememberMe")} />
           Remember me
         </Label>
         <span

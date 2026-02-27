@@ -8,11 +8,12 @@ import {
   forgotPasswordSchema,
   type ForgotPasswordInput,
 } from "@/utils/schemas/forgotPasswordSchema";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "@/app/store/store";
 import { forgotPassword } from "@/app/asyncThunk/authThunk";
 import toast from "react-hot-toast";
 import { useRef } from "react";
+import type { RootState } from "@/app/store/store";
 
 const ForgotPasswordForm = () => {
   const ref = useRef<HTMLButtonElement>(null);
@@ -25,6 +26,7 @@ const ForgotPasswordForm = () => {
   } = useForm<ForgotPasswordInput>({
     resolver: zodResolver(forgotPasswordSchema),
   });
+  const { loading } = useSelector((state: RootState) => state.auth);
 
   const onSubmit = (data: ForgotPasswordInput) => {
     dispatch(forgotPassword(data)).then((resultAction) => {
@@ -52,7 +54,12 @@ const ForgotPasswordForm = () => {
           <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
         )}
       </div>
-      <Button type="submit" label="Reset Password" ref={ref}></Button>
+      <Button
+        type="submit"
+        label="Reset Password"
+        disabled={loading}
+        ref={ref}
+      ></Button>
       <div className="text-center">
         <span
           onClick={() => navigate("/")}
