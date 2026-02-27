@@ -15,11 +15,10 @@ interface LoginResponse {
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
-  async (data: LoginInput, { rejectWithValue }) => {
+  async (data: LoginInput, {rejectWithValue }) => {
     try {
-      return await fetchApi("POST", "/auth/login", data, {
-        withCredentials: true,
-      });
+      const response = await apiThunk<LoginResponse>("/auth/login", data);
+      return response;
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Login failed");
@@ -27,16 +26,34 @@ export const loginUser = createAsyncThunk(
   },
 );
 
-export const forgotPassword = createAsyncThunk<
-  string,
-  ForgotPasswordInput,
-  { rejectValue: string }
->("auth/forgotPassword", async (data, { rejectWithValue }) => {
-  try {
-    return await fetchApi<string>("POST", "/auth/forgetPassword", data);
-  } catch (error) {
-    if (error instanceof Error) {
-      return rejectWithValue(error.message);
+export const checkMe = createAsyncThunk(
+  "auth/checkMe",
+  async (_ , {rejectWithValue})=>{
+    try{
+      const res = await fetch("https://localhost:7188/api/auth/me",{
+        method : "GET",
+        credentials : "include",
+        headers :{
+          "Content-Type": "application/json",
+        }
+      });
+      return await res.json();
+    }catch(error){
+      if (error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("Login failed");
+    }
+
+  }
+)
+
+export const forgotPassword = createAsyncThunk(
+  "auth/forgotPassword",
+  async (data: ForgotPasswordInput, { rejectWithValue }) => {
+    try {
+      return await apiThunk("/auth/forgetPassword", data);
+    } catch (error) {
+      if (error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("Failed to send reset link");
     }
     return rejectWithValue("Failed to send reset link");
   }
@@ -55,6 +72,25 @@ export const resetPassword = createAsyncThunk(
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Reset failed");
+    }
+  },
+);
+
+export const logoutUser = createAsyncThunk(
+  "auth/logoutUser",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await fetch("https://localhost:7188/api/auth/logout",{
+        method: "POST", 
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return await res.json();
+    } catch (error) {
+      if (error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("Logout failed");
     }
   },
 );

@@ -9,9 +9,10 @@ import { loginSchema } from "@/utils/schemas/loginSchema";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/app/store/store";
-import { loginUser } from "@/app/asyncThunk/authThunk";
 import { useRef } from "react";
+import { checkMe, loginUser } from "@/app/asyncThunk/authThunk";
 import { useEffect } from "react";
+import { check } from "zod";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -47,7 +48,10 @@ const LoginForm = () => {
     const resultAction = await dispatch(loginUser(data));
     if (loginUser.fulfilled.match(resultAction)) {
       toast.success("Logged in successfully!");
-      navigate("/admin");
+      setTimeout(() => {
+        dispatch(checkMe());
+      }, 50);
+      navigate("/admin" , {replace:true});
     } else {
       toast.error(resultAction.payload as string);
     }

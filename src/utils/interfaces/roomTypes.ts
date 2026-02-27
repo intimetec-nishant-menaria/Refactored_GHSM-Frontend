@@ -1,9 +1,11 @@
 export interface RoomTypesPayload {
   id: number;
+  roomNumber:string;
+  roomTypeId:number;
   roomTypeName: string;
   capacity: number;
   pricePerNight: number;
-  amenities: string[];
+  roomStatus :number;
 }
 
 export interface RoomState {
@@ -11,3 +13,18 @@ export interface RoomState {
   loading: boolean;
   error: string | null;
 }
+
+export interface RoomType{
+  id : number;
+  roomTypeName : string;
+  capacity : number;
+  pricePerNight : number;
+  amenities : string[];
+}
+
+export interface RoomTypeState{
+  roomTypes : RoomType[];
+  loading : boolean;
+  error : string | null;
+}
+
