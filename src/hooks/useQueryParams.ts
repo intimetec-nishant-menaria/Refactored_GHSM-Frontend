@@ -1,8 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 
-export const useQueryParams = () => {
+export const useQueryParams = <T extends Record<string, string | null>>() => {
   const [searchParams] = useSearchParams();
-  const token: string | null = searchParams.get("token");
-  const email: string | null = searchParams.get("email");
-  return { token, email };
+  const params = Object.fromEntries(searchParams.entries()) as T;
+  return params;
 };

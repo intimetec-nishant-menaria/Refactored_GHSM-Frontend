@@ -19,7 +19,10 @@ const ResetPasswordForm = () => {
   const ref = useRef<HTMLButtonElement>(null);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { token, email } = useQueryParams();
+  const { token, email } = useQueryParams<{
+    token: string | null;
+    email: string | null;
+  }>();
   const {
     register,
     handleSubmit,
