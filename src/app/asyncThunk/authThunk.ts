@@ -65,6 +65,26 @@ export const loginUser = createAsyncThunk(
   },
 );
 
+export const checkMe = createAsyncThunk(
+  "auth/checkMe",
+  async (_ , {rejectWithValue})=>{
+    try{
+      const res = await fetch("https://localhost:7188/api/auth/me",{
+        method : "GET",
+        credentials : "include",
+        headers :{
+          "Content-Type": "application/json",
+        }
+      });
+      return await res.json();
+    }catch(error){
+      if (error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("Login failed");
+    }
+
+  }
+)
+
 export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
   async (data: ForgotPasswordInput, { rejectWithValue }) => {
