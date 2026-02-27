@@ -15,11 +15,9 @@ interface LoginResponse {
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
-  async (data: LoginInput, { rejectWithValue }) => {
+  async (data: LoginInput, {rejectWithValue }) => {
     try {
       const response = await apiThunk<LoginResponse>("/auth/login", data);
-      localStorage.setItem("token", response.token);
-      localStorage.setItem("user", JSON.stringify(response.user));
       return response;
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
@@ -27,6 +25,26 @@ export const loginUser = createAsyncThunk(
     }
   },
 );
+
+export const checkMe = createAsyncThunk(
+  "auth/checkMe",
+  async (_ , {rejectWithValue})=>{
+    try{
+      const res = await fetch("https://localhost:7188/api/auth/me",{
+        method : "GET",
+        credentials : "include",
+        headers :{
+          "Content-Type": "application/json",
+        }
+      });
+      return await res.json();
+    }catch(error){
+      if (error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("Login failed");
+    }
+
+  }
+)
 
 export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
@@ -58,7 +76,14 @@ export const logoutUser = createAsyncThunk(
   "auth/logoutUser",
   async (_, { rejectWithValue }) => {
     try {
-      return await apiThunk("/auth/logout", {});
+      const res = await fetch("https://localhost:7188/api/auth/logout",{
+        method: "POST", 
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      return await res.json();
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Logout failed");
