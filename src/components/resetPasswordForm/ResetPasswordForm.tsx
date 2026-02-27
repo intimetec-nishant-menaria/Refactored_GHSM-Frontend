@@ -13,8 +13,10 @@ import type { AppDispatch } from "@/app/store/store";
 import { resetPassword } from "@/app/asyncThunk/authThunk";
 import { useNavigate } from "react-router-dom";
 import { useQueryParams } from "@/hooks/useQueryParams";
+import { useRef } from "react";
 
 const ResetPasswordForm = () => {
+  const ref = useRef<HTMLButtonElement>(null);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { token, email } = useQueryParams();
@@ -74,7 +76,7 @@ const ResetPasswordForm = () => {
           </p>
         )}
       </div>
-      <Button type="submit" label="Reset Password"></Button>
+      <Button type="submit" label="Reset Password" ref={ref}></Button>
     </form>
   );
 };

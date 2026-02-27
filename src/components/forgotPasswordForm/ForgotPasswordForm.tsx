@@ -12,8 +12,10 @@ import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/app/store/store";
 import { forgotPassword } from "@/app/asyncThunk/authThunk";
 import toast from "react-hot-toast";
+import { useRef } from "react";
 
 const ForgotPasswordForm = () => {
+  const ref = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const {
@@ -50,7 +52,7 @@ const ForgotPasswordForm = () => {
           <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
         )}
       </div>
-      <Button type="submit" label="Reset Password"></Button>
+      <Button type="submit" label="Reset Password" ref={ref}></Button>
       <div className="text-center">
         <span
           onClick={() => navigate("/")}

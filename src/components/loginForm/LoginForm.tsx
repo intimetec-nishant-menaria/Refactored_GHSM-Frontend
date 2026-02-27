@@ -10,11 +10,17 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/app/store/store";
 import { loginUser } from "@/app/asyncThunk/authThunk";
+import { useRef } from "react";
 
 const LoginForm = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { register, handleSubmit, formState: { errors },} = useForm<LoginInput>({
+  const ref = useRef<HTMLButtonElement>(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
   });
 
@@ -33,7 +39,12 @@ const LoginForm = () => {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
       <div>
         <Label htmlFor="email">Email:</Label>
-        <Input id="email" type="text" placeholder="Email" {...register("email")} />
+        <Input
+          id="email"
+          type="text"
+          placeholder="Email"
+          {...register("email")}
+        />
         {errors.email && (
           <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
         )}
@@ -41,7 +52,12 @@ const LoginForm = () => {
 
       <div>
         <Label htmlFor="password">Password:</Label>
-        <Input id="password" type="password" placeholder="Password" {...register("password")}/>
+        <Input
+          id="password"
+          type="password"
+          placeholder="Password"
+          {...register("password")}
+        />
         {errors.password && (
           <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
         )}
@@ -52,11 +68,14 @@ const LoginForm = () => {
           <Input type="checkbox" {...register("rememberMe")} />
           Remember me
         </Label>
-        <span onClick={() => navigate("/forgot-password")} className="text-blue-600 hover:underline cursor-pointer" >
+        <span
+          onClick={() => navigate("/forgot-password")}
+          className="text-blue-600 hover:underline cursor-pointer"
+        >
           Forgot password?
         </span>
       </div>
-      <Button type="submit" label="Login"></Button>
+      <Button type="submit" label="Login" ref={ref}></Button>
     </form>
   );
 };
