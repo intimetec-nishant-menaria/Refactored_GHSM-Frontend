@@ -1,12 +1,20 @@
 const BASE_URL = "https://localhost:7188/api";
 
-const apiThunk = async <T>(endpoint: string, body: unknown): Promise<T> => {
-  const token = localStorage.getItem("token");
+type HttpMethods = "GET" | "POST" | "PUT" | "DELETE" | "PAtch"
+
+interface RequestOptions{
+  method?: HttpMethods,
+  body?: unknown,
+  headers?: HeadersInit
+}
+
+const apiThunk = async <T>(endpoint: string, options : RequestOptions = {}): Promise<T> => {
+  const {method = "GET" , body , headers ={}} = options;
   const response = await fetch(`${BASE_URL}${endpoint}`, {
-    method: "POST",
+    method,
     headers: {
       "Content-Type": "application/json",
-      ...(token && { Authorization: `Bearer ${token}` }),
+      ...headers,
     },
     credentials: "include",
     body: JSON.stringify(body),

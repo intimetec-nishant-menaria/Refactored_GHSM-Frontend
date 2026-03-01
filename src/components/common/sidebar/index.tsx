@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import menuIcon from "@/assets/menuIcon.png";
 import crossIcon from "@/assets/crossIcon.png";
 import SidebarItem from "./SidebarItem";
@@ -16,7 +16,7 @@ const Sidebar = () => {
   const menuItems = menuByRole[role];
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleLogout = () => {
+  function handleLogout(){
     try {
       dispatch(logoutUser()).unwrap();
       navigate("/");
