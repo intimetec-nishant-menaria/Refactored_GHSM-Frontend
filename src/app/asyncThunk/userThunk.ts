@@ -4,31 +4,23 @@ import type {
   CreateUserPayload,
   UpdateUserPayload,
 } from "@/utils/interfaces/user";
+import apiThunk from "./apiThunkHelper";
 
 export const fetchUsers = createAsyncThunk<User[]>(
   "user/fetchUsers",
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue })=>{
     try {
-      const res = await fetch("https://localhost:7188/api/UserManagement");
-      if (!res.ok) {
-        const error = await res.json();
-        return rejectWithValue(error.message || "Failed to fetch users");
-      }
-      const data = await res.json();
-      return data;
+      return await apiThunk<User[]>("/UserManagement");
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("something went wrong");
     }
   },
 );
 export const fetchUserById = createAsyncThunk(
   "users/fetchUserById",
   async (id: number) => {
-    const response = await fetch(
-      `https://localhost:7188/api/UserManagement/${id}`,
-    );
-    if (!response.ok) throw new Error("Failed to fetch user");
-    return (await response.json()) as User;
+    return await apiThunk(`/UserManagement/${id}`);
   },
 );
 
@@ -36,16 +28,10 @@ export const createUser = createAsyncThunk(
   "user/createUser",
   async (userData: CreateUserPayload, { rejectWithValue }) => {
     try {
-      const res = await fetch("https://localhost:7188/api/UserManagement", {
+      return await apiThunk("/UserManagement", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(userData),
+        body: userData,
       });
-      if (!res.ok) {
-        const err = await res.json();
-        return rejectWithValue(err.message || "Failed to create user");
-      }
-      return await res.json();
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
     }
@@ -56,20 +42,14 @@ export const deleteUser = createAsyncThunk(
   "user/deleteUser",
   async (userId: number, { rejectWithValue }) => {
     try {
-      const res = await fetch(
-        `https://localhost:7188/api/UserManagement/${userId}`,
+      return await apiThunk(`/UserManagement/${userId}`,
         {
-          method: "DELETE",
+          method: "DELETE"
         },
       );
-
-      if (!res.ok) {
-        const err = await res.json();
-        return rejectWithValue(err.message || "Failed to delete user");
-      }
-      return userId;
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("something went wrong");
     }
   },
 );
@@ -78,23 +58,12 @@ export const updateUser = createAsyncThunk(
   "user/updateUser",
   async (data: UpdateUserPayload, { rejectWithValue }) => {
     try {
-      const res = await fetch(
-        `https://localhost:7188/api/UserManagement/${data.id}`,
-        {
+      return await apiThunk(`/UserManagement/${data.id}`,
+        { 
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
+          body: data,
         },
       );
-
-      if (!res.ok) {
-        const err = await res.json();
-        return rejectWithValue(err.message || "Failed to update user");
-      }
-
-      return await res.json();
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Something went wrong");

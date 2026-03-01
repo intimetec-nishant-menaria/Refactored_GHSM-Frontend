@@ -1,16 +1,21 @@
 const BASE_URL = import.meta.env.BASE_URL;
 
-type HttpMethod = "GET" | "POST" | "PUT" | "DELETE";
+type HttpMethods = "GET" | "POST" | "PUT" | "DELETE" | "PAtch"
 
-const fetchApi = async <T>(
-  method: HttpMethod,
-  endpoint: string,
-  body: unknown,
-  options?: { withCredentials?: boolean },
-): Promise<T> => {
+interface RequestOptions{
+  method?: HttpMethods,
+  body?: unknown,
+  headers?: HeadersInit
+}
+
+const apiThunk = async <T>(endpoint: string, options : RequestOptions = {}): Promise<T> => {
+  const {method = "GET" , body , headers ={}} = options;
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     method,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...headers,
+    },
     credentials: "include",
     body: JSON.stringify(body),
   });
@@ -24,4 +29,4 @@ const fetchApi = async <T>(
   return result;
 };
 
-export default fetchApi;
+export default apiThunk;
