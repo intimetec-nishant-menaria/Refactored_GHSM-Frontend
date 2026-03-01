@@ -19,9 +19,11 @@ interface LoginResponse {
 interface LoginResponse {
   token: string;
   user: {
-    id: string;
+    id: number;
+    name : string;
     email: string;
-    role: string;
+    role: number;
+    isActive : boolean;
   };
 }
 
