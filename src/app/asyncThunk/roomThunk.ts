@@ -1,6 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
-import type { RoomData, UpdateRoomPayload } from "@/utils/interfaces/room";
+import type {RoomData, UpdateRoomPayload } from "@/utils/interfaces/room";
 
 export const fetchRooms = createAsyncThunk<RoomTypesPayload[]>(
   "room/fetchRooms",
@@ -89,3 +89,4 @@ export const updateRoom = createAsyncThunk(
     }
   },
 );
+
