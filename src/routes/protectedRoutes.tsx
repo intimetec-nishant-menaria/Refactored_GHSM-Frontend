@@ -6,13 +6,8 @@ function ProtectedRoutes(){
     const  {user ,loading} = useAppSelector(state=>state.auth);
 
     if(loading) return <div>Loading...</div>
-    if(!user){
-        return <Navigate to="/" replace />
-    }
-
-    return(
-        <Outlet/>
-    )
+    
+    return user ? <Outlet/> : <Navigate to ="/login" replace/>
 }
 
 export default ProtectedRoutes;

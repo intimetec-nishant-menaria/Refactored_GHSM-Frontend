@@ -1,6 +1,6 @@
 const BASE_URL = "https://localhost:7188/api";
 
-type HttpMethods = "GET" | "POST" | "PUT" | "DELETE" | "PAtch"
+type HttpMethods = "GET" | "POST" | "PUT" | "DELETE" | "PATCH"
 
 interface RequestOptions{
   method?: HttpMethods,

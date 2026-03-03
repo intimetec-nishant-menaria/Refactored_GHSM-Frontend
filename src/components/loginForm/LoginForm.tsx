@@ -45,7 +45,7 @@ const LoginForm = () => {
     const resultAction = await dispatch(loginUser(data));
     if (loginUser.fulfilled.match(resultAction)) {
       toast.success("Logged in successfully!");
-      navigate("/admin" , {replace:true});
+      navigate("/" , {replace:true});
     } else {
       toast.error(resultAction.payload as string);
     }
