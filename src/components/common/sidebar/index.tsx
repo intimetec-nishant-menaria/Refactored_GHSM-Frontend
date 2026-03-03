@@ -1,65 +1,56 @@
-import { useState, type ChangeEvent } from "react";
-import menuIcon from "@/assets/menuIcon.png";
 import crossIcon from "@/assets/crossIcon.png";
 import SidebarItem from "./SidebarItem";
-// import { useSelector } from "react-redux";
 import { menuByRole } from "./menuConfig";
-// import type { RootState } from "@/app/store/store";
 import { useNavigate } from "react-router-dom";
 import { logoutUser } from "@/app/asyncThunk/authThunk";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { useAppSelector } from "@/hooks/useAppSelector";
 
-const Sidebar = () => {
+interface SidebarProps {
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+}
+
+const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const role = "admin";
-  const menuItems = menuByRole[role];
-  const [isOpen, setIsOpen] = useState(false);
+  const { user } = useAppSelector((state) => state.auth);
+  
+  const role = user?.role || "Guest";
+  const menuItems = menuByRole[role as keyof typeof menuByRole] || [];
 
-  function handleLogout(){
+  function handleLogout() {
     try {
       dispatch(logoutUser()).unwrap();
       navigate("/");
     } catch (error) {
       console.error("Logout failed", error);
     }
-  };
+  }
 
   return (
     <>
-      <div className="md:hidden p-4 bg-slate-500 text-white flex flex-col gap-3 items-center">
-        <h2 className="font-semibold">Guesthouse</h2>
-        <button onClick={() => setIsOpen(true)}>
-          <img src={menuIcon} alt="menu" className="w-6 h-6" />
-        </button>
-      </div>
-
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+          className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity"
           onClick={() => setIsOpen(false)}
         />
       )}
-
       <div
-        className={`fixed top-0 left-0 z-50 w-64 h-screen bg-slate-500 text-white transform transition-transform duration-300
-        ${isOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 md:static md:flex md:flex-col md:h-screen`}
+        className={`fixed top-0 left-0 z-50 w-64 h-full bg-slate-500 text-white transform transition-transform duration-300 ease-in-out
+        ${isOpen ? "translate-x-0" : "-translate-x-full"} 
+        md:translate-x-0 md:static md:flex md:flex-col md:w-full`}
       >
-        <div className="h-16 p-6 border-b border-slate-700 flex justify-between items-center">
+        <div className="h-16 p-6 border-b border-slate-700 flex justify-between items-center shrink-0">
           <div>
-            <h2 className="text-lg font-semibold">Guesthouse</h2>
-            <p className="text-sm text-slate-400">{role}</p>
+            <h2 className="text-lg font-semibold leading-tight">Guesthouse</h2>
+            <p className="text-xs text-slate-300 capitalize">{role}</p>
           </div>
-          <button className="md:hidden" onClick={() => setIsOpen(false)}>
-            <img
-              src={crossIcon}
-              alt="cross"
-              className="w-6 h-6 cursor-pointer"
-            />
+          <button className="md:hidden p-1 hover:bg-slate-600 rounded" onClick={() => setIsOpen(false)}>
+            <img src={crossIcon} alt="close" className="w-5 h-5 invert" />
           </button>
         </div>
-
-        <div className="flex-1 overflow-y-auto p-4 space-y-2">
+        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
           {menuItems.map((item) => (
             <SidebarItem
               key={item.path}
@@ -68,12 +59,11 @@ const Sidebar = () => {
               onClick={() => setIsOpen(false)}
             />
           ))}
-        </div>
-
-        <div className="p-4 border-t border-slate-700">
+        </nav>
+        <div className="p-4 border-t border-slate-700 shrink-0">
           <button
             onClick={handleLogout}
-            className="w-full bg-red-600 hover:bg-red-700 py-2 rounded-md transition"
+            className="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-md transition-colors font-medium text-sm"
           >
             Logout
           </button>
