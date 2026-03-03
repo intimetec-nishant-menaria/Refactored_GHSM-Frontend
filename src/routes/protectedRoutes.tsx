@@ -1,18 +1,13 @@
-import { Outlet , useNavigate} from "react-router-dom";
+import { useAppSelector } from "@/hooks/useAppSelector";
+import { Navigate, Outlet} from "react-router-dom";
 
-function isAuthenticated():boolean{
-    return document.cookie!==null;
-}
 
 function ProtectedRoutes(){
-    const navigate = useNavigate();
-    if(!isAuthenticated()){
-        navigate("/" , {replace : true});
-    }
+    const  {user ,loading} = useAppSelector(state=>state.auth);
 
-    return(
-        <Outlet/>
-    )
+    if(loading) return <div>Loading...</div>
+    
+    return user ? <Outlet/> : <Navigate to ="/login" replace/>
 }
 
 export default ProtectedRoutes;

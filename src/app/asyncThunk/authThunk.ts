@@ -3,13 +3,16 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { ForgotPasswordInput } from "@/utils/schemas/forgotPasswordSchema";
 import type { ResetPasswordPayload } from "@/utils/interfaces/ResetPasswordPayload";
 import apiThunk from "./apiThunkHelper";
+import type { User } from "@/utils/interfaces/user";
 
 interface LoginResponse {
   token: string;
   user: {
-    id: string;
+    id: number;
+    name : string;
     email: string;
-    role: string;
+    role: number;
+    isActive : boolean;
   };
 }
 
@@ -17,7 +20,12 @@ export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (data: LoginInput, {rejectWithValue }) => {
     try {
-      const response = await apiThunk<LoginResponse>("/auth/login", data);
+      await apiThunk<LoginResponse>("/auth/login", {
+        method : "POST",
+        body : data,
+      });
+      
+      const response = await apiThunk<User>("/auth/me");
       return response;
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
@@ -26,31 +34,14 @@ export const loginUser = createAsyncThunk(
   },
 );
 
-export const checkMe = createAsyncThunk(
-  "auth/checkMe",
-  async (_ , {rejectWithValue})=>{
-    try{
-      const res = await fetch("https://localhost:7188/api/auth/me",{
-        method : "GET",
-        credentials : "include",
-        headers :{
-          "Content-Type": "application/json",
-        }
-      });
-      return await res.json();
-    }catch(error){
-      if (error instanceof Error) return rejectWithValue(error.message);
-      return rejectWithValue("Login failed");
-    }
-
-  }
-)
-
 export const forgotPassword = createAsyncThunk(
   "auth/forgotPassword",
   async (data: ForgotPasswordInput, { rejectWithValue }) => {
     try {
-      return await apiThunk("/auth/forgetPassword", data);
+      return await apiThunk("/auth/forgetPassword", {
+        method : "POST",
+        body : data
+      });
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Failed to send reset link");
@@ -62,7 +53,10 @@ export const resetPassword = createAsyncThunk(
   "auth/resetPassword",
   async (data: ResetPasswordPayload, { rejectWithValue }) => {
     try {
-      return await apiThunk("/auth/resetPassword", data);
+      return await apiThunk("/auth/resetPassword", {
+        method : "POST",
+        body : data
+      });
     } catch (error) {
       if (error instanceof Error) {
         return rejectWithValue(error.message);
@@ -76,17 +70,24 @@ export const logoutUser = createAsyncThunk(
   "auth/logoutUser",
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch("https://localhost:7188/api/auth/logout",{
+      return await apiThunk("/auth/logout",{
         method: "POST", 
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
       });
-      return await res.json();
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Logout failed");
     }
   },
 );
+
+export const checkMe = createAsyncThunk(
+  "auth/checkMe",
+  async ( _ , {rejectWithValue} )=>{
+    try{
+      return await apiThunk<User>("/auth/me");
+    }catch(error){
+      if (error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("Logout failed");
+    }
+  }
+)

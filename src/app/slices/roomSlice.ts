@@ -1,4 +1,4 @@
-import type { RoomState } from "@/utils/interfaces/roomTypes";
+import type { RoomState} from "@/utils/interfaces/roomTypes";
 import { createSlice } from "@reduxjs/toolkit";
 import { deleteRoom, fetchRooms } from "../asyncThunk/roomThunk";
 
@@ -28,7 +28,6 @@ const RoomSlice = createSlice({
       });
 
       builder.addCase(deleteRoom.fulfilled , (state , action)=>{
-        console.log(action.payload);
         state.rooms = state.rooms.filter( room => room.id !=action.payload);
       });
   },
