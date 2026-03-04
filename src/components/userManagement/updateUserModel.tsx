@@ -35,7 +35,7 @@ const UpdateUserModal = ({ closeModal, user }: Props) => {
       }),
     );
 
-    dispatch(fetchUsers());
+    await dispatch(fetchUsers());
 
     closeModal();
   };

@@ -1,13 +1,9 @@
-import { useAppSelector } from "@/hooks/useAppSelector";
 import { Navigate, Outlet} from "react-router-dom";
 
-
 function ProtectedRoutes(){
-    const  {user ,loading} = useAppSelector(state=>state.auth);
-
-    if(loading) return <div>Loading...</div>
+    const token = document.cookie;
     
-    return user ? <Outlet/> : <Navigate to ="/login" replace/>
+    return token ? <Outlet/> : <Navigate to ="/login" replace/>
 }
 
 export default ProtectedRoutes;

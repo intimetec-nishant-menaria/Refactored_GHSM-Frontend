@@ -47,10 +47,10 @@ const RoomManagement = () => {
     dispatch(fetchRoomType());
   }, [dispatch]);
 
-  const handleDelete = (roomid: number) => {
+  const handleDelete = async (roomid: number) => {
     if (window.confirm("Delete this room?")) {
-      dispatch(deleteRoom(roomid));
-      dispatch(fetchRooms());
+      await dispatch(deleteRoom(roomid));
+      await dispatch(fetchRooms());
     }
   };
   const goToNextPage = () => setCurrentPage(prev => prev + 1);
@@ -162,7 +162,7 @@ const RoomManagement = () => {
                   <div className="flex justify-center items-center gap-3">
                     <img src={editIcon} alt="Edit" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={() => openUpdateRoomModel(room)} />
                     <span className="text-gray-300">|</span>
-                    <img src={deleteIcon} alt="Delete" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={() => handleDelete(room.id)} />
+                    <img src={deleteIcon} alt="Delete" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={()=>handleDelete(room.id)} />
                   </div>
                 </td>
               </tr>
