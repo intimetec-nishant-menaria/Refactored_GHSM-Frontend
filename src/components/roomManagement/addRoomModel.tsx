@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent } from "react";
 import Input from "../common/input/Input";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { addRoom } from "@/app/asyncThunk/roomThunk";
+import { addRoom, fetchRooms } from "@/app/asyncThunk/roomThunk";
 import toast from "react-hot-toast";
 
 const numberRegex = /^\d*$/;
@@ -27,6 +27,8 @@ function AddRoomModel({closeModal}:Props){
               (resultAction.payload as string) || "Failed to add room",
             );
           }
+        }).then(()=>{
+          dispatch(fetchRooms());
         });
      }
     }

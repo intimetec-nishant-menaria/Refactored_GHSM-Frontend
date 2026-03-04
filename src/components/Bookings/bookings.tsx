@@ -147,12 +147,12 @@ function Bookings() {
                       ))}
                     </select>
                   </div>
-                  <div className="hidden sm:block ">
+                  <div className="hidden sm:block">
                     <Button
                       disabled={continueDisabled}
                       label="Continue"
                       onClick={handleContinue}
-                      className="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:bg-gray-300 font-bold transition-all h-[46px]"
+                      className="px-8 py-2.5 mt-5.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg disabled:bg-gray-300 font-bold transition-all h-[46px]"
                     />
                   </div>
                 </div>
@@ -181,7 +181,7 @@ function Bookings() {
                 ))
               )}
             </div>
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-30">
+            <div className="lg:hidden md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] z-30">
               <Button
                 disabled={continueDisabled}
                 label={!selectedRoom ? "Select a Room" : "Continue to Booking"}

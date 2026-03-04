@@ -1,6 +1,8 @@
-import { useState } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { createUser, fetchUsers } from "@/app/asyncThunk/userThunk";
+import { useForm } from "react-hook-form";
+import { addUserSchema, type addUserInput } from "@/utils/schemas/addUserSchema";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 interface Props {
   closeModal: () => void;
@@ -8,62 +10,72 @@ interface Props {
 
 const CreateUserModal = ({ closeModal }: Props) => {
   const dispatch = useAppDispatch();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRoleId] = useState(3);
-  const [isActive, setIsActive] = useState(true);
-  const [password, setPassword] = useState("");
+  const {
+    register , 
+    handleSubmit,
+    formState : {errors}
+  } = useForm<addUserInput>({
+    resolver : zodResolver(addUserSchema),
+    defaultValues: {
+      name:"",
+      email:"",
+      role : 3,
+      password:"",
+      isActive: true,
+    },
+  })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (name.length < 1) {
-      setName("Name is not Valid");
-      return;
-    }
-    await dispatch(createUser({ name, email, role, isActive, password }));
-    dispatch(fetchUsers());
+  const onSubmit = async (data:addUserInput) => {
+    await dispatch(createUser(data));
+    await dispatch(fetchUsers());
     closeModal();
   };
 
   return (
     <div className="absolute top-0 right-0 mt-12 mr-4 w-96 bg-white p-6 rounded-lg shadow-lg z-50">
       <h2 className="text-xl font-bold mb-4">Create User</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
         <input
           type="text"
           placeholder="Name"
           className="border px-3 py-2 rounded"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          {...register("name")}
         />
+        {errors.name && (
+          <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+        )}
         <input
           type="email"
           placeholder="Email"
           className="border px-3 py-2 rounded"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          {...register("email")}
         />
-        <input
-          type="number"
-          placeholder="Role ID"
-          className="border px-3 py-2 rounded"
-          value={role}
-          onChange={(e) => setRoleId(Number(e.target.value))}
-          required
-        />
+        {errors.email && (
+          <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+        )}
+        <select id="RoomType"
+            {...register('role')} 
+            className="border p-2 rounded focus:ring-2 focus:ring-blue-500">
+            <option key="1" value={1}>Admin</option>
+            <option key="2" value={2}>Staff</option>
+            <option key="3" value={3}>Guest</option>
+        </select>
+        {errors.role && (
+          <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>
+        )}
         <input
           type="password"
           placeholder="Password"
           className="border px-3 py-2 rounded"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
+          {...register("password")}
         />
+        {errors.password && (
+          <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+        )}
         <label className="flex items-center gap-2">
           <input
             type="checkbox"
-            checked={isActive}
-            onChange={(e) => setIsActive(e.target.checked)}
+            {...register("isActive")}
           />
           Active
         </label>

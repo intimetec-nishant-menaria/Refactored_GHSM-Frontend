@@ -46,22 +46,15 @@ const RoomManagement = () => {
     dispatch(fetchRoomType());
   }, [dispatch]);
 
-  function handleDelete(roomid:number){
-    dispatch(deleteRoom(roomid));
-    dispatch(fetchRooms());
-  }
-
-  function goToNextPage() {
-      setCurrentPage(currentPage + 1);
-  }
-
-  function goToPrevPage() {
-      setCurrentPage(currentPage - 1);
-  }
-
-  function goToSpecificPage(pageNumber:number) {
-      setCurrentPage(pageNumber);
-  }
+  const handleDelete = async (roomid: number) => {
+    if (window.confirm("Delete this room?")) {
+      await dispatch(deleteRoom(roomid));
+      await dispatch(fetchRooms());
+    }
+  };
+  const goToNextPage = () => setCurrentPage(prev => prev + 1);
+  const goToPrevPage = () => setCurrentPage(prev => prev - 1);
+  const goToSpecificPage = (pageNumber: number) => setCurrentPage(pageNumber);
 
   if (loading || roomTypesLoading) return <p className="p-4">Loading...</p>;
   if (error || roomTypesError) return <p className="p-4 text-red-500">{error || roomTypesError }</p>;
@@ -136,8 +129,15 @@ const RoomManagement = () => {
                     onClick={() => openUpdateRoomModel(room)}
                   />
                 </td>
-                </tr>
-              ))}
+                <td className="py-4 px-4">
+                  <div className="flex justify-center items-center gap-3">
+                    <img src={editIcon} alt="Edit" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={() => openUpdateRoomModel(room)} />
+                    <span className="text-gray-300">|</span>
+                    <img src={deleteIcon} alt="Delete" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={()=>handleDelete(room.id)} />
+                  </div>
+                </td>
+              </tr>
+            ))}
           </tbody>
          </table>
         {<PagingController

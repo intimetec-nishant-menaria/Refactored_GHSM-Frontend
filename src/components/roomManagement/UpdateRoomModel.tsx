@@ -30,7 +30,7 @@ function UpdateRoomModel({closeModal , room}:Props){
         }
     }
 
-    function handleOnSubmit(){
+    async function handleOnSubmit(){
         if(room.roomNumber == roomNumber && room.roomStatus == roomStatus && roomTypeId==defaultRoomTypeId)
             return;
 
@@ -43,6 +43,8 @@ function UpdateRoomModel({closeModal , room}:Props){
                 (resultAction.payload as string) || "Failed to update room",
                 );
             }
+            }).then(()=>{
+              dispatch(fetchRooms());
             });
         }
 

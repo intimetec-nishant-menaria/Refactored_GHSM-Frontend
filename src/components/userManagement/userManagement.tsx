@@ -32,7 +32,7 @@ const UserManagement = () => {
   const handleDelete = async (userId: number) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       await dispatch(deleteUser(userId));
-      dispatch(fetchUsers());
+      await dispatch(fetchUsers());
     }
   };
 
