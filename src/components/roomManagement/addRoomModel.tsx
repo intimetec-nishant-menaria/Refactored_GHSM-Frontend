@@ -10,77 +10,124 @@ interface Props {
   closeModal: () => void;
 }
 
-function AddRoomModel({closeModal}:Props){
-    const dispatch = useAppDispatch();
+function AddRoomModel({ closeModal }: Props) {
+  const dispatch = useAppDispatch();
 
-    const [roomNumber , setRoomNumber] = useState("");
-    const [roomTypeId , setRoomTypeId] = useState(1);
-    const [numberError , setNumberError] = useState(false);
+  const [roomNumber, setRoomNumber] = useState("");
+  const [roomTypeId, setRoomTypeId] = useState(1);
+  const [numberError, setNumberError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-    function handleOnSubmit(){
-     if(!numberError){
-        dispatch(addRoom({ roomNumber ,roomTypeId})).then((resultAction) => {
-        if (addRoom.fulfilled.match(resultAction)) {
-          toast.success("Room add successful!");
-        } else {
-            toast.error(
-              (resultAction.payload as string) || "Failed to add room",
-            );
-          }
-        }).then(()=>{
-          dispatch(fetchRooms());
-        });
-     }
+  async function handleOnSubmit(e: ChangeEvent) {
+    e.preventDefault(); 
+
+    if (roomNumber.trim() === "") {
+      setNumberError(true);
+      return;
     }
 
-    function handleOnChange(e : ChangeEvent<HTMLInputElement>){
-      if(numberRegex.test(e.target.value) &&  e.target.value.length>0){
-        setNumberError(false);
-        setRoomNumber(e.target.value);
-      }else{
-        setNumberError(true);
+    if (!numberError) {
+      setIsSubmitting(true);
+      try {
+        const resultAction = await dispatch(addRoom({ roomNumber, roomTypeId }));
+        
+        if (addRoom.fulfilled.match(resultAction)) {
+          toast.success("Room added successfully!");
+          await dispatch(fetchRooms());
+          closeModal();
+        } else {
+          toast.error((resultAction.payload as string) || "Failed to add room");
+        }
+      } catch (error) {
+        toast.error("Something went wrong");
+      } finally {
+        setIsSubmitting(false);
       }
     }
-    return (
-      <div className="fixed top-1/4 left-1/2 mt-12 mr-4 w-96 bg-white p-6 rounded-lg shadow-lg z-50">
-        <h2 className="text-xl font-bold mb-4">Add Room</h2>
-        <form  onSubmit={handleOnSubmit} className="flex flex-col gap-3">
-          <div className="flex-col justify-end gap-2 mt-2">
-            <div className="mb-2 flex-col ">
-              <label htmlFor="RoomNumber">Room Number:</label>
-              <Input type="text" id="RoomNumber" onChange={handleOnChange}></Input>
-              {numberError ? <p className="text-red-500">Room Number must be a Number</p> : ""}
+  }
 
-              <label htmlFor="RoomType">Select Room Type</label>
-              <div className="mt-1">
-                <select id="RoomType"
-                    onChange={(e:ChangeEvent<HTMLInputElement>)=>setRoomTypeId(Number(e.target.value))} 
-                    value={roomTypeId} className="border p-2 rounded focus:ring-2 focus:ring-blue-500">
-                  <option key="1" value={1}>Single</option>
-                  <option key="2" value={2}>Double</option>
-                  <option key="3" value={3}>Suite</option>
-                </select>
-              </div>
+  function handleOnChange(e: ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+    if (numberRegex.test(value)) {
+      setNumberError(false);
+      setRoomNumber(value);
+    } else {
+      setNumberError(true);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in duration-300">
+        <div className="bg-slate-50 p-6 border-b border-slate-100 flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">Add New Room</h2>
+            <p className="text-sm text-slate-500">Register a new unit in the guest house system.</p>
+          </div>
+          <button 
+            onClick={closeModal} 
+            className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-600 transition-colors"
+          >
+            ✕
+          </button>
+        </div>
+        <form onSubmit={handleOnSubmit} className="p-8 flex flex-col gap-6">
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="RoomNumber" className="text-sm font-semibold text-slate-700">
+                Room Number
+              </label>
+              <Input 
+                type="text" 
+                id="RoomNumber" 
+                placeholder="e.g. 101"
+                onChange={handleOnChange}
+                className={numberError ? "border-red-500 focus:ring-red-100" : ""}
+              />
+              {numberError && (
+                <p className="text-red-500 text-xs font-medium italic">
+                  Room Number must be a valid numeric value.
+                </p>
+              )}
             </div>
-            <div className="flex gap-1">
-              <button
-                type="button"
-                onClick={closeModal}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            <div className="flex-col flex gap-2">
+              <label htmlFor="RoomType" className="text-sm font-semibold text-slate-700">
+                Room Type
+              </label>
+              <select 
+                id="RoomType"
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => setRoomTypeId(Number(e.target.value))} 
+                value={roomTypeId}
+                className="border w-full border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-100 bg-white outline-none transition-all cursor-pointer"
               >
+                <option value={1}>Single Room</option>
+                <option value={2}>Double Room</option>
+                <option value={3}>Luxury Suite</option>
+              </select>
+            </div>
+
+          </div>
+          <div className="flex items-center gap-3 pt-4 border-t border-slate-50">
+            <button
+              type="button"
+              onClick={closeModal}
+              className="flex-1 px-4 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+            >
               Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-              ✓
-              </button>
-            </div>
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="flex-1 px-4 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:bg-blue-400 flex justify-center items-center gap-2"
+            >
+              {isSubmitting ? "Adding..." : "Confirm Add"}
+              {!isSubmitting && <span className="text-lg">✓</span>}
+            </button>
           </div>
         </form>
       </div>
-    )
+    </div>
+  );
 }
 
 export default AddRoomModel;

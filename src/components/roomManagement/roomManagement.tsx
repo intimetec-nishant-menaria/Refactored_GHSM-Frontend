@@ -7,9 +7,11 @@ import deleteIcon from "@/assets/deleteIcon.png";
 import editIcon from "@/assets/editIcon.png";
 import Button from "../common/button/Button";
 import AddRoomModel from "./addRoomModel";
+import RoomCategoryManagement from "../roomCategoryManagement/roomCategoryManagement.tsx"
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
 import UpdateRoomModel from "./UpdateRoomModel";
 import { fetchRoomType } from "@/app/asyncThunk/roomTypeThunk";
+import RoomStatusDropDown from "../common/roomStatusDropDown/RoomStatusDropDown.tsx";
 
 const RoomManagement = () => {
   const dispatch = useAppDispatch();
@@ -24,6 +26,7 @@ const RoomManagement = () => {
 
   const [roomTypeFilter, setRoomTypeFilter] = useState(0);
   const [roomStatusFilter, setRoomStatusFilter] = useState(0);
+  const [isRoomManagementOpen , setIsRoomManagementOpen] = useState(true);
 
   const filteredItems = useMemo(() => {
     let temp = roomTypeFilter === 0 ? rooms : rooms.filter(room => room.roomTypeId === roomTypeFilter);
@@ -72,118 +75,116 @@ const RoomManagement = () => {
 
   return (
     <div className="p-4 md:p-6 bg-gray-100 min-h-screen w-full">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-800">Room Management</h1>
-        <Button
-          onClick={openCreateRoomModal}
-          label="Add Room"
-          className="w-full sm:w-32 h-10 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition-all"
-        />
+      <div className="h-10 w-full flex justify-center items-center">
+        <button onClick={()=>setIsRoomManagementOpen(true)} className={`w-1/2 h-full ${isRoomManagementOpen ? "bg-gray-100" : "bg-white shadow-2xl rounded-2xl"} cursor-pointer`}>Room Management</button>
+        <button onClick={()=>setIsRoomManagementOpen(false)} className={`w-1/2 h-full ${isRoomManagementOpen ? "bg-white shadow-2xl rounded-2xl" : "bg-gray-100"} cursor-pointer`}>Room Category Management</button>
       </div>
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <div className="flex-1">
-          <label className="text-xs font-semibold text-gray-500 uppercase mb-1 block">Room Type</label>
-          <select 
-            value={roomTypeFilter} 
-            onChange={(e: ChangeEvent<HTMLSelectElement>) => setRoomTypeFilter(Number(e.target.value))}
-            className="w-full border p-2 rounded bg-white focus:ring-2 focus:ring-blue-500 outline-none"
-          >
-            <option value={0}>All Types</option>
-            {roomTypes.map((type) => (
-              <option key={type.id} value={type.id}>{type.roomTypeName}</option>
-            ))}
-          </select>
-        </div>
-        <div className="flex-1">
-          <label className="text-xs font-semibold text-gray-500 uppercase mb-1 block">Status</label>
-          <select 
-            value={roomStatusFilter} 
-            onChange={(e: ChangeEvent<HTMLSelectElement>) => setRoomStatusFilter(Number(e.target.value))}
-            className="w-full border p-2 rounded bg-white focus:ring-2 focus:ring-blue-500 outline-none"
-          >
-            <option value={0}>All Status</option>
-            <option value={1}>Available</option>
-            <option value={2}>Occupied</option>
-            <option value={3}>Maintenance</option>
-            <option value={4}>Out Of Order</option>
-          </select>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 gap-4 md:hidden">
-        {currentItems.map((room) => (
-          <div key={room.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-lg font-bold text-blue-600">Room {room.roomNumber}</span>
-              <div className="flex gap-4">
-                <img src={editIcon} alt="Edit" className="w-5 h-5" onClick={() => openUpdateRoomModel(room)} />
-                <img src={deleteIcon} alt="Delete" className="w-5 h-5" onClick={() => handleDelete(room.id)} />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-y-3 text-sm">
-              <p><span className="text-gray-500 block">Type</span> {room.roomTypeName}</p>
-              <p><span className="text-gray-500 block">Price</span> ${room.pricePerNight}/night</p>
-              <p><span className="text-gray-500 block">Capacity</span> {room.capacity} Persons</p>
-              <p><span className="text-gray-500 block">Status</span> 
-                <span className={`font-semibold ${room.roomStatus === 1 ? 'text-green-600' : 'text-amber-600'}`}>
-                  {getStatusLabel(room.roomStatus)}
-                </span>
-              </p>
-            </div>
+      {
+        isRoomManagementOpen ? (
+          <>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <Button
+              onClick={openCreateRoomModal}
+              label="Add Room"
+              className="w-full sm:w-32 h-10 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition-all"
+            />
           </div>
-        ))}
-      </div>
-      <div className="hidden md:block overflow-x-auto bg-white rounded-lg shadow-md mb-6">
-        <table className="min-w-full text-left">
-          <thead className="bg-gray-200 text-gray-700 uppercase text-xs">
-            <tr>
-              <th className="py-3 px-4">Room No.</th>
-              <th className="py-3 px-4">Room Type</th>
-              <th className="py-3 px-4 text-center">Capacity</th>
-              <th className="py-3 px-4">Price</th>
-              <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4 text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {currentItems.map(room => (
-              <tr key={room.id} className="hover:bg-gray-50 transition-colors">
-                <td className="py-4 px-4 font-medium">{room.roomNumber}</td>
-                <td className="py-4 px-4">{room.roomTypeName}</td>
-                <td className="py-4 px-4 text-center">{room.capacity}</td>
-                <td className="py-4 px-4 font-semibold">${room.pricePerNight}</td>
-                <td className="py-4 px-4">
-                  <span className={`px-2 py-1 rounded text-xs font-bold ${
-                    room.roomStatus === 1 ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
-                  }`}>
-                    {getStatusLabel(room.roomStatus)}
-                  </span>
-                </td>
-                <td className="py-4 px-4">
-                  <div className="flex justify-center items-center gap-3">
-                    <img src={editIcon} alt="Edit" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={() => openUpdateRoomModel(room)} />
-                    <span className="text-gray-300">|</span>
-                    <img src={deleteIcon} alt="Delete" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={()=>handleDelete(room.id)} />
+          <div className="flex flex-col sm:flex-row gap-3 mb-6">
+            <div className="flex-1 flex flex-col gap-2">
+              <label className="text-xs font-semibold text-gray-500 uppercase mb-1 block">Room Type</label>
+              <select 
+                value={roomTypeFilter} 
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => setRoomTypeFilter(Number(e.target.value))}
+               className="w-full border border-slate-200 p-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white outline-none transition-all cursor-pointer"
+              >
+                <option value={0}>All Types</option>
+                {roomTypes.map((type) => (
+                  <option key={type.id} value={type.id}>{type.roomTypeName}</option>
+                ))}
+              </select>
+            </div>
+            <RoomStatusDropDown roomStatus={roomStatusFilter}  setRoomStatus={setRoomStatusFilter}/>
+          </div>
+          <div className="grid grid-cols-1 gap-4 md:hidden">
+            {currentItems.map((room) => (
+              <div key={room.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-lg font-bold text-blue-600">Room {room.roomNumber}</span>
+                  <div className="flex gap-4">
+                    <img src={editIcon} alt="Edit" className="w-5 h-5" onClick={() => openUpdateRoomModel(room)} />
+                    <img src={deleteIcon} alt="Delete" className="w-5 h-5" onClick={() => handleDelete(room.id)} />
                   </div>
-                </td>
-              </tr>
+                </div>
+                <div className="grid grid-cols-2 gap-y-3 text-sm">
+                  <p><span className="text-gray-500 block">Type</span> {room.roomTypeName}</p>
+                  <p><span className="text-gray-500 block">Price</span> Rs.{room.pricePerNight}/night</p>
+                  <p><span className="text-gray-500 block">Capacity</span> {room.capacity} Persons</p>
+                  <p><span className="text-gray-500 block">Status</span> 
+                    <span className={`font-semibold ${room.roomStatus === 1 ? 'text-green-600' : 'text-amber-600'}`}>
+                      {getStatusLabel(room.roomStatus)}
+                    </span>
+                  </p>
+                </div>
+              </div>
             ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="mt-4">
-        <PagingController
-          dataLength={filteredItems.length}
-          itemPerPage={itemPerPage}
-          currentPage={currentPage}
-          goToPrevious={goToPrevPage}
-          goToNext={goToNextPage}
-          goToSpecificPage={goToSpecificPage}
-        />
-      </div>
-      {isCreateRoomModalOpen && <AddRoomModel closeModal={closeModal} />}
-      {editingRoom && (
-        <UpdateRoomModel closeModal={closeUpdateRoomModel} room={editingRoom} />
-      )}
+          </div>
+          <div className="hidden md:block overflow-x-auto bg-white rounded-lg shadow-md mb-6">
+            <table className="min-w-full text-left">
+              <thead className="bg-gray-200 text-gray-700 uppercase text-xs">
+                <tr>
+                  <th className="py-3 px-4">Room No.</th>
+                  <th className="py-3 px-4">Room Type</th>
+                  <th className="py-3 px-4 text-center">Capacity</th>
+                  <th className="py-3 px-4">Price</th>
+                  <th className="py-3 px-4">Status</th>
+                  <th className="py-3 px-4 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {currentItems.map(room => (
+                  <tr key={room.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="py-4 px-4 font-medium">{room.roomNumber}</td>
+                    <td className="py-4 px-4">{room.roomTypeName}</td>
+                    <td className="py-4 px-4 text-center">{room.capacity}</td>
+                    <td className="py-4 px-4 font-semibold">${room.pricePerNight}</td>
+                    <td className="py-4 px-4">
+                      <span className={`px-2 py-1 rounded text-xs font-bold ${
+                        room.roomStatus === 1 ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
+                      }`}>
+                        {getStatusLabel(room.roomStatus)}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4">
+                      <div className="flex justify-center items-center gap-3">
+                        <img src={editIcon} alt="Edit" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={() => openUpdateRoomModel(room)} />
+                        <span className="text-gray-300">|</span>
+                        <img src={deleteIcon} alt="Delete" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={()=>handleDelete(room.id)} />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="mt-4">
+            <PagingController
+              dataLength={filteredItems.length}
+              itemPerPage={itemPerPage}
+              currentPage={currentPage}
+              goToPrevious={goToPrevPage}
+              goToNext={goToNextPage}
+              goToSpecificPage={goToSpecificPage}
+            />
+            {isCreateRoomModalOpen && <AddRoomModel closeModal={closeModal} />}
+            {editingRoom && (
+              <UpdateRoomModel closeModel={closeUpdateRoomModel} data={editingRoom} />
+            )}
+          </div>
+        </>
+        ):(
+          <RoomCategoryManagement/>
+        )
+      }
     </div>
   );
 };

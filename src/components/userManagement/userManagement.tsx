@@ -132,7 +132,7 @@ const UserManagement = () => {
 
       {isCreateModalOpen && <CreateUserModal closeModal={closeCreateModal} />}
       {editingUser && (
-        <UpdateUserModal closeModal={closeUpdateModal} user={editingUser} />
+        <UpdateUserModal closeModel={closeUpdateModal} data={editingUser} />
       )}
     </div>
   );
