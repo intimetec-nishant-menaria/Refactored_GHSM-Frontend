@@ -18,13 +18,22 @@ function UpdateRoomModel({closeModel , data}:UpdateModelProps<RoomTypesPayload>)
     const [roomTypeId , setRoomTypeId ] = useState(defaultRoomTypeId);
     const [roomStatus , setRoomStatus] = useState(data.roomStatus);
 
-    function handleOnChange(e : ChangeEvent<HTMLInputElement>){
-        if(numberRegex.test(e.target.value) &&  e.target.value.length>0){
-            setNumberError(false);
-            setRoomNumber(e.target.value);
-        }else{
-            setNumberError(true);
-        }
+  function handleOnChange(e: ChangeEvent<HTMLInputElement>) {
+    const value = e.target.value;
+    if (numberRegex.test(value) && value.length > 0) {
+      setNumberError(false);
+      setRoomNumber(value);
+    } else {
+      setNumberError(true);
+      setRoomNumber(value); 
+    }
+  }
+
+  async function handleOnSubmit(e: ChangeEvent) {
+    e.preventDefault(); 
+    if (data.roomNumber === roomNumber && data.roomStatus === roomStatus && roomTypeId === defaultRoomTypeId) {
+      closeModel();
+      return;
     }
 
     async function handleOnSubmit(){
@@ -44,8 +53,9 @@ function UpdateRoomModel({closeModel , data}:UpdateModelProps<RoomTypesPayload>)
               dispatch(fetchRooms());
             });
         }
-
+      });
     }
+  }
 
     return (
         <div className="fixed top-1/4 left-1/2 mt-12 mr-4 w-96 bg-white p-6 rounded-lg shadow-lg z-50">
@@ -75,19 +85,33 @@ function UpdateRoomModel({closeModel , data}:UpdateModelProps<RoomTypesPayload>)
                 onClick={closeModel}
                 className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
               >
-              Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-              ✓
-              </button>
+                <option value={1}>Available</option>
+                <option value={2}>Occupied</option>
+                <option value={3}>Maintenance</option>
+                <option value={4}>Out Of Order</option>
+              </select>
             </div>
           </div>
+          <div className="flex items-center gap-3 pt-4">
+            <button
+              type="button"
+              onClick={closeModel}
+              className="flex-1 px-4 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 flex justify-center items-center gap-2"
+            >
+              <span>Update Room</span>
+              <span className="text-lg">✓</span>
+            </button>
+          </div>
         </form>
-        </div>
-    )
+      </div>
+    </div>
+  );
 }
 
 export default UpdateRoomModel;

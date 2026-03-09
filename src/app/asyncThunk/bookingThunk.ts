@@ -1,6 +1,11 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import apiThunk from "./apiThunkHelper";
-import type { CreateBookingPayload } from "@/utils/interfaces/booking";
+import type { CreateBookingPayload, updateBookingPayload } from "@/utils/interfaces/booking";
+
+interface fetchBookingsArgs{
+    startDate : string;
+    endDate : string;
+}
 
 export const createBooking = createAsyncThunk(
     "api/createBooking",
@@ -30,10 +35,10 @@ export const fetchAllBookings = createAsyncThunk(
 )
 
 export const cancelBooking = createAsyncThunk(
-    "api/cacelBookings",
+    "api/cancelBookings",
     async (id : number , { rejectWithValue })=>{
         try{
-            return await apiThunk(`/booking/${id}/cancel`,{
+            return await apiThunk(`/booking/cancel/${id}`,{
                 method: "POST"
             });
         }catch(error){
@@ -43,3 +48,29 @@ export const cancelBooking = createAsyncThunk(
     }
 )
 
+export const fetchBookingsByRange = createAsyncThunk(
+    "api/fetchBookingsByRange",
+    async (  dates : fetchBookingsArgs , {rejectWithValue} )=>{
+        try{
+                return await apiThunk(`/booking/range?start=${dates.startDate}&end=${dates.endDate}`);
+        }catch(error){
+            if(error instanceof Error)  return rejectWithValue(error.message);
+            rejectWithValue("something went wrong");
+        }
+    }
+)
+
+export const updateBooking = createAsyncThunk(
+    "api/updateBooking",
+    async ( data : updateBookingPayload , {rejectWithValue})=>{
+        try{
+            return await apiThunk(`/booking/${data.id}`,{
+                method : "PUT",
+                body : data
+            });
+        }catch(error){
+            if(error instanceof Error) return rejectWithValue(error.message);
+            return rejectWithValue("something went wrong");
+        }
+    }
+)

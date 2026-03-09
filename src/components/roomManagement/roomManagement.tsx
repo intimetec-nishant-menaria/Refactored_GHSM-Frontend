@@ -7,9 +7,11 @@ import deleteIcon from "@/assets/deleteIcon.png";
 import editIcon from "@/assets/editIcon.png";
 import Button from "../common/button/Button";
 import AddRoomModel from "./addRoomModel";
+import RoomCategoryManagement from "../roomCategoryManagement/roomCategoryManagement.tsx"
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
 import UpdateRoomModel from "./UpdateRoomModel";
 import { fetchRoomType } from "@/app/asyncThunk/roomTypeThunk";
+import RoomStatusDropDown from "../common/roomStatusDropDown/RoomStatusDropDown.tsx";
 
 const RoomManagement = () => {
   const dispatch = useAppDispatch();
@@ -135,8 +137,18 @@ const RoomManagement = () => {
                     <span className="text-gray-300">|</span>
                     <img src={deleteIcon} alt="Delete" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={()=>handleDelete(room.id)} />
                   </div>
-                </td>
-              </tr>
+                </div>
+                <div className="grid grid-cols-2 gap-y-3 text-sm">
+                  <p><span className="text-gray-500 block">Type</span> {room.roomTypeName}</p>
+                  <p><span className="text-gray-500 block">Price</span> Rs.{room.pricePerNight}/night</p>
+                  <p><span className="text-gray-500 block">Capacity</span> {room.capacity} Persons</p>
+                  <p><span className="text-gray-500 block">Status</span> 
+                    <span className={`font-semibold ${room.roomStatus === 1 ? 'text-green-600' : 'text-amber-600'}`}>
+                      {getStatusLabel(room.roomStatus)}
+                    </span>
+                  </p>
+                </div>
+              </div>
             ))}
           </tbody>
          </table>
