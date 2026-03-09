@@ -3,6 +3,7 @@ import { createUser, fetchUsers } from "@/app/asyncThunk/userThunk";
 import { useForm } from "react-hook-form";
 import { addUserSchema, type addUserInput } from "@/utils/schemas/addUserSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import toast from "react-hot-toast";
 
 const CreateUserModal = ({ closeModel }: {closeModel:()=>void}) => {
   const dispatch = useAppDispatch();
