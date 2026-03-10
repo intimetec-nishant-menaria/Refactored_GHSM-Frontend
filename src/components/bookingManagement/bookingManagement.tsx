@@ -55,11 +55,11 @@ const BookingManagement = () => {
     dispatch(fetchAllBookings());
   }, [dispatch]);
 
-  const handleCancel = (bookingId: number, checkInDate: string) => {
+  const handleCancel =async (bookingId: number, checkInDate: string) => {
       if (window.confirm("Are you sure you want to cancel this booking?")) {
-        dispatch(cancelBooking(bookingId)).then(() => {
+        await dispatch(cancelBooking(bookingId)).then(async () => {
           toast.success("Booking cancelled successfully.");
-          dispatch(fetchAllBookings());
+          await dispatch(fetchAllBookings());
         })
         .catch((error: any) => {
           toast.error(error?.message || "Failed to cancel booking.");

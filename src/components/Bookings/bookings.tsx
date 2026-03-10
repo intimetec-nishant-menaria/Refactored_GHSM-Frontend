@@ -73,6 +73,7 @@ function Bookings() {
   async function onConfirmBooking() {
     try {
       if (!selectedRoom || !user || !checkIn || !checkOut) return;
+      console.log(dayjs(checkIn).toISOString());
       await dispatch(
         createBooking({
           roomId: selectedRoom.id,

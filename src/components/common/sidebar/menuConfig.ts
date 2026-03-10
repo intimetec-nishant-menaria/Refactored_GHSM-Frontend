@@ -12,6 +12,10 @@ export const menuByRole: Record<string, MenuItem[]> = {
     { label: "Check-in/Check-out", path: "/admin/checkings" },
     { label: "Guests", path: "/admin/guests" },
   ],
+  Staff:[
+    { label: "Booking Management", path: "/admin/bookings" },
+    { label: "Check-in/Check-out", path: "/admin/checkings" },
+  ],
   Guest: [
     { label: "Dashboard", path: "/user/dashboard" },
     { label: "Profile", path: "/user/profile" },
