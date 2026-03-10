@@ -17,6 +17,7 @@ const BookingSlice = createSlice({
             state.loading = true;
         }).addCase(fetchAllBookings.fulfilled , (state,action)=>{
             state.bookings = action.payload ?? [];
+            console.log(state.bookings);
             state.loading = false;
         }).addCase(fetchAllBookings.rejected , (state , action)=>{
             state.loading=false;
