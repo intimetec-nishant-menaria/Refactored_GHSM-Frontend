@@ -9,7 +9,6 @@ function PublicRoutes() {
   const authRoutes = ["/login"];
 
   if (user && authRoutes.includes(location.pathname)) {
-    console.log(location.pathname)
     if (user.role === 1) {
       return <Navigate to="/admin/dashboard" replace />;
     } else {

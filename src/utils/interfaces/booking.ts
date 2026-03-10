@@ -7,11 +7,12 @@ export interface CreateBookingPayload{
 }
 
 export interface BookingPayload{
-    bookingId : number;
+    id : number;
+    guestId : number ;
+    guestName : string;
+    guestEmail : string;
     roomId : number ; 
     roomNumber : string;
-    userId : number ;
-    userEmail : string;
     checkInDate : string ;
     checkOutDate : string;
     status : number;

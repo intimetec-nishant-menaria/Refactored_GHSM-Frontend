@@ -7,7 +7,7 @@ export const fetchAvailableRooms = createAsyncThunk(
   "rooms/available",
   async ( data: RoomAvailabilityRequest, { rejectWithValue})=>{
     try{
-      return await apiThunk<RoomTypesPayload[]>("/booking/available",{
+      return await apiThunk<RoomTypesPayload[]>("/rooms/availability",{
         method: "POST",
         body : data
       });

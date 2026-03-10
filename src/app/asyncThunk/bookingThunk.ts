@@ -74,3 +74,33 @@ export const updateBooking = createAsyncThunk(
         }
     }
 )
+
+export const checkIn = createAsyncThunk(
+    "api/updateBooking",
+    async ( bookingId : number, {rejectWithValue})=>{
+        try{
+            return await apiThunk(`/booking/${bookingId}/checkin`,{
+                method : "POST",
+                body : bookingId
+            });
+        }catch(error){
+            if(error instanceof Error) return rejectWithValue(error.message);
+            return rejectWithValue("something went wrong");
+        }
+    }
+)
+
+export const checkOut = createAsyncThunk(
+    "api/updateBooking",
+    async ( bookingId: number , {rejectWithValue})=>{
+        try{
+            return await apiThunk(`/booking/${bookingId}/checkout`,{
+                method : "POST",
+                body : bookingId
+            });
+        }catch(error){
+            if(error instanceof Error) return rejectWithValue(error.message);
+            return rejectWithValue("something went wrong");
+        }
+    }
+)
