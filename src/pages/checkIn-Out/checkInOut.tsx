@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { fetchBookingsByRange, updateBooking } from "@/app/asyncThunk/bookingThunk";
+import { checkIn, checkOut, fetchBookingsByRange, updateBooking } from "@/app/asyncThunk/bookingThunk";
 import PagingController from "@/components/common/paging/PagingController";
 import Button from "@/components/common/button/Button";
 import toast from "react-hot-toast";
@@ -42,18 +42,19 @@ const CheckInOutManagement = () => {
   }, [dispatch]);
 
   const handleAction = async (booking : BookingPayload) => {
+    console.log(booking);
     const actionText = activeTab === "checkin" ? "Check-In" : "Check-Out";
     if (window.confirm(`Are you sure you want to process ${actionText} for this booking?`)) {
         if(activeTab === "checkin"){
             try{
-                await dispatch(updateBooking({id : booking.bookingId , checkIn : booking.checkInDate , checkOut : booking.checkOutDate , status : 2})).unwrap();
+                await dispatch(checkIn(booking.id)).unwrap();
                 toast.success(`${actionText} successful`);
             }catch(error :any){
                 toast.error(error?.message || `${actionText} failed.`);
             }
         }else{
             try{          
-                await dispatch(updateBooking({id : booking.bookingId , checkIn : booking.checkInDate , checkOut : booking.checkOutDate , status : 3}))
+                await dispatch(checkOut(booking.id)).unwrap();
                 toast.success(`${actionText} successful`);
             }catch(error:any){
                 toast.error(error?.message || `${actionText} failed.`);
@@ -125,12 +126,12 @@ const CheckInOutManagement = () => {
       <div className="grid grid-cols-1 gap-4 md:hidden">
         {currentItems.length > 0 ? (
           currentItems.map((b) => (
-            <div key={b.bookingId} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
+            <div key={b.id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
               <div className="flex justify-between items-start mb-4">
                 <span className="text-[10px] font-bold text-gray-400 uppercase">Room {b.roomNumber}</span>
                 {getStatusBadge(b.status)}
               </div>
-              <h3 className="font-bold text-gray-800 break-all mb-1">{b.userEmail}</h3>
+              <h3 className="font-bold text-gray-800 break-all mb-1">{b.guestEmail}</h3>
               <p className="text-xs text-gray-500 mb-4 italic">
                 {new Date(b.checkInDate).toLocaleDateString()} - {new Date(b.checkOutDate).toLocaleDateString()}
               </p>
@@ -165,9 +166,9 @@ const CheckInOutManagement = () => {
           <tbody className="divide-y divide-gray-100">
             {currentItems.length > 0 ? (
               currentItems.map((b) => (
-                <tr key={b.bookingId} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-4 px-4 text-gray-500 font-mono text-sm">#{b.bookingId}</td>
-                  <td className="py-4 px-4 font-medium text-gray-800">{b.userEmail}</td>
+                <tr key={b.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="py-4 px-4 text-gray-500 font-mono text-sm">#{b.id}</td>
+                  <td className="py-4 px-4 font-medium text-gray-800">{b.guestEmail}</td>
                   <td className="py-4 px-4">{b.roomNumber}</td>
                   <td className="py-4 px-4 text-sm">{new Date(b.checkInDate).toLocaleDateString()}</td>
                   <td className="py-4 px-4 text-sm">{new Date(b.checkOutDate).toLocaleDateString()}</td>

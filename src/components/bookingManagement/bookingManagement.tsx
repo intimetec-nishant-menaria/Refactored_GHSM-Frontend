@@ -35,7 +35,7 @@ const BookingManagement = () => {
 
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
-      const matchesUser = !searchUser || b.userEmail.toLowerCase().includes(searchUser.toLowerCase());
+      const matchesUser = !searchUser || b.guestEmail.toLowerCase().includes(searchUser.toLowerCase());
       const matchesRoom = !roomFilter || b.roomNumber.toString().includes(roomFilter);
       const matchesStatus = statusFilter === 0 || b.status === statusFilter;
 
@@ -118,11 +118,11 @@ const BookingManagement = () => {
       <div className="grid grid-cols-1 gap-4 md:hidden">
         {currentItems.length > 0 ? (
           currentItems.map((b) => (
-            <div key={b.bookingId} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            <div key={b.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
               <div className="flex justify-between items-start mb-3">
                 <div className="max-w-[70%]">
-                  <span className="text-[10px] font-bold text-gray-400 uppercase">ID: #{b.bookingId}</span>
-                  <p className="font-semibold text-gray-800 break-all text-sm leading-tight">{b.userEmail}</p>
+                  <span className="text-[10px] font-bold text-gray-400 uppercase">ID: #{b.id}</span>
+                  <p className="font-semibold text-gray-800 break-all text-sm leading-tight">{b.guestName}</p>
                 </div>
                 {getStatusBadge(b.status)}
               </div>
@@ -143,7 +143,7 @@ const BookingManagement = () => {
               {b.status === 1 && new Date(b.checkInDate) > new Date() && (
                 <Button
                   label="Cancel Booking"
-                  onClick={() => handleCancel(b.bookingId, b.checkInDate)}
+                  onClick={() => handleCancel(b.id, b.checkInDate)}
                   className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-md font-bold text-sm transition-colors mt-2"
                 />
               )}
@@ -169,9 +169,9 @@ const BookingManagement = () => {
           <tbody className="divide-y divide-gray-100">
             {currentItems.length > 0 ? (
               currentItems.map((b) => (
-                <tr key={b.bookingId} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-4 px-4 text-gray-500 font-mono text-sm">#{b.bookingId}</td>
-                  <td className="py-4 px-4 font-medium text-gray-800">{b.userEmail}</td>
+                <tr key={b.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="py-4 px-4 text-gray-500 font-mono text-sm">#{b.id}</td>
+                  <td className="py-4 px-4 font-medium text-gray-800">{b.guestName}</td>
                   <td className="py-4 px-4">{b.roomNumber}</td>
                   <td className="py-4 px-4 text-sm">{new Date(b.checkInDate).toLocaleDateString()}</td>
                   <td className="py-4 px-4 text-sm">{new Date(b.checkOutDate).toLocaleDateString()}</td>
@@ -180,7 +180,7 @@ const BookingManagement = () => {
                     {b.status == 1 /*&& new Date(b.checkInDate) > new Date()*/ ? (
                       <Button
                         label="Cancel"
-                        onClick={() => handleCancel(b.bookingId, b.checkInDate)}
+                        onClick={() => handleCancel(b.id, b.checkInDate)}
                         className="bg-red-500 hover:bg-red-600 hover:text-white text-red-600 px-4 py-1 rounded-full transition-all text-xs font-bold border border-red-200"
                       />
                     ) : (

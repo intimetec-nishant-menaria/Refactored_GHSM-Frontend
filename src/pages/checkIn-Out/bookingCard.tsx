@@ -2,7 +2,7 @@ import Button from "@/components/common/button/Button";
 import dayjs from "dayjs";
 
 interface BookingCardProps {
-  booking: any;
+  booking:any;
   activeTab: "checkin" | "checkout";
   onAction: (id: number, status: string) => void;
 }
