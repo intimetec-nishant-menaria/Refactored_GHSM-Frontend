@@ -10,7 +10,12 @@ interface Props {
   onConfirmBooking: () => void;
 }
 
-function BookingSummary({ selectedRoom, checkIn, checkOut, onConfirmBooking }: Props) {
+function BookingSummary({
+  selectedRoom,
+  checkIn,
+  checkOut,
+  onConfirmBooking,
+}: Props) {
   const { user } = useAppSelector((state) => state.auth);
 
   if (!selectedRoom || !checkIn || !checkOut) {
@@ -44,11 +49,15 @@ function BookingSummary({ selectedRoom, checkIn, checkOut, onConfirmBooking }: P
               </h3>
               <div className="flex justify-between md:flex-col lg:flex-row text-sm gap-1">
                 <span className="text-gray-500">Name</span>
-                <span className="font-medium text-right md:text-left lg:text-right">{user?.name}</span>
+                <span className="font-medium text-right md:text-left lg:text-right">
+                  {user?.name}
+                </span>
               </div>
               <div className="flex justify-between md:flex-col lg:flex-row text-sm gap-1">
                 <span className="text-gray-500">Email</span>
-                <span className="font-medium text-right md:text-left lg:text-right break-all">{user?.email}</span>
+                <span className="font-medium text-right md:text-left lg:text-right break-all">
+                  {user?.email}
+                </span>
               </div>
             </div>
             <div className="space-y-3">
@@ -57,11 +66,15 @@ function BookingSummary({ selectedRoom, checkIn, checkOut, onConfirmBooking }: P
               </h3>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Check-in</span>
-                <span className="font-medium">{dayjs(checkIn).format("MMM DD, YYYY")}</span>
+                <span className="font-medium">
+                  {dayjs(checkIn).format("MMM DD, YYYY")}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Check-out</span>
-                <span className="font-medium">{dayjs(checkOut).format("MMM DD, YYYY")}</span>
+                <span className="font-medium">
+                  {dayjs(checkOut).format("MMM DD, YYYY")}
+                </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-500">Total Nights</span>
@@ -89,7 +102,9 @@ function BookingSummary({ selectedRoom, checkIn, checkOut, onConfirmBooking }: P
 
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Price / Night</span>
-                <span className="font-medium">${selectedRoom.pricePerNight}</span>
+                <span className="font-medium">
+                  ${selectedRoom.pricePerNight}
+                </span>
               </div>
             </div>
 
@@ -117,7 +132,6 @@ function BookingSummary({ selectedRoom, checkIn, checkOut, onConfirmBooking }: P
             </p>
           </div>
         </div>
-
       </div>
     </div>
   );

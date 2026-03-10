@@ -9,22 +9,22 @@ interface LoginResponse {
   token: string;
   user: {
     id: number;
-    name : string;
+    name: string;
     email: string;
     role: number;
-    isActive : boolean;
+    isActive: boolean;
   };
 }
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
-  async (data: LoginInput, {rejectWithValue }) => {
+  async (data: LoginInput, { rejectWithValue }) => {
     try {
       await apiThunk<LoginResponse>("/auth/login", {
-        method : "POST",
-        body : data,
+        method: "POST",
+        body: data,
       });
-      
+
       const response = await apiThunk<User>("/auth/me");
       return response;
     } catch (error) {
@@ -39,8 +39,8 @@ export const forgotPassword = createAsyncThunk(
   async (data: ForgotPasswordInput, { rejectWithValue }) => {
     try {
       return await apiThunk("/auth/forgetPassword", {
-        method : "POST",
-        body : data
+        method: "POST",
+        body: data,
       });
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
@@ -54,8 +54,8 @@ export const resetPassword = createAsyncThunk(
   async (data: ResetPasswordPayload, { rejectWithValue }) => {
     try {
       return await apiThunk("/auth/resetPassword", {
-        method : "POST",
-        body : data
+        method: "POST",
+        body: data,
       });
     } catch (error) {
       if (error instanceof Error) {
@@ -70,8 +70,8 @@ export const logoutUser = createAsyncThunk(
   "auth/logoutUser",
   async (_, { rejectWithValue }) => {
     try {
-      return await apiThunk("/auth/logout",{
-        method: "POST", 
+      return await apiThunk("/auth/logout", {
+        method: "POST",
       });
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
@@ -82,12 +82,12 @@ export const logoutUser = createAsyncThunk(
 
 export const checkMe = createAsyncThunk(
   "auth/checkMe",
-  async ( _ , {rejectWithValue} )=>{
-    try{
+  async (_, { rejectWithValue }) => {
+    try {
       return await apiThunk<User>("/auth/me");
-    }catch(error){
+    } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Logout failed");
     }
-  }
-)
+  },
+);

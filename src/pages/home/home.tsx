@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import Bookings from "@/components/Bookings/bookings";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import toast from "react-hot-toast";;
+import toast from "react-hot-toast";
 import Carousel from "@/components/common/carousel/Carousel";
 
 function Home() {
@@ -20,7 +20,7 @@ function Home() {
   return (
     <div className="max-w-screen mx-auto space-y-8">
       <section>
-        <Carousel/>
+        <Carousel />
       </section>
       <section>
         <Bookings />

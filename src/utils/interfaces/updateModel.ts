@@ -1,4 +1,4 @@
-export interface UpdateModelProps<T>{
-    closeModel : ()=>void;
-    data:T;
+export interface UpdateModelProps<T> {
+  closeModel: () => void;
+  data: T;
 }

@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   role: number;
-  isActive: boolean; 
+  isActive: boolean;
 }
 
 export interface UserState {

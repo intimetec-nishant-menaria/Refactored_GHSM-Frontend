@@ -22,7 +22,9 @@ function Bookings() {
   const [filter, setFilter] = useState(0);
   const [checkIn, setCheckIn] = useState<Dayjs | null>(null);
   const [checkOut, setCheckOut] = useState<Dayjs | null>(null);
-  const [selectedRoom, setSelectedRoom] = useState<RoomTypesPayload | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<RoomTypesPayload | null>(
+    null,
+  );
   const [bookingStep, setBookingStep] = useState(1);
   const [isRedirectToLoginModelOpen, setLoginModel] = useState(false);
 
@@ -42,7 +44,7 @@ function Bookings() {
       fetchAvailableRooms({
         checkInDate: dayjs(checkIn).toISOString(),
         checkOutDate: dayjs(checkOut).toISOString(),
-      })
+      }),
     );
   }, [checkIn, checkOut, dispatch]);
 
@@ -67,7 +69,7 @@ function Bookings() {
       return;
     }
     setBookingStep(2);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   async function onConfirmBooking() {
@@ -80,7 +82,7 @@ function Bookings() {
           userId: user.id,
           checkInDate: dayjs(checkIn).toISOString(),
           checkOutDate: dayjs(checkOut).toISOString(),
-        })
+        }),
       ).unwrap();
 
       toast.success("Booking confirmed successfully!");
@@ -113,10 +115,14 @@ function Bookings() {
             )}
           </div>
           <div className="flex gap-4 text-xs md:text-sm font-medium pt-2">
-            <div className={`px-4 py-1.5 rounded-full transition-colors ${bookingStep === 1 ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-600"}`}>
+            <div
+              className={`px-4 py-1.5 rounded-full transition-colors ${bookingStep === 1 ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-600"}`}
+            >
               1. Select Room
             </div>
-            <div className={`px-4 py-1.5 rounded-full transition-colors ${bookingStep === 2 ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-600"}`}>
+            <div
+              className={`px-4 py-1.5 rounded-full transition-colors ${bookingStep === 2 ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-600"}`}
+            >
               2. Confirm
             </div>
           </div>
@@ -127,7 +133,9 @@ function Bookings() {
             <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm border border-gray-100">
               <div className="flex flex-col lg:flex-row gap-6 lg:items-end">
                 <div className="flex-1 w-full overflow-x-auto">
-                  <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">Select Dates</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">
+                    Select Dates
+                  </label>
                   <DateRangePicker
                     checkIn={checkIn}
                     checkOut={checkOut}
@@ -136,15 +144,21 @@ function Bookings() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-4 lg:w-auto">
                   <div className="flex-1 sm:w-64">
-                    <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">Room Category</label>
+                    <label className="text-xs font-bold text-gray-400 uppercase mb-2 block">
+                      Room Category
+                    </label>
                     <select
-                      onChange={(e: ChangeEvent<HTMLSelectElement>) => setFilter(Number(e.target.value))}
+                      onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+                        setFilter(Number(e.target.value))
+                      }
                       value={filter}
                       className="w-full border px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white outline-none"
                     >
                       <option value={0}>All Room Types</option>
                       {roomTypes.map((rt) => (
-                        <option key={rt.id} value={rt.id}>{rt.roomTypeName}</option>
+                        <option key={rt.id} value={rt.id}>
+                          {rt.roomTypeName}
+                        </option>
                       ))}
                     </select>
                   </div>
@@ -164,12 +178,18 @@ function Bookings() {
               {loading ? (
                 <div className="col-span-full py-20 text-center">
                   <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-gray-500 font-medium">Checking availability...</p>
+                  <p className="text-gray-500 font-medium">
+                    Checking availability...
+                  </p>
                 </div>
               ) : availableRooms.length === 0 ? (
                 <div className="col-span-full py-20 bg-white rounded-xl border-2 border-dashed border-gray-200 text-center">
-                  <p className="text-gray-400 font-medium">No rooms available for these dates.</p>
-                  <p className="text-sm text-gray-400">Try adjusting your dates or room type filter.</p>
+                  <p className="text-gray-400 font-medium">
+                    No rooms available for these dates.
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    Try adjusting your dates or room type filter.
+                  </p>
                 </div>
               ) : (
                 availableRooms.map((room) => (

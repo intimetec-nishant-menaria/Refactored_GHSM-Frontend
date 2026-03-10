@@ -7,9 +7,9 @@ import { checkMe } from "./app/asyncThunk/authThunk";
 function App() {
   const dispatch = useAppDispatch();
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(checkMe());
-  },[dispatch]);
+  }, [dispatch]);
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />
