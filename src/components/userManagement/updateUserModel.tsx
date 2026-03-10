@@ -21,7 +21,11 @@ const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
       return;
     }
     setError(false);
-    if (name === data.name && role === data.role && isActive === data.isActive) {
+    if (
+      name === data.name &&
+      role === data.role &&
+      isActive === data.isActive
+    ) {
       closeModel();
       return;
     }
@@ -87,20 +91,36 @@ const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
         </div>
         <form onSubmit={handleSubmit} className="p-8 flex flex-col gap-6">
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="name" className="text-sm font-semibold text-slate-700">Name</label>
+            <label
+              htmlFor="name"
+              className="text-sm font-semibold text-slate-700"
+            >
+              Name
+            </label>
             <input
               id="name"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
               className={`border px-4 py-2.5 rounded-xl outline-none focus:ring-2 transition-all ${
-                error ? 'border-red-400 focus:ring-red-100' : 'focus:ring-blue-100 border-slate-200'
+                error
+                  ? "border-red-400 focus:ring-red-100"
+                  : "focus:ring-blue-100 border-slate-200"
               }`}
             />
-            {error && <p className="text-red-500 text-xs font-medium italic">Name should not be empty</p>}
+            {error && (
+              <p className="text-red-500 text-xs font-medium italic">
+                Name should not be empty
+              </p>
+            )}
           </div>
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" className="text-sm font-semibold text-slate-700">Email (Cannot be changed)</label>
+            <label
+              htmlFor="email"
+              className="text-sm font-semibold text-slate-700"
+            >
+              Email (Cannot be changed)
+            </label>
             <input
               id="email"
               type="email"
@@ -111,7 +131,12 @@ const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
           </div>
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="flex-1 flex flex-col gap-1.5">
-              <label htmlFor="role" className="text-sm font-semibold text-slate-700">Role</label>
+              <label
+                htmlFor="role"
+                className="text-sm font-semibold text-slate-700"
+              >
+                Role
+              </label>
               <select
                 id="role"
                 value={role}
@@ -132,7 +157,9 @@ const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
                   onChange={(e) => setIsActive(e.target.checked)}
                   className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-sm font-semibold text-slate-700">Account Active</span>
+                <span className="text-sm font-semibold text-slate-700">
+                  Account Active
+                </span>
               </label>
             </div>
           </div>

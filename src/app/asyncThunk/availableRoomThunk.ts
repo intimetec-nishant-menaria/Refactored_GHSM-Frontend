@@ -9,11 +9,11 @@ export const fetchAvailableRooms = createAsyncThunk(
     try{
       return await apiThunk<RoomTypesPayload[]>("/rooms/availability",{
         method: "POST",
-        body : data
+        body: data,
       });
-    }catch(error){
-      if(error instanceof Error) return rejectWithValue(error.message);
+    } catch (error) {
+      if (error instanceof Error) return rejectWithValue(error.message);
       rejectWithValue("Something went wrong");
     }
-  }
-)
+  },
+);

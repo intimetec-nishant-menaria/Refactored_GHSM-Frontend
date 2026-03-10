@@ -19,11 +19,9 @@ export const deleteRoom = createAsyncThunk(
   "room/delete",
   async (roomId: number, { rejectWithValue }) => {
     try {
-      return await apiThunk(`/Rooms/${roomId}`,
-        {
-          method: "DELETE",
-        },
-      );
+      return await apiThunk(`/Rooms/${roomId}`, {
+        method: "DELETE",
+      });
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
     }
@@ -32,7 +30,7 @@ export const deleteRoom = createAsyncThunk(
 
 export const addRoom = createAsyncThunk(
   "user/addRoom",
-  async (roomData : RoomData, { rejectWithValue }) => {
+  async (roomData: RoomData, { rejectWithValue }) => {
     try {
       return await apiThunk("/Rooms", {
         method: "POST",
@@ -48,16 +46,13 @@ export const updateRoom = createAsyncThunk(
   "user/updateRoom",
   async (data: UpdateRoomPayload, { rejectWithValue }) => {
     try {
-      return await apiThunk(`/Rooms/${data.id}`,
-        {
-          method: "PUT",
-          body: data
-        },
-      );
+      return await apiThunk(`/Rooms/${data.id}`, {
+        method: "PUT",
+        body: data,
+      });
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Something went wrong");
     }
   },
 );
-

@@ -2,11 +2,11 @@ import type { BookingState } from "@/utils/interfaces/booking";
 import { createSlice } from "@reduxjs/toolkit";
 import { fetchAllBookings } from "../asyncThunk/bookingThunk";
 
-const initialState:BookingState ={
-    bookings :[],
-    loading : false,
-    error : null,
-}
+const initialState: BookingState = {
+  bookings: [],
+  loading: false,
+  error: null,
+};
 
 const BookingSlice = createSlice({
     name : "bookingSlice",

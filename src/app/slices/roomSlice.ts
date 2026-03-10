@@ -19,7 +19,9 @@ const RoomSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchRooms.fulfilled, (state, action) => {
-        state.rooms = action.payload.sort((a,b)=>(Number(a.roomNumber)-Number(b.roomNumber)));
+        state.rooms = action.payload.sort(
+          (a, b) => Number(a.roomNumber) - Number(b.roomNumber),
+        );
         state.loading = false;
       })
       .addCase(fetchRooms.rejected, (state, action) => {
@@ -27,9 +29,9 @@ const RoomSlice = createSlice({
         state.error = action.payload as string;
       });
 
-      builder.addCase(deleteRoom.fulfilled , (state , action)=>{
-        state.rooms = state.rooms.filter( room => room.id !=action.payload);
-      });
+    builder.addCase(deleteRoom.fulfilled, (state, action) => {
+      state.rooms = state.rooms.filter((room) => room.id != action.payload);
+    });
   },
 });
 
