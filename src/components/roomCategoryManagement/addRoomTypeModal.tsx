@@ -40,7 +40,7 @@ const AddRoomTypeModel = ({ closeModal }: AddRoomTypeModelProps) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-    //   await dispatch(createRoomType(formData)).unwrap();
+      //   await dispatch(createRoomType(formData)).unwrap();
       dispatch(fetchRoomType());
       closeModal();
     } catch (err) {
@@ -54,20 +54,31 @@ const AddRoomTypeModel = ({ closeModal }: AddRoomTypeModelProps) => {
         {/* Header */}
         <div className="bg-blue-600 p-4 flex justify-between items-center text-white">
           <h3 className="text-lg font-bold">Add New Room Category</h3>
-          <button onClick={closeModal} className="hover:text-gray-200 text-2xl">&times;</button>
+          <button onClick={closeModal} className="hover:text-gray-200 text-2xl">
+            &times;
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Room Type Enum Select */}
           <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Room Type</label>
+            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+              Room Type
+            </label>
             <select
               className="w-full border rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 outline-none"
               value={formData.roomTypeName}
-              onChange={(e) => setFormData({ ...formData, roomTypeName: Number(e.target.value) })}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  roomTypeName: Number(e.target.value),
+                })
+              }
             >
               {RoomTypeOptions.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
               ))}
             </select>
           </div>
@@ -75,20 +86,26 @@ const AddRoomTypeModel = ({ closeModal }: AddRoomTypeModelProps) => {
           <div className="grid grid-cols-2 gap-4">
             {/* Capacity */}
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Capacity (Persons)</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                Capacity (Persons)
+              </label>
               <input
                 type="number"
                 min="1"
                 className="w-full border rounded-lg p-2.5"
                 value={formData.capacity}
-                onChange={(e) => setFormData({ ...formData, capacity: Number(e.target.value) })}
+                onChange={(e) =>
+                  setFormData({ ...formData, capacity: Number(e.target.value) })
+                }
                 required
               />
             </div>
 
             {/* Price */}
             <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Price Per Night</label>
+              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+                Price Per Night
+              </label>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-gray-400">$</span>
                 <input
@@ -96,7 +113,12 @@ const AddRoomTypeModel = ({ closeModal }: AddRoomTypeModelProps) => {
                   step="0.01"
                   className="w-full border rounded-lg p-2.5 pl-7"
                   value={formData.pricePerNight}
-                  onChange={(e) => setFormData({ ...formData, pricePerNight: Number(e.target.value) })}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      pricePerNight: Number(e.target.value),
+                    })
+                  }
                   required
                 />
               </div>
@@ -105,10 +127,15 @@ const AddRoomTypeModel = ({ closeModal }: AddRoomTypeModelProps) => {
 
           {/* Amenities Multi-Select */}
           <div>
-            <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Amenities</label>
+            <label className="block text-xs font-bold text-gray-500 uppercase mb-2">
+              Amenities
+            </label>
             <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto border rounded-lg p-3 bg-gray-50">
               {amenities?.map((amenity) => (
-                <label key={amenity.id} className="flex items-center gap-2 cursor-pointer hover:bg-white p-1 rounded transition-colors">
+                <label
+                  key={amenity.id}
+                  className="flex items-center gap-2 cursor-pointer hover:bg-white p-1 rounded transition-colors"
+                >
                   <input
                     type="checkbox"
                     className="w-4 h-4 rounded text-blue-600"
@@ -119,7 +146,9 @@ const AddRoomTypeModel = ({ closeModal }: AddRoomTypeModelProps) => {
                 </label>
               ))}
               {(!amenities || amenities.length === 0) && (
-                <p className="text-xs text-gray-400 italic col-span-2">No amenities available</p>
+                <p className="text-xs text-gray-400 italic col-span-2">
+                  No amenities available
+                </p>
               )}
             </div>
           </div>

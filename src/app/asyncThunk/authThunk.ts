@@ -4,6 +4,7 @@ import type { ForgotPasswordInput } from "@/utils/schemas/forgotPasswordSchema";
 import type { ResetPasswordPayload } from "@/utils/interfaces/resetPassword";
 import apiThunk from "./apiThunkHelper";
 import type { User } from "@/utils/interfaces/user";
+import type { ChangePasswordPayload } from "@/utils/interfaces/changePassword";
 
 interface LoginResponse {
   token: string;
@@ -122,6 +123,23 @@ export const checkMe = createAsyncThunk(
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Logout failed");
+    }
+  },
+);
+
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async (data: ChangePasswordPayload, { rejectWithValue }) => {
+    try {
+      return await apiThunk("/auth/changePassword", {
+        method: "POST",
+        body: data,
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
+      return rejectWithValue("Change Password failed");
     }
   },
 );

@@ -1,10 +1,11 @@
+import ChangePasswordForm from "@/components/common/changePasswordForm/ChangePasswordForm";
 import AuthLayout from "@/components/layouts/AuthLayout";
 
 const ChangePassword = () => {
   return (
     <>
       <AuthLayout title="Change Password">
-        <div className="text-center"></div>
+        <ChangePasswordForm />
       </AuthLayout>
     </>
   );

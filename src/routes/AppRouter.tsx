@@ -2,7 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "@/pages/login/Login";
 import ForgotPassword from "@/pages/forgotPassword/ForgotPassword";
 import ResetPassword from "@/pages/resetPassword/ResetPassword";
-import ChangePassword from "@/pages/changePassword/changePassword";
+import ChangePassword from "@/pages/changePassword/ChangePassword";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import UserManagement from "@/components/userManagement/userManagement";
 import RoomManagement from "@/components/roomManagement/roomManagement";
