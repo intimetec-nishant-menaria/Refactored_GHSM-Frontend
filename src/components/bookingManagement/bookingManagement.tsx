@@ -49,26 +49,35 @@ const BookingManagement = () => {
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = useMemo(() => filteredBookings.slice(startIndex, endIndex), [filteredBookings, startIndex, endIndex]);
+  const currentItems = useMemo(
+    () => filteredBookings.slice(startIndex, endIndex),
+    [filteredBookings, startIndex, endIndex],
+  );
 
   useEffect(() => {
     dispatch(fetchAllBookings());
   }, [dispatch]);
 
-  const handleCancel =async (bookingId: number, checkInDate: string) => {
-      if (window.confirm("Are you sure you want to cancel this booking?")) {
-        await dispatch(cancelBooking(bookingId)).then(async () => {
+  const handleCancel = async (bookingId: number, checkInDate: string) => {
+    if (window.confirm("Are you sure you want to cancel this booking?")) {
+      await dispatch(cancelBooking(bookingId))
+        .then(async () => {
           toast.success("Booking cancelled successfully.");
           await dispatch(fetchAllBookings());
         })
         .catch((error: any) => {
           toast.error(error?.message || "Failed to cancel booking.");
         });
-      }
+    }
   };
 
   const getStatusBadge = (status: number) => {
-    const labels = { 1: "Booked", 2: "Checked In", 3: "Completed", 4: "Cancelled" };
+    const labels = {
+      1: "Booked",
+      2: "Checked In",
+      3: "Completed",
+      4: "Cancelled",
+    };
     const styles = {
       1: "bg-blue-100 text-blue-700 border border-blue-200",
       2: "bg-emerald-100 text-emerald-700 border border-emerald-200",
@@ -76,37 +85,55 @@ const BookingManagement = () => {
       4: "bg-red-100 text-red-700 border border-red-200",
     };
     const label = labels[status as keyof typeof labels] || "Unknown";
-    const style = styles[status as keyof typeof styles] || "bg-gray-100 text-gray-700";
+    const style =
+      styles[status as keyof typeof styles] || "bg-gray-100 text-gray-700";
 
-    return <span className={`px-2 py-1 rounded text-xs font-bold ${style}`}>{label}</span>;
+    return (
+      <span className={`px-2 py-1 rounded text-xs font-bold ${style}`}>
+        {label}
+      </span>
+    );
   };
 
-  if (loading) return <p className="p-6 text-center text-blue-600 font-medium">Loading bookings...</p>;
+  if (loading)
+    return (
+      <p className="p-6 text-center text-blue-600 font-medium">
+        Loading bookings...
+      </p>
+    );
   if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
 
   return (
     <div className="p-4 md:p-6 bg-gray-100 min-h-screen w-full">
-      <h1 className="text-xl md:text-2xl font-bold mb-6 text-gray-800">Booking Management</h1>
+      <h1 className="text-xl md:text-2xl font-bold mb-6 text-gray-800">
+        Booking Management
+      </h1>
       <div className="flex flex-col lg:flex-row gap-4 mb-6">
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <input
             type="text"
             placeholder="Search by user email..."
             value={searchUser}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchUser(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setSearchUser(e.target.value)
+            }
             className="border p-2 rounded focus:ring-2 focus:ring-blue-500 flex-grow sm:w-64 outline-none bg-white shadow-sm"
           />
           <input
             type="text"
             placeholder="Room #"
             value={roomFilter}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => setRoomFilter(e.target.value)}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setRoomFilter(e.target.value)
+            }
             className="border p-2 rounded focus:ring-2 focus:ring-blue-500 w-full sm:w-32 outline-none bg-white shadow-sm"
           />
         </div>
         <select
           value={statusFilter}
-          onChange={(e: ChangeEvent<HTMLSelectElement>) => setStatusFilter(Number(e.target.value))}
+          onChange={(e: ChangeEvent<HTMLSelectElement>) =>
+            setStatusFilter(Number(e.target.value))
+          }
           className="border p-2 rounded focus:ring-2 focus:ring-blue-500 bg-white outline-none w-full lg:w-48 shadow-sm"
         >
           <option value={0}>All Status</option>
@@ -126,16 +153,21 @@ const BookingManagement = () => {
                 </div>
                 {getStatusBadge(b.status)}
               </div>
-              
+
               <div className="grid grid-cols-2 gap-2 text-xs py-3 border-y border-gray-50 my-2">
                 <div>
-                  <p className="text-gray-400 uppercase font-bold text-[9px]">Room Number</p>
+                  <p className="text-gray-400 uppercase font-bold text-[9px]">
+                    Room Number
+                  </p>
                   <p className="font-medium text-gray-700">{b.roomNumber}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 uppercase font-bold text-[9px]">Duration</p>
+                  <p className="text-gray-400 uppercase font-bold text-[9px]">
+                    Duration
+                  </p>
                   <p className="text-gray-700">
-                    {new Date(b.checkInDate).toLocaleDateString()} - {new Date(b.checkOutDate).toLocaleDateString()}
+                    {new Date(b.checkInDate).toLocaleDateString()} -{" "}
+                    {new Date(b.checkOutDate).toLocaleDateString()}
                   </p>
                 </div>
               </div>
@@ -150,7 +182,9 @@ const BookingManagement = () => {
             </div>
           ))
         ) : (
-          <div className="bg-white p-8 text-center rounded-lg text-gray-400">No bookings found matching your filters.</div>
+          <div className="bg-white p-8 text-center rounded-lg text-gray-400">
+            No bookings found matching your filters.
+          </div>
         )}
       </div>
       <div className="hidden md:block overflow-x-auto bg-white rounded-lg shadow-md mb-6">
@@ -173,11 +207,16 @@ const BookingManagement = () => {
                   <td className="py-4 px-4 text-gray-500 font-mono text-sm">#{b.id}</td>
                   <td className="py-4 px-4 font-medium text-gray-800">{b.guestName}</td>
                   <td className="py-4 px-4">{b.roomNumber}</td>
-                  <td className="py-4 px-4 text-sm">{new Date(b.checkInDate).toLocaleDateString()}</td>
-                  <td className="py-4 px-4 text-sm">{new Date(b.checkOutDate).toLocaleDateString()}</td>
+                  <td className="py-4 px-4 text-sm">
+                    {new Date(b.checkInDate).toLocaleDateString()}
+                  </td>
+                  <td className="py-4 px-4 text-sm">
+                    {new Date(b.checkOutDate).toLocaleDateString()}
+                  </td>
                   <td className="py-4 px-4">{getStatusBadge(b.status)}</td>
                   <td className="py-4 px-4 text-center">
-                    {b.status == 1 /*&& new Date(b.checkInDate) > new Date()*/ ? (
+                    {b.status ==
+                    1 /*&& new Date(b.checkInDate) > new Date()*/ ? (
                       <Button
                         label="Cancel"
                         onClick={() => handleCancel(b.id, b.checkInDate)}
@@ -191,7 +230,9 @@ const BookingManagement = () => {
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="py-10 text-center text-gray-400">No bookings found.</td>
+                <td colSpan={7} className="py-10 text-center text-gray-400">
+                  No bookings found.
+                </td>
               </tr>
             )}
           </tbody>

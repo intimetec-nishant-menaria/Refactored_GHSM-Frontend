@@ -1,15 +1,18 @@
 const BASE_URL = "https://localhost:7188/api";
 
-type HttpMethods = "GET" | "POST" | "PUT" | "DELETE" | "PATCH"
+type HttpMethods = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
-interface RequestOptions{
-  method?: HttpMethods,
-  body?: unknown,
-  headers?: HeadersInit
+interface RequestOptions {
+  method?: HttpMethods;
+  body?: unknown;
+  headers?: HeadersInit;
 }
 
-const apiThunk = async <T>(endpoint: string, options : RequestOptions = {}): Promise<T> => {
-  const {method = "GET" , body , headers ={}} = options;
+const apiThunk = async <T>(
+  endpoint: string,
+  options: RequestOptions = {},
+): Promise<T> => {
+  const { method = "GET", body, headers = {} } = options;
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     method,
     headers: {

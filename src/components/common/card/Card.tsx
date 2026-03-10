@@ -28,9 +28,7 @@ function RoomCard({ room, isSelected = false, onSelect }: RoomCardProps) {
       className={clsx(
         "cursor-pointer m-1 sm:m-2 rounded-2xl bg-white p-3 sm:p-5 shadow-sm transition-all duration-200 border",
         "hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-blue-300",
-        isSelected
-          ? "border-blue-600 ring-2 ring-blue-200"
-          : "border-gray-200"
+        isSelected ? "border-blue-600 ring-2 ring-blue-200" : "border-gray-200",
       )}
     >
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 space-y-2 sm:space-y-0">
@@ -57,14 +55,14 @@ function RoomCard({ room, isSelected = false, onSelect }: RoomCardProps) {
         <button
           type="button"
           onClick={(e) => {
-            e.stopPropagation(); 
+            e.stopPropagation();
             handleSelect();
           }}
           className={clsx(
             "px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-medium transition-colors duration-200",
             isSelected
               ? "bg-blue-600 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white"
+              : "bg-gray-100 text-gray-700 hover:bg-blue-600 hover:text-white",
           )}
         >
           {isSelected ? "Selected" : "Select"}

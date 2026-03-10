@@ -1,6 +1,6 @@
-import type { RoomState} from "@/utils/interfaces/roomTypes";
+import type { RoomState } from "@/utils/interfaces/roomTypes";
 import { createSlice } from "@reduxjs/toolkit";
-import {  fetchAvailableRooms} from "../asyncThunk/availableRoomThunk";
+import { fetchAvailableRooms } from "../asyncThunk/availableRoomThunk";
 
 const initialState: RoomState = {
   rooms: [],
@@ -12,15 +12,17 @@ const AvailableRoomSlice = createSlice({
   name: "availableRoom",
   initialState,
   reducers: {},
-  extraReducers: (builder) => {;
-
-      builder
+  extraReducers: (builder) => {
+    builder
       .addCase(fetchAvailableRooms.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(fetchAvailableRooms.fulfilled, (state, action) => {
-        state.rooms = action.payload?.sort((a,b)=>(Number(a.roomNumber)-Number(b.roomNumber))) ?? [] ;
+        state.rooms =
+          action.payload?.sort(
+            (a, b) => Number(a.roomNumber) - Number(b.roomNumber),
+          ) ?? [];
         state.loading = false;
       })
       .addCase(fetchAvailableRooms.rejected, (state, action) => {

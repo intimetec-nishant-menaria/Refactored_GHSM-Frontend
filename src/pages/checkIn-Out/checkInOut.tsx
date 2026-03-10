@@ -13,7 +13,7 @@ const CheckInOutManagement = () => {
   const { bookings, loading, error } = useAppSelector((state) => state.booking);
 
   const [activeTab, setActiveTab] = useState<"checkin" | "checkout">("checkin");
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
   const [searchUser, setSearchUser] = useState("");
@@ -21,9 +21,13 @@ const CheckInOutManagement = () => {
 
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
-      const matchesStatus = activeTab === "checkin" ? b.status === 1 : b.status === 2;
-      const matchesUser = !searchUser || b.userEmail.toLowerCase().includes(searchUser.toLowerCase());
-      const matchesRoom = !roomFilter || b.roomNumber.toString().includes(roomFilter);
+      const matchesStatus =
+        activeTab === "checkin" ? b.status === 1 : b.status === 2;
+      const matchesUser =
+        !searchUser ||
+        b.guestEmail.toLowerCase().includes(searchUser.toLowerCase());
+      const matchesRoom =
+        !roomFilter || b.roomNumber.toString().includes(roomFilter);
 
       return matchesStatus && matchesUser && matchesRoom;
     });
@@ -35,14 +39,21 @@ const CheckInOutManagement = () => {
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentItems = useMemo(() => filteredBookings.slice(startIndex, endIndex), [filteredBookings, startIndex, endIndex]);
+  const currentItems = useMemo(
+    () => filteredBookings.slice(startIndex, endIndex),
+    [filteredBookings, startIndex, endIndex],
+  );
 
   useEffect(() => {
-    dispatch(fetchBookingsByRange({startDate : dayjs().startOf('day').toISOString() , endDate :  dayjs().endOf('day').toISOString() }));
+    dispatch(
+      fetchBookingsByRange({
+        startDate: dayjs().startOf("day").toISOString(),
+        endDate: dayjs().endOf("day").toISOString(),
+      }),
+    );
   }, [dispatch]);
 
   const handleAction = async (booking : BookingPayload) => {
-    console.log(booking);
     const actionText = activeTab === "checkin" ? "Check-In" : "Check-Out";
     if (window.confirm(`Are you sure you want to process ${actionText} for this booking?`)) {
         if(activeTab === "checkin"){
@@ -60,37 +71,76 @@ const CheckInOutManagement = () => {
                 toast.error(error?.message || `${actionText} failed.`);
             }
         }
-        await dispatch(fetchBookingsByRange({startDate : dayjs().startOf('day').toISOString() , endDate :  dayjs().endOf('day').toISOString() }));
+      } else {
+        try {
+          await dispatch(
+            updateBooking({
+              id: booking.id,
+              checkIn: booking.checkInDate,
+              checkOut: booking.checkOutDate,
+              status: 3,
+            }),
+          );
+          toast.success(`${actionText} successful`);
+        } catch (error: any) {
+          toast.error(error?.message || `${actionText} failed.`);
+        }
+      }
+      await dispatch(
+        fetchBookingsByRange({
+          startDate: dayjs().startOf("day").toISOString(),
+          endDate: dayjs().endOf("day").toISOString(),
+        }),
+      );
     }
-  };
 
   const getStatusBadge = (status: number) => {
-    const labels = { 1: "Booked", 2: "Checked In", 3: "Completed", 4: "Cancelled" };
+    const labels = {
+      1: "Booked",
+      2: "Checked In",
+      3: "Completed",
+      4: "Cancelled",
+    };
     const styles = {
       1: "bg-blue-100 text-blue-700 border border-blue-200",
       2: "bg-emerald-100 text-emerald-700 border border-emerald-200",
       3: "bg-slate-100 text-slate-600 border border-slate-200",
       4: "bg-red-100 text-red-700 border border-red-200",
     };
-    return <span className={`px-2 py-1 rounded text-[10px] font-bold ${styles[status as keyof typeof styles] || "bg-gray-100"}`}>{labels[status as keyof typeof labels] || "Unknown"}</span>;
+    return (
+      <span
+        className={`px-2 py-1 rounded text-[10px] font-bold ${styles[status as keyof typeof styles] || "bg-gray-100"}`}
+      >
+        {labels[status as keyof typeof labels] || "Unknown"}
+      </span>
+    );
   };
-  
-  const goToNextPage = () => setCurrentPage(prev => prev + 1);
-  const goToPrevPage = () => setCurrentPage(prev => prev - 1);
+
+  const goToNextPage = () => setCurrentPage((prev) => prev + 1);
+  const goToPrevPage = () => setCurrentPage((prev) => prev - 1);
   const goToSpecificPage = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  if (loading) return <p className="p-6 text-center text-blue-600 font-medium animate-pulse">Loading operations...</p>;
-
+  if (loading){
+    return (
+      <p className="p-6 text-center text-blue-600 font-medium animate-pulse">
+        Loading operations...
+      </p>
+    );
+  }
   return (
     <div className="p-4 md:p-6 bg-gray-100 min-h-screen w-full">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">Front Desk Operations</h1>
-        
+        <h1 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">
+          Front Desk Operations
+        </h1>
+
         <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-200 w-full md:w-auto">
           <button
             onClick={() => setActiveTab("checkin")}
             className={`flex-1 md:w-32 py-2 rounded-lg text-sm font-bold transition-all ${
-              activeTab === "checkin" ? "bg-blue-600 text-white shadow-md" : "text-gray-500 hover:bg-gray-50"
+              activeTab === "checkin"
+                ? "bg-blue-600 text-white shadow-md"
+                : "text-gray-500 hover:bg-gray-50"
             }`}
           >
             Check-In
@@ -98,7 +148,9 @@ const CheckInOutManagement = () => {
           <button
             onClick={() => setActiveTab("checkout")}
             className={`flex-1 md:w-32 py-2 rounded-lg text-sm font-bold transition-all ${
-              activeTab === "checkout" ? "bg-blue-600 text-white shadow-md" : "text-gray-500 hover:bg-gray-50"
+              activeTab === "checkout"
+                ? "bg-blue-600 text-white shadow-md"
+                : "text-gray-500 hover:bg-gray-50"
             }`}
           >
             Check-Out
@@ -128,29 +180,40 @@ const CheckInOutManagement = () => {
           currentItems.map((b) => (
             <div key={b.id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
               <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-bold text-gray-400 uppercase">Room {b.roomNumber}</span>
+                <span className="text-[10px] font-bold text-gray-400 uppercase">
+                  Room {b.roomNumber}
+                </span>
                 {getStatusBadge(b.status)}
               </div>
               <h3 className="font-bold text-gray-800 break-all mb-1">{b.guestEmail}</h3>
               <p className="text-xs text-gray-500 mb-4 italic">
-                {new Date(b.checkInDate).toLocaleDateString()} - {new Date(b.checkOutDate).toLocaleDateString()}
+                {new Date(b.checkInDate).toLocaleDateString()} -{" "}
+                {new Date(b.checkOutDate).toLocaleDateString()}
               </p>
-              
+
               <Button
-                label={activeTab === "checkin" ? "Confirm Check-In" : "Process Check-Out"}
+                label={
+                  activeTab === "checkin"
+                    ? "Confirm Check-In"
+                    : "Process Check-Out"
+                }
                 onClick={() => handleAction(b)}
                 className={`w-full py-2.5 rounded-xl font-bold text-white transition-all ${
-                  activeTab === "checkin" ? "bg-emerald-500 hover:bg-emerald-600" : "bg-amber-500 hover:bg-amber-600"
+                  activeTab === "checkin"
+                    ? "bg-emerald-500 hover:bg-emerald-600"
+                    : "bg-amber-500 hover:bg-amber-600"
                 }`}
               />
             </div>
           ))
         ) : (
-          <div className="bg-white p-10 text-center rounded-2xl text-gray-400 italic">No pending {activeTab}s.</div>
+          <div className="bg-white p-10 text-center rounded-2xl text-gray-400 italic">
+            No pending {activeTab}s.
+          </div>
         )}
       </div>
 
-       <div className="hidden md:block overflow-x-auto bg-white rounded-lg shadow-md mb-6">
+      <div className="hidden md:block overflow-x-auto bg-white rounded-lg shadow-md mb-6">
         <table className="min-w-full text-left border-collapse">
           <thead className="bg-gray-200 text-gray-600 uppercase text-xs">
             <tr>
@@ -170,29 +233,36 @@ const CheckInOutManagement = () => {
                   <td className="py-4 px-4 text-gray-500 font-mono text-sm">#{b.id}</td>
                   <td className="py-4 px-4 font-medium text-gray-800">{b.guestEmail}</td>
                   <td className="py-4 px-4">{b.roomNumber}</td>
-                  <td className="py-4 px-4 text-sm">{new Date(b.checkInDate).toLocaleDateString()}</td>
-                  <td className="py-4 px-4 text-sm">{new Date(b.checkOutDate).toLocaleDateString()}</td>
+                  <td className="py-4 px-4 text-sm">
+                    {new Date(b.checkInDate).toLocaleDateString()}
+                  </td>
+                  <td className="py-4 px-4 text-sm">
+                    {new Date(b.checkOutDate).toLocaleDateString()}
+                  </td>
                   <td className="py-4 px-4">{getStatusBadge(b.status)}</td>
                   <td className="py-4 px-4 text-center">
-                    {b.status == 1 /*&& new Date(b.checkInDate) > new Date()*/ ? (
+                    {b.status ==
+                    1 /*&& new Date(b.checkInDate) > new Date()*/ ? (
                       <Button
                         label="Check-In"
                         onClick={() => handleAction(b)}
                         className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-1.5 rounded-full transition-all text-[11px] font-black uppercase tracking-wider shadow-sm"
-                        />
+                      />
                     ) : (
-                        <Button
-                            label="Check-Out"
-                            onClick={() => handleAction(b)}
-                            className="bg-green-500 hover:bg-amber-600 text-white px-4 py-1.5 rounded-full transition-all text-[11px] font-black uppercase tracking-wider shadow-sm"
-                        />
+                      <Button
+                        label="Check-Out"
+                        onClick={() => handleAction(b)}
+                        className="bg-green-500 hover:bg-amber-600 text-white px-4 py-1.5 rounded-full transition-all text-[11px] font-black uppercase tracking-wider shadow-sm"
+                      />
                     )}
                   </td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="py-10 text-center text-gray-400">No bookings found.</td>
+                <td colSpan={7} className="py-10 text-center text-gray-400">
+                  No bookings found.
+                </td>
               </tr>
             )}
           </tbody>
@@ -211,5 +281,6 @@ const CheckInOutManagement = () => {
     </div>
   );
 };
+
 
 export default CheckInOutManagement;

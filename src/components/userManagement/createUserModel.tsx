@@ -1,7 +1,10 @@
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { createUser, fetchUsers } from "@/app/asyncThunk/userThunk";
 import { useForm } from "react-hook-form";
-import { addUserSchema, type addUserInput } from "@/utils/schemas/addUserSchema";
+import {
+  addUserSchema,
+  type addUserInput,
+} from "@/utils/schemas/addUserSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 
@@ -11,11 +14,11 @@ interface Props {
 
 const CreateUserModal = ({ closeModal }: Props) => {
   const dispatch = useAppDispatch();
-  
+
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm<addUserInput>({
     resolver: zodResolver(addUserSchema),
     defaultValues: {
@@ -37,54 +40,81 @@ const CreateUserModal = ({ closeModal }: Props) => {
       } else {
         toast.error("Failed to create user");
       }
-    } catch (error) {
+    } catch {
       toast.error("An unexpected error occurred");
     }
   };
 
   return (
-    <div 
-      className="fixed inset-0 z-100 flex justify-center items-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-100 flex justify-center items-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in duration-300">
         <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-slate-800">Add New User</h2>
-            <p className="text-slate-500 text-sm">Assign roles and access for your team or guests.</p>
+            <p className="text-slate-500 text-sm">
+              Assign roles and access for your team or guests.
+            </p>
           </div>
-          <button 
-            onClick={closeModal} 
+          <button
+            onClick={closeModal}
             className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-600 transition-all"
           >
             ✕
           </button>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)} className="p-8 flex flex-col gap-5">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="p-8 flex flex-col gap-5"
+        >
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="name" className="text-sm font-semibold text-slate-700">Full Name</label>
+            <label
+              htmlFor="name"
+              className="text-sm font-semibold text-slate-700"
+            >
+              Full Name
+            </label>
             <input
               id="name"
               type="text"
-              className={`border px-4 py-2.5 rounded-xl outline-none focus:ring-2 transition-all ${errors.name ? 'border-red-400 focus:ring-red-100' : 'focus:ring-blue-100 border-slate-200'}`}
+              className={`border px-4 py-2.5 rounded-xl outline-none focus:ring-2 transition-all ${errors.name ? "border-red-400 focus:ring-red-100" : "focus:ring-blue-100 border-slate-200"}`}
               {...register("name")}
             />
-            {errors.name && <p className="text-red-500 text-xs font-medium italic">{errors.name.message}</p>}
+            {errors.name && (
+              <p className="text-red-500 text-xs font-medium italic">
+                {errors.name.message}
+              </p>
+            )}
           </div>
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" className="text-sm font-semibold text-slate-700">Email Address</label>
+            <label
+              htmlFor="email"
+              className="text-sm font-semibold text-slate-700"
+            >
+              Email Address
+            </label>
             <input
               id="email"
               type="email"
-              className={`border px-4 py-2.5 rounded-xl outline-none focus:ring-2 transition-all ${errors.email ? 'border-red-400 focus:ring-red-100' : 'focus:ring-blue-100 border-slate-200'}`}
+              className={`border px-4 py-2.5 rounded-xl outline-none focus:ring-2 transition-all ${errors.email ? "border-red-400 focus:ring-red-100" : "focus:ring-blue-100 border-slate-200"}`}
               {...register("email")}
             />
-            {errors.email && <p className="text-red-500 text-xs font-medium italic">{errors.email.message}</p>}
+            {errors.email && (
+              <p className="text-red-500 text-xs font-medium italic">
+                {errors.email.message}
+              </p>
+            )}
           </div>
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 flex flex-col gap-1.5">
-              <label htmlFor="role" className="text-sm font-semibold text-slate-700">Assign Role</label>
-              <select 
+              <label
+                htmlFor="role"
+                className="text-sm font-semibold text-slate-700"
+              >
+                Assign Role
+              </label>
+              <select
                 id="role"
-                {...register('role', { valueAsNumber: true })} 
+                {...register("role", { valueAsNumber: true })}
                 className="border border-slate-200 p-2.5 rounded-xl focus:ring-2 focus:ring-blue-100 bg-white outline-none"
               >
                 <option value={1}>Admin</option>
@@ -100,20 +130,31 @@ const CreateUserModal = ({ closeModal }: Props) => {
                   className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                   {...register("isActive")}
                 />
-                <span className="text-sm font-semibold text-slate-700">Account Active</span>
+                <span className="text-sm font-semibold text-slate-700">
+                  Account Active
+                </span>
               </label>
             </div>
           </div>
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="password" className="text-sm font-semibold text-slate-700">Password</label>
+            <label
+              htmlFor="password"
+              className="text-sm font-semibold text-slate-700"
+            >
+              Password
+            </label>
             <input
               id="password"
               type="password"
               placeholder="••••••••"
-              className={`border px-4 py-2.5 rounded-xl outline-none focus:ring-2 transition-all ${errors.password ? 'border-red-400 focus:ring-red-100' : 'focus:ring-blue-100 border-slate-200'}`}
+              className={`border px-4 py-2.5 rounded-xl outline-none focus:ring-2 transition-all ${errors.password ? "border-red-400 focus:ring-red-100" : "focus:ring-blue-100 border-slate-200"}`}
               {...register("password")}
             />
-            {errors.password && <p className="text-red-500 text-xs font-medium italic">{errors.password.message}</p>}
+            {errors.password && (
+              <p className="text-red-500 text-xs font-medium italic">
+                {errors.password.message}
+              </p>
+            )}
           </div>
           <div className="flex justify-end gap-3 mt-4 pt-4 border-t border-slate-50">
             <button

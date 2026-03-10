@@ -8,7 +8,7 @@ import apiThunk from "./apiThunkHelper";
 
 export const fetchUsers = createAsyncThunk<User[]>(
   "user/fetchUsers",
-  async (_, { rejectWithValue })=>{
+  async (_, { rejectWithValue }) => {
     try {
       return await apiThunk<User[]>("/UserManagement");
     } catch (error) {
@@ -42,11 +42,9 @@ export const deleteUser = createAsyncThunk(
   "user/deleteUser",
   async (userId: number, { rejectWithValue }) => {
     try {
-      return await apiThunk(`/UserManagement/${userId}`,
-        {
-          method: "DELETE"
-        },
-      );
+      return await apiThunk(`/UserManagement/${userId}`, {
+        method: "DELETE",
+      });
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("something went wrong");
@@ -58,12 +56,10 @@ export const updateUser = createAsyncThunk(
   "user/updateUser",
   async (data: UpdateUserPayload, { rejectWithValue }) => {
     try {
-      return await apiThunk(`/UserManagement/${data.id}`,
-        { 
-          method: "PUT",
-          body: data,
-        },
-      );
+      return await apiThunk(`/UserManagement/${data.id}`, {
+        method: "PUT",
+        body: data,
+      });
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Something went wrong");

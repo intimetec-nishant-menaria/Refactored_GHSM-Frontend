@@ -20,36 +20,45 @@ const authSlice = createSlice({
       state.message = null;
     },
   },
-  extraReducers : (builder)=>{
-    builder.addCase(loginUser.pending , (state)=>{
-      state.loading = true;
-    }).addCase(loginUser.fulfilled , (state , action)=>{
-      state.user = action.payload;
-      state.loading = false;
-    }).addCase(loginUser.rejected , (state ,action)=>{
-      state.loading = false;
-      state.error = action.error as string;
-    });
+  extraReducers: (builder) => {
+    builder
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.loading = false;
+      })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error as string;
+      });
 
-    builder.addCase(checkMe.pending , (state)=>{
-      state.loading = true;
-    }).addCase(checkMe.fulfilled , (state , action)=>{
-      state.user = action.payload;
-      state.loading = false;
-    }).addCase(checkMe.rejected , (state ,action)=>{
-      state.loading = false;
-      state.error = action.error as string;
-    });
+    builder
+      .addCase(checkMe.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(checkMe.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.loading = false;
+      })
+      .addCase(checkMe.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error as string;
+      });
 
-    builder.addCase(logoutUser.pending , (state)=>{
-      state.loading = true;
-    }).addCase(logoutUser.fulfilled , (state)=>{
-      state.user = null;
-      state.loading = false;
-    }).addCase(logoutUser.rejected , (state)=>{
-      state.loading = false;
-    })
-  }
+    builder
+      .addCase(logoutUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.loading = false;
+      })
+      .addCase(logoutUser.rejected, (state) => {
+        state.loading = false;
+      });
+  },
 });
 
 export const { clearError, clearMessage } = authSlice.actions;

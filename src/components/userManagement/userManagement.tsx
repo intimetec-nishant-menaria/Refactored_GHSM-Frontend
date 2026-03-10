@@ -50,7 +50,10 @@ const UserManagement = () => {
       </div>
       <div className="grid grid-cols-1 gap-4 md:hidden">
         {users.map((user) => (
-          <div key={user.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <div
+            key={user.id}
+            className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
+          >
             <div className="flex justify-between items-start mb-2">
               <div>
                 <p className="font-bold text-gray-900">{user.name}</p>
@@ -74,11 +77,15 @@ const UserManagement = () => {
             <div className="grid grid-cols-2 text-sm pt-2 border-t border-gray-100">
               <div>
                 <span className="text-gray-500 block">Role</span>
-                <span className="font-medium">{user.role === 1 ? "Admin" : "Staff"}</span>
+                <span className="font-medium">
+                  {user.role === 1 ? "Admin" : "Staff"}
+                </span>
               </div>
               <div>
                 <span className="text-gray-500 block">Status</span>
-                <span className={`font-medium ${user.isActive ? "text-green-600" : "text-gray-400"}`}>
+                <span
+                  className={`font-medium ${user.isActive ? "text-green-600" : "text-gray-400"}`}
+                >
                   {user.isActive ? "Active" : "Inactive"}
                 </span>
               </div>
@@ -103,7 +110,9 @@ const UserManagement = () => {
                 <td className="py-3 px-4">{user.name}</td>
                 <td className="py-3 px-4 text-gray-600">{user.email}</td>
                 <td className="py-3 px-4">
-                  <span className={`px-2 py-1 rounded-full text-xs ${user.role === 1 ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'}`}>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs ${user.role === 1 ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}
+                  >
                     {user.role === 1 ? "Admin" : "Staff"}
                   </span>
                 </td>
