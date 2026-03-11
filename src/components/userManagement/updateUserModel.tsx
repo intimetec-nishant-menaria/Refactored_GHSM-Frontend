@@ -2,19 +2,15 @@ import { useState } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { updateUser, fetchUsers } from "@/app/asyncThunk/userThunk";
 import type { User } from "@/utils/interfaces/user";
+import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
 
-interface Props {
-  closeModal: () => void;
-  user: User;
-}
-
-const UpdateUserModal = ({ closeModal, user }: Props) => {
+const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
   const dispatch = useAppDispatch();
 
-  const [name, setName] = useState(user.name);
-  const [email] = useState(user.email);
-  const [role, setRole] = useState(user.role);
-  const [isActive, setIsActive] = useState(user.isActive);
+  const [name, setName] = useState(data.name);
+  const [email] = useState(data.email);
+  const [role, setRole] = useState(data.role);
+  const [isActive, setIsActive] = useState(data.isActive);
   const [error, setError] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,7 +23,7 @@ const UpdateUserModal = ({ closeModal, user }: Props) => {
 
     await dispatch(
       updateUser({
-        id: user.id,
+        id: data.id,
         name,
         email,
         role,
@@ -37,7 +33,7 @@ const UpdateUserModal = ({ closeModal, user }: Props) => {
 
     await dispatch(fetchUsers());
 
-    closeModal();
+    closeModel();
   };
 
   return (
@@ -78,7 +74,7 @@ const UpdateUserModal = ({ closeModal, user }: Props) => {
         <div className="flex justify-end gap-2 mt-2">
           <button
             type="button"
-            onClick={closeModal}
+            onClick={closeModel}
             className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
           >
             Cancel

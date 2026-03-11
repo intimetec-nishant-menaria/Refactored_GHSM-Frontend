@@ -1,16 +1,12 @@
 import { useState, type ChangeEvent } from "react";
-import Input from "../common/input/Input";
+import Input from "@/components/common/input";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { addRoom, fetchRooms } from "@/app/asyncThunk/roomThunk";
 import toast from "react-hot-toast";
 
 const numberRegex = /^\d*$/;
 
-interface Props {
-  closeModal: () => void;
-}
-
-function AddRoomModel({closeModal}:Props){
+function AddRoomModel({closeModel}:{closeModel:()=>void}){
     const dispatch = useAppDispatch();
 
     const [roomNumber , setRoomNumber] = useState("");
@@ -65,7 +61,7 @@ function AddRoomModel({closeModal}:Props){
             <div className="flex gap-1">
               <button
                 type="button"
-                onClick={closeModal}
+                onClick={closeModel}
                 className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
               >
               Cancel

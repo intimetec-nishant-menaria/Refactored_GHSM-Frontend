@@ -13,7 +13,7 @@ function Home() {
   const dispatch = useAppDispatch();
 
   const [selectedRoom, setSelectedRoom] = useState<RoomType | null>(null);
-  const [isRoomModalOpen, setRoomModalOpen] = useState(false);
+  const [isRoomModalOpen, setRoomModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     dispatch(fetchRoomType());

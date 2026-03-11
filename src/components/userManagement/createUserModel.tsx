@@ -4,11 +4,7 @@ import { useForm } from "react-hook-form";
 import { addUserSchema, type addUserInput } from "@/utils/schemas/addUserSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-interface Props {
-  closeModal: () => void;
-}
-
-const CreateUserModal = ({ closeModal }: Props) => {
+const CreateUserModal = ({ closeModel }: {closeModel:()=>void}) => {
   const dispatch = useAppDispatch();
   const {
     register , 
@@ -28,7 +24,7 @@ const CreateUserModal = ({ closeModal }: Props) => {
   const onSubmit = async (data:addUserInput) => {
     await dispatch(createUser(data));
     await dispatch(fetchUsers());
-    closeModal();
+    closeModel();
   };
 
   return (
@@ -83,7 +79,7 @@ const CreateUserModal = ({ closeModal }: Props) => {
         <div className="flex justify-end gap-2 mt-2">
           <button
             type="button"
-            onClick={closeModal}
+            onClick={closeModel}
             className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
           >
             Cancel
