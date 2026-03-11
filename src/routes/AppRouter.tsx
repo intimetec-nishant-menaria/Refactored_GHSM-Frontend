@@ -12,6 +12,7 @@ import Home from "@/pages/home/home";
 import BookingManagement from "@/components/bookingManagement/bookingManagement";
 import Calendar from "@/components/common/Calendar/calendar";
 import CheckInOutManagement from "@/pages/checkIn-Out/checkInOut";
+import GuestManagement from "@/components/guestManagement/guestManagement";
 
 export default function AppRouter() {
   return (
@@ -34,6 +35,7 @@ export default function AppRouter() {
           <Route path="rooms" element={<RoomManagement />} />
           <Route path="bookings" element={<BookingManagement />} />
           <Route path="checkings" element={<CheckInOutManagement />} />
+          <Route path="guests" element={<GuestManagement/>}/>
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
