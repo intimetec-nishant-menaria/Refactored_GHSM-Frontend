@@ -1,6 +1,6 @@
 import type { BookingState } from "@/utils/interfaces/booking";
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAllBookings } from "../asyncThunk/bookingThunk";
+import { fetchAllBookings, fetchBookingsByRange } from "../asyncThunk/bookingThunk";
 
 const initialState: BookingState = {
   bookings: [],
@@ -17,10 +17,19 @@ const BookingSlice = createSlice({
             state.loading = true;
         }).addCase(fetchAllBookings.fulfilled , (state,action)=>{
             state.bookings = action.payload ?? [];
-            console.log(state.bookings);
             state.bookings = state.bookings.sort((a,b)=>a.checkInDate.localeCompare(b.checkInDate));
             state.loading = false;
         }).addCase(fetchAllBookings.rejected , (state , action)=>{
+            state.loading=false;
+            state.error = action.payload as string;
+        })
+
+        builder.addCase(fetchBookingsByRange.pending , (state)=>{
+            state.loading = true;
+        }).addCase(fetchBookingsByRange.fulfilled , (state,action)=>{
+            state.bookings = action.payload ?? [];
+            state.loading = false;
+        }).addCase(fetchBookingsByRange.rejected , (state , action)=>{
             state.loading=false;
             state.error = action.payload as string;
         })

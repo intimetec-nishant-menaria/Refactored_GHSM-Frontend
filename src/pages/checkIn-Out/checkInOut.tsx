@@ -1,23 +1,50 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from "react";
+import {useEffect, useMemo, useState } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { checkIn, checkOut, fetchBookingsByRange, updateBooking } from "@/app/asyncThunk/bookingThunk";
+import { 
+  checkIn, 
+  checkOut, 
+  fetchBookingsByRange 
+} from "@/app/asyncThunk/bookingThunk";
 import PagingController from "@/components/common/paging/PagingController";
-import Button from "@/components/common/button/Button";
+import DateRangePicker from "@/components/Bookings/DateRangePicker"; 
+import ManualBookingModal from "./manualBookingModel"; 
 import toast from "react-hot-toast";
 import type { BookingPayload } from "@/utils/interfaces/booking";
 import dayjs from "dayjs";
+import ConfirmationModel from "@/components/common/confirmationModel/confirmationModel";
 
 const CheckInOutManagement = () => {
   const dispatch = useAppDispatch();
-  const { bookings, loading, error } = useAppSelector((state) => state.booking);
+  const { bookings, loading , error } = useAppSelector((state) => state.booking);
 
   const [activeTab, setActiveTab] = useState<"checkin" | "checkout">("checkin");
+  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
+  const [searchUser, setSearchUser] = useState("");
+  const [roomFilter, setRoomFilter] = useState("");
+  const [ isConfirmationModelOpen , setConfirmationModel] = useState(false);
+  const [bookingId , setBookingId] = useState<number | null>(null);
+  
+  const [dateRange, setDateRange] = useState({
+    startDate: dayjs().startOf("month"),
+    endDate: dayjs().endOf("month"),
+  });
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
-  const [searchUser, setSearchUser] = useState("");
-  const [roomFilter, setRoomFilter] = useState("");
+
+  const loadBookings = () => {
+    dispatch(
+      fetchBookingsByRange({
+        startDate: dateRange.startDate.format("YYYY-MM-DD"),
+        endDate: dateRange.endDate.format("YYYY-MM-DD"),
+      })
+    ).unwrap().catch((err) => toast.error(err || "Failed to sync bookings"));
+  }
+
+  useEffect(() => {
+    loadBookings();
+  }, [dispatch, dateRange]);
 
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
@@ -35,14 +62,12 @@ const CheckInOutManagement = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchUser, roomFilter, activeTab]);
+  }, [searchUser, roomFilter, activeTab, dateRange]);
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = useMemo(
-    () => filteredBookings.slice(startIndex, endIndex),
-    [filteredBookings, startIndex, endIndex],
-  );
+  const currentItems = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredBookings.slice(start, start + itemsPerPage);
+  }, [filteredBookings, currentPage, itemsPerPage]);
 
   useEffect(() => {
     dispatch(
@@ -86,41 +111,44 @@ const CheckInOutManagement = () => {
         } catch (error: any) {
           toast.error(error?.message || `${actionText} failed.`);
         }
+        toast.success(`${activeTab} successful`);
+        loadBookings(); 
+      } catch (error: any) {
+        toast.error(error?.message || "Operation failed");
       }
-      await dispatch(
-        fetchBookingsByRange({
-          startDate: dayjs().startOf("day").toISOString(),
-          endDate: dayjs().endOf("day").toISOString(),
-        }),
-      );
+      setBookingId(null);
+      setConfirmationModel(false);
+  };
+
+  const handleDateChange = (date: dayjs.Dayjs | null) => {
+    if (!date) return;
+    if (!dateRange.startDate || (dateRange.startDate && dateRange.endDate)) {
+      setDateRange({ startDate: date, endDate: date });
+    } else {
+      if (date.isBefore(dateRange.startDate)) {
+        setDateRange({ startDate: date, endDate: dateRange.startDate });
+      } else {
+        setDateRange({ ...dateRange, endDate: date });
+      }
     }
   };
 
   const getStatusBadge = (status: number) => {
-    const labels = {
-      1: "Booked",
-      2: "Checked In",
-      3: "Completed",
-      4: "Cancelled",
+    const styles: Record<number, string> = {
+      1: "bg-blue-50 text-blue-600 border-blue-100",
+      2: "bg-emerald-50 text-emerald-600 border-emerald-100",
+      3: "bg-slate-50 text-slate-500 border-slate-100",
+      4: "bg-red-50 text-red-600 border-red-100",
     };
-    const styles = {
-      1: "bg-blue-100 text-blue-700 border border-blue-200",
-      2: "bg-emerald-100 text-emerald-700 border border-emerald-200",
-      3: "bg-slate-100 text-slate-600 border border-slate-200",
-      4: "bg-red-100 text-red-700 border border-red-200",
-    };
+    const labels: Record<number, string> = { 1: "Booked", 2: "In House", 3: "Completed", 4: "Cancelled" };
     return (
-      <span
-        className={`px-2 py-1 rounded text-[10px] font-bold ${styles[status as keyof typeof styles] || "bg-gray-100"}`}
-      >
-        {labels[status as keyof typeof labels] || "Unknown"}
+      <span className={`px-2.5 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${styles[status]}`}>
+        {labels[status]}
       </span>
     );
   };
 
-  const goToNextPage = () => setCurrentPage((prev) => prev + 1);
-  const goToPrevPage = () => setCurrentPage((prev) => prev - 1);
-  const goToSpecificPage = (pageNumber: number) => setCurrentPage(pageNumber);
+  if(error) return <div>Error</div>
 
   if (loading)
     return (
@@ -130,156 +158,153 @@ const CheckInOutManagement = () => {
     );
 
   return (
-    <div className="p-4 md:p-6 bg-gray-100 min-h-screen w-full">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-800 tracking-tight">
-          Front Desk Operations
-        </h1>
+    <div className="p-4 md:p-8 min-h-screen w-full font-sans">
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-6">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Front Desk Operations</h1>
+          <p className="text-slate-500 text-sm">
+            Current Period: <span className="font-bold text-slate-700">{dateRange.startDate.format("MMM DD")} — {dateRange.endDate.format("MMM DD")}</span>
+          </p>
+        </div>
+        
+        <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto">
+          <div className="flex bg-white p-1 rounded-2xl shadow-sm border border-slate-200">
+            <button 
+              onClick={() => setActiveTab("checkin")} 
+              className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === "checkin" ? "bg-blue-600 text-white shadow-lg shadow-blue-200" : "text-slate-400 hover:bg-slate-50"}`}
+            >
+              Check-In List
+            </button>
+            <button 
+              onClick={() => setActiveTab("checkout")} 
+              className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === "checkout" ? "bg-blue-600 text-white shadow-lg shadow-blue-200" : "text-slate-400 hover:bg-slate-50"}`}
+            >
+              Check-Out List
+            </button>
+          </div>
 
-        <div className="flex bg-white p-1 rounded-xl shadow-sm border border-gray-200 w-full md:w-auto">
-          <button
-            onClick={() => setActiveTab("checkin")}
-            className={`flex-1 md:w-32 py-2 rounded-lg text-sm font-bold transition-all ${
-              activeTab === "checkin"
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-500 hover:bg-gray-50"
-            }`}
+          <button 
+            onClick={() => setIsManualModalOpen(true)} 
+            className="px-6 py-3 bg-indigo-600 text-white rounded-2xl text-xs font-bold shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all hover:-translate-y-0.5 active:translate-y-0"
           >
-            Check-In
-          </button>
-          <button
-            onClick={() => setActiveTab("checkout")}
-            className={`flex-1 md:w-32 py-2 rounded-lg text-sm font-bold transition-all ${
-              activeTab === "checkout"
-                ? "bg-blue-600 text-white shadow-md"
-                : "text-gray-500 hover:bg-gray-50"
-            }`}
-          >
-            Check-Out
+            + New Booking
           </button>
         </div>
       </div>
+      
+      <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mb-8 flex flex-col lg:flex-row items-center gap-6">
+        <div className="w-full lg:w-auto">
+          <DateRangePicker 
+            checkIn={dateRange.startDate} 
+            checkOut={dateRange.endDate} 
+            handleDateClick={handleDateChange} 
+            allowPast={true}
+          />
+        </div>
+        
+        <div className="h-10 w-[1px] bg-slate-100 hidden lg:block" />
 
-      <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6 flex flex-wrap gap-4">
-        <input
-          type="text"
-          placeholder="Search guest email..."
-          value={searchUser}
-          onChange={(e) => setSearchUser(e.target.value)}
-          className="border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none flex-grow md:max-w-xs text-sm"
-        />
-        <input
-          type="text"
-          placeholder="Room #"
-          value={roomFilter}
-          onChange={(e) => setRoomFilter(e.target.value)}
-          className="border p-2 rounded-lg focus:ring-2 focus:ring-blue-500 w-24 outline-none text-sm"
-        />
+        <div className="flex flex-wrap gap-4 flex-grow w-full lg:w-auto">
+          <input
+            type="text"
+            placeholder="Search by Guest Name"
+            value={searchUser}
+            onChange={(e) => setSearchUser(e.target.value)}
+            className="flex-grow border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-blue-50 outline-none text-sm transition-all bg-slate-50/30"
+          />
+          <input
+            type="text"
+            placeholder="Room #"
+            value={roomFilter}
+            onChange={(e) => setRoomFilter(e.target.value)}
+            className="w-28 border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-blue-50 outline-none text-sm transition-all text-center font-bold"
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:hidden">
-        {currentItems.length > 0 ? (
-          currentItems.map((b) => (
-            <div key={b.id} className="bg-white p-5 rounded-2xl shadow-sm border border-gray-200">
-              <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-bold text-gray-400 uppercase">
-                  Room {b.roomNumber}
-                </span>
-                {getStatusBadge(b.status)}
-              </div>
-              <h3 className="font-bold text-gray-800 break-all mb-1">{b.guestEmail}</h3>
-              <p className="text-xs text-gray-500 mb-4 italic">
-                {new Date(b.checkInDate).toLocaleDateString()} -{" "}
-                {new Date(b.checkOutDate).toLocaleDateString()}
-              </p>
-
-              <Button
-                label={
-                  activeTab === "checkin"
-                    ? "Confirm Check-In"
-                    : "Process Check-Out"
-                }
-                onClick={() => handleAction(b)}
-                className={`w-full py-2.5 rounded-xl font-bold text-white transition-all ${
-                  activeTab === "checkin"
-                    ? "bg-emerald-500 hover:bg-emerald-600"
-                    : "bg-amber-500 hover:bg-amber-600"
-                }`}
-              />
-            </div>
-          ))
-        ) : (
-          <div className="bg-white p-10 text-center rounded-2xl text-gray-400 italic">
-            No pending {activeTab}s.
-          </div>
-        )}
-      </div>
-
-      <div className="hidden md:block overflow-x-auto bg-white rounded-lg shadow-md mb-6">
-        <table className="min-w-full text-left border-collapse">
-          <thead className="bg-gray-200 text-gray-600 uppercase text-xs">
-            <tr>
-              <th className="py-3 px-4">Booking ID</th>
-              <th className="py-3 px-4">User</th>
-              <th className="py-3 px-4">Room Number</th>
-              <th className="py-3 px-4">Check In</th>
-              <th className="py-3 px-4">Check Out</th>
-              <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4 text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {currentItems.length > 0 ? (
-              currentItems.map((b) => (
-                <tr key={b.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-4 px-4 text-gray-500 font-mono text-sm">#{b.id}</td>
-                  <td className="py-4 px-4 font-medium text-gray-800">{b.guestEmail}</td>
-                  <td className="py-4 px-4">{b.roomNumber}</td>
-                  <td className="py-4 px-4 text-sm">
-                    {new Date(b.checkInDate).toLocaleDateString()}
-                  </td>
-                  <td className="py-4 px-4 text-sm">
-                    {new Date(b.checkOutDate).toLocaleDateString()}
-                  </td>
-                  <td className="py-4 px-4">{getStatusBadge(b.status)}</td>
-                  <td className="py-4 px-4 text-center">
-                    {b.status ==
-                    1 /*&& new Date(b.checkInDate) > new Date()*/ ? (
-                      <Button
-                        label="Check-In"
-                        onClick={() => handleAction(b)}
-                        className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-1.5 rounded-full transition-all text-[11px] font-black uppercase tracking-wider shadow-sm"
-                      />
-                    ) : (
-                      <Button
-                        label="Check-Out"
-                        onClick={() => handleAction(b)}
-                        className="bg-green-500 hover:bg-amber-600 text-white px-4 py-1.5 rounded-full transition-all text-[11px] font-black uppercase tracking-wider shadow-sm"
-                      />
-                    )}
-                  </td>
+      {loading && bookings.length === 0 ? (
+        <div className="py-32 text-center">
+          <div className="inline-block animate-bounce mb-4 text-blue-600 font-black text-2xl">...</div>
+          <p className="text-slate-400 font-medium tracking-wide">Retrieving records from database...</p>
+        </div>
+      ) : (
+         <div className="hidden md:block overflow-x-auto bg-white rounded-lg shadow-md mb-6">
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left">
+            <thead className="bg-gray-200 text-gray-600 border-b text-xs uppercase border-slate-100">
+                <tr>
+                  <th className="py-5 px-8">Guest Name</th>
+                  <th className="py-5 px-8">Room</th>
+                  <th className="py-5 px-8">Stay Period</th>
+                  <th className="py-5 px-8">Status</th>
+                  <th className="py-5 px-8 text-right">Actions</th>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={7} className="py-10 text-center text-gray-400">
-                  No bookings found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-      <div className="mt-6 flex justify-center">
-        <PagingController
-          dataLength={filteredBookings.length}
-          itemPerPage={itemsPerPage}
-          currentPage={currentPage}
-          goToPrevious={goToPrevPage}
-          goToNext={goToNextPage}
-          goToSpecificPage={goToSpecificPage}
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {currentItems.length > 0 ? currentItems.map((b) => (
+                  <tr key={b.id} className="hover:bg-blue-50/20 transition-colors group">
+                    <td className="py-5 px-8">
+                      <div className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors">{b.userName}</div>
+                    </td>
+                    <td className="py-5 px-8">
+                        Room {b.roomNumber}
+                    </td>
+                    <td className="py-5 px-8 text-xs text-slate-500 font-medium">
+                      <div className="flex items-center gap-2">
+                         <span>{dayjs(b.checkInDate).format("DD MMM")}</span>
+                         <span className="text-slate-300">→</span>
+                         <span>{dayjs(b.checkOutDate).format("DD MMM")}</span>
+                      </div>
+                    </td>
+                    <td className="py-5 px-8">{getStatusBadge(b.bookingStatus)}</td>
+                    <td className="py-5 px-8 text-right">
+                      <button 
+                        onClick={() => {
+                          setBookingId(b.bookingId)
+                          setConfirmationModel(true);
+                        }} 
+                        className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-white transition-all shadow-md active:scale-95 ${activeTab === 'checkin' ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-100' : 'bg-orange-500 hover:bg-orange-600 shadow-orange-100'}`}
+                      >
+                        Confirm {activeTab === 'checkin' ? 'Arrival' : 'Departure'}
+                      </button>
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan={5} className="py-32 text-center">
+                      <div className="text-slate-300 italic text-sm mb-1">No bookings match these filters.</div>
+                      <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Try adjusting the date range or search terms.</div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      <div className="flex justify-center mt-10">
+        <PagingController 
+          dataLength={filteredBookings.length} 
+          itemPerPage={itemsPerPage} 
+          currentPage={currentPage} 
+          goToPrevious={() => setCurrentPage(p => Math.max(1, p - 1))} 
+          goToNext={() => setCurrentPage(p => p + 1)} 
+          goToSpecificPage={setCurrentPage} 
         />
       </div>
+
+      {isManualModalOpen && (
+        <ManualBookingModal 
+          closeModel={() => { 
+            setIsManualModalOpen(false); 
+            loadBookings(); 
+          }} 
+        />
+      )}
+      {isConfirmationModelOpen && <ConfirmationModel 
+            label={`Are you sure you want to process ${activeTab} for bookingId ${bookingId}?` }
+            isConfirmationModelOpen={setConfirmationModel} actionText={activeTab} submitAction={handleAction} className={activeTab === "checkin" ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-100" : 'bg-orange-500 hover:bg-orange-600 shadow-orange-100'}/>}
     </div>
   );
 };

@@ -10,7 +10,7 @@ export const fetchUsers = createAsyncThunk<User[]>(
   "user/fetchUsers",
   async (_, { rejectWithValue }) => {
     try {
-      return await apiThunk<User[]>("/UserManagement");
+      return await apiThunk<User[]>("/UserManagement/getAllUsers");
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("something went wrong");
@@ -20,7 +20,7 @@ export const fetchUsers = createAsyncThunk<User[]>(
 export const fetchUserById = createAsyncThunk(
   "users/fetchUserById",
   async (id: number) => {
-    return await apiThunk(`/UserManagement/${id}`);
+    return await apiThunk(`/UserManagement/getUserById/${id}`);
   },
 );
 
@@ -28,7 +28,7 @@ export const createUser = createAsyncThunk(
   "user/createUser",
   async (userData: CreateUserPayload, { rejectWithValue }) => {
     try {
-      return await apiThunk("/UserManagement", {
+      return await apiThunk("/UserManagement/createUser", {
         method: "POST",
         body: userData,
       });
@@ -42,7 +42,7 @@ export const deleteUser = createAsyncThunk(
   "user/deleteUser",
   async (userId: number, { rejectWithValue }) => {
     try {
-      return await apiThunk(`/UserManagement/${userId}`, {
+      return await apiThunk(`/UserManagement/${userId}/deleteUser`, {
         method: "DELETE",
       });
     } catch (error) {
@@ -56,7 +56,7 @@ export const updateUser = createAsyncThunk(
   "user/updateUser",
   async (data: UpdateUserPayload, { rejectWithValue }) => {
     try {
-      return await apiThunk(`/UserManagement/${data.id}`, {
+      return await apiThunk(`/UserManagement/${data.id}/updateUser`, {
         method: "PUT",
         body: data,
       });

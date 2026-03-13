@@ -42,14 +42,15 @@ function Bookings() {
 
     dispatch(
       fetchAvailableRooms({
-        checkInDate: dayjs(checkIn).toISOString(),
-        checkOutDate: dayjs(checkOut).toISOString(),
+        checkInDate: dayjs(checkIn).format("YYYY-MM-DD"),
+        checkOutDate: dayjs(checkOut).format("YYYY-MM-DD"),
       }),
     );
   }, [checkIn, checkOut, dispatch]);
 
   const handleDateClick = (newValue: Dayjs | null) => {
     if (!newValue) return;
+    console.log(dayjs(newValue).format("YYYY-MM-DD"));
     if (!checkIn || (checkIn && checkOut)) {
       setCheckIn(newValue);
       setCheckOut(null);

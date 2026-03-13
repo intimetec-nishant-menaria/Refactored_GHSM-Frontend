@@ -12,6 +12,7 @@ import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
 import UpdateRoomModel from "./UpdateRoomModel";
 import { fetchRoomType } from "@/app/asyncThunk/roomTypeThunk";
 import RoomStatusDropDown from "../common/roomStatusDropDown/RoomStatusDropDown.tsx";
+import ConfirmationModel from "../common/confirmationModel/confirmationModel.tsx";
 
 const RoomManagement = () => {
   const dispatch = useAppDispatch();
@@ -49,10 +50,10 @@ const RoomManagement = () => {
   }, [dispatch]);
 
   const handleDelete = async (roomid: number) => {
-    if (window.confirm("Delete this room?")) {
       await dispatch(deleteRoom(roomid));
       await dispatch(fetchRooms());
-    }
+      setRoomId(null);
+      setConfirmationModel(false);
   };
   const goToNextPage = () => setCurrentPage(prev => prev + 1);
   const goToPrevPage = () => setCurrentPage(prev => prev - 1);

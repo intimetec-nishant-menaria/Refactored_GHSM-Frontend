@@ -9,6 +9,9 @@ import editIcon from "@/assets/editIcon.png";
 import CreateUserModal from "@/components/userManagement/createUserModel";
 import UpdateUserModal from "@/components/userManagement/updateUserModel";
 import type { User } from "@/utils/interfaces/user";
+import ConfirmationModel from "../common/confirmationModel/confirmationModel";
+import { useAppSelector } from "@/hooks/useAppSelector";
+import toast from "react-hot-toast";
 
 const UserManagement = () => {
   const dispatch = useAppDispatch();
@@ -16,23 +19,31 @@ const UserManagement = () => {
     (state: RootState) => state.user,
   );
 
+  const {user} = useAppSelector(state=>state.auth); 
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [isConfirmationModelOpen ,setConfirmationModel ] = useState(false);
+  const [userId , setUserId] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(fetchUsers());
   }, [dispatch]);
 
   const openCreateModal = () => setIsCreateModalOpen(true);
-  const closeCreateModal = () => setIsCreateModalOpen(false);
+  const closeCreateModel = () => setIsCreateModalOpen(false);
   const openUpdateModal = (user: User) => setEditingUser(user);
   const closeUpdateModal = () => setEditingUser(null);
 
   const handleDelete = async (userId: number) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
+    if(userId == user?.id){
+      toast.error("Admin cannot delete himself.");
+      return;
+    }
       await dispatch(deleteUser(userId));
       await dispatch(fetchUsers());
-    }
+      setUserId(null);
+      setConfirmationModel(false);
   };
 
   if (loading) return <p>Loading users...</p>;
@@ -95,6 +106,7 @@ const UserManagement = () => {
       {editingUser && (
         <UpdateUserModal closeModel={closeUpdateModal} user={editingUser} />
       )}
+      {isConfirmationModelOpen && <ConfirmationModel label="Are you sure you want to delete this user?" isConfirmationModelOpen={setConfirmationModel} submitAction={()=>handleDelete(userId)}/>}
     </div>
   );
 };

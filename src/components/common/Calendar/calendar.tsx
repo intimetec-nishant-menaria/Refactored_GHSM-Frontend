@@ -19,7 +19,7 @@ interface BookingDto {
 }
 
 function Calendar() {
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<unknown[]>([]);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const dispatch = useAppDispatch();
 
@@ -27,9 +27,8 @@ function Calendar() {
     const startDate = new Date(dateInfo.startStr).toISOString();
     const endDate = new Date(dateInfo.endStr).toISOString();
 
-    const res: BookingDto[] =
-      (await dispatch(fetchBookingsByRange({ startDate, endDate })).unwrap()) ??
-      [];
+    const res: BookingDto[] = (await dispatch(fetchBookingsByRange({ startDate, endDate })).unwrap()) ?? [];
+
     const formatedData = res.map((booking) => ({
       id: booking.bookingId.toString(),
       title: `${booking.userName} (Room ${booking.roomNumber})`,
@@ -66,7 +65,7 @@ function Calendar() {
   }
 
   return (
-    <div className="flex flex-col h-screen p-4 md:p-8 bg-slate-50 font-sans">
+    <div className="flex flex-col h-screen p-4 md:p-8  font-sans">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">

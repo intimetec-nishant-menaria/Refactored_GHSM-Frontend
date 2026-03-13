@@ -9,7 +9,7 @@ function AdminLayout() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="flex h-screen w-full bg-gray-50 overflow-hidden">
+    <div className="flex h-screen w-full bg-gray-100  overflow-hidden">
       {user && (
         <aside className="md:w-64 lg:w-1/6 h-screen bg-slate-500 shrink-0 z-50">
           <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />

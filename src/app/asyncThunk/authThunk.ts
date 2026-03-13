@@ -59,7 +59,7 @@ export const loginUser = createAsyncThunk(
         body: data,
       });
 
-      const response = await apiThunk<User>("/auth/me");
+      const response = await apiThunk<User>("/auth/getUserDetails");
       return response;
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
@@ -119,7 +119,7 @@ export const checkMe = createAsyncThunk(
   "auth/checkMe",
   async (_, { rejectWithValue }) => {
     try {
-      return await apiThunk<User>("/auth/me");
+      return await apiThunk<User>("/auth/getUserDetails");
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Logout failed");

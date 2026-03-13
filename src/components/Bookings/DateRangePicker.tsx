@@ -8,9 +8,10 @@ interface Props {
   checkIn: Dayjs | null;
   checkOut: Dayjs | null;
   handleDateClick: (date: Dayjs | null) => void;
+  allowPast?: boolean;
 }
 
-const DateRangePicker = ({ checkIn, checkOut, handleDateClick }: Props) => {
+const DateRangePicker = ({ checkIn, checkOut, handleDateClick , allowPast = false }: Props) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box className="flex flex-col md:flex-row gap-4 w-full">
@@ -25,7 +26,7 @@ const DateRangePicker = ({ checkIn, checkOut, handleDateClick }: Props) => {
           label="Check Out"
           value={checkOut}
           onChange={(newDate) => handleDateClick(newDate)}
-          disablePast
+          disablePast={!allowPast}
           minDate={checkIn ?? undefined}
           sx={{ width: { xs: "100%", md: 250 } }}
         />

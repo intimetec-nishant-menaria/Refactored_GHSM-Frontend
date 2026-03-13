@@ -1,16 +1,15 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { fetchUsers, deleteUser } from "@/app/asyncThunk/userThunk";
 import type { RootState } from "@/app/store/store";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import Button from "@/components/common/button/Button";
 import deleteIcon from "@/assets/deleteIcon.png";
 import editIcon from "@/assets/editIcon.png";
-import UpdateUserModal from "@/components/userManagement/updateUserModel";
-import type { User } from "@/utils/interfaces/user";
-import { fetchAllGuest } from "@/app/asyncThunk/guestThunk";
+import { deleteGuest, fetchAllGuest } from "@/app/asyncThunk/guestThunk";
 import type { GuestState } from "@/utils/interfaces/guest";
 import CreateGuestModal from "./guestAddModel";
+import UpdateGuestModal from "./guestUpdateModel";
+import ConfirmationModel from "../common/confirmationModel/confirmationModel";
 
 const GuestManagement = () => {
   const dispatch = useAppDispatch();
@@ -19,7 +18,9 @@ const GuestManagement = () => {
   );
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [editingUser, setEditingUser] = useState<GuestState | null>(null);
+  const [isConfirmationModelOpen , setConfirmationModel] = useState(false);
+  const [deleteId , setDeleteId] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(fetchAllGuest());
@@ -28,13 +29,13 @@ const GuestManagement = () => {
   const openCreateModal = () => setIsCreateModalOpen(true);
   const closeCreateModal = () => setIsCreateModalOpen(false);
   const openUpdateModal = (guest : GuestState) => setEditingUser(guest);
-  const closeUpdateModal = () => setEditingUser(null);
+  const closeUpdateModel = () => setEditingUser(null);
 
   const handleDelete = async (guestId: number) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      await dispatch(deleteUser(guestId));
-      await dispatch(fetchUsers());
-    }
+      await dispatch(deleteGuest(guestId));
+      await dispatch(fetchAllGuest());
+      setDeleteId(null);
+      setConfirmationModel(false);
   };
 
   if (loading) return <p className="p-6 text-center">Loading users...</p>;
@@ -86,7 +87,7 @@ const GuestManagement = () => {
               <div>
                <span className="text-gray-500 block">Address</span>
                 <span className="font-medium">
-                  {guest.Address}
+                  {guest.address}
                 </span>
               </div>
             </div>
@@ -110,7 +111,7 @@ const GuestManagement = () => {
                 <td className="py-3 px-4">{guest.name}</td>
                 <td className="py-3 px-4 text-gray-600">{guest.email}</td>
                 <td className="py-3 px-4 text-gray-600">{guest.contact}</td>
-                <td className="py-3 px-4">{guest.Address}</td>
+                <td className="py-3 px-4">{guest.address}</td>
                 <td className="py-3 px-4">
                   <div className="flex justify-center gap-3">
                     <img
@@ -123,7 +124,10 @@ const GuestManagement = () => {
                       src={deleteIcon}
                       alt="Delete"
                       className="cursor-pointer w-5 h-5 opacity-70 hover:opacity-100"
-                      onClick={() => handleDelete(guest.id)}
+                      onClick={() =>{
+                        setDeleteId(guest.id)
+                        setConfirmationModel(true)
+                      }}
                     />
                   </div>
                 </td>
@@ -135,8 +139,9 @@ const GuestManagement = () => {
 
       {isCreateModalOpen && <CreateGuestModal closeModal={closeCreateModal} />}
       {editingUser && (
-        <UpdateUserModal closeModel={closeUpdateModal} data={editingUser} />
+        <UpdateGuestModal closeModel={closeUpdateModel} data={editingUser} />
       )}
+      {isConfirmationModelOpen && <ConfirmationModel label="Are you sure you want to delete this Guest? " isConfirmationModelOpen={setConfirmationModel} submitAction={()=>handleDelete(deleteId)}/>}
     </div>
   );
 };

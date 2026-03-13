@@ -4,7 +4,7 @@ export interface GuestState{
     email : string;
     contact : string;
     idProof : string;
-    Address : string;
+    address : string;
     emergencyContact : string;
 }
 
@@ -15,10 +15,11 @@ export interface GuestStatePayload{
 }
 
 export interface UpdateGuest{
+    id : number;
     name : string;
     email : string;
     contact : string;
     idProof : string;
-    Address : string;
+    address : string;
     emergencyContact : string;
 }

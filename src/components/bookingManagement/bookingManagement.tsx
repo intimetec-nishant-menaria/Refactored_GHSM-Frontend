@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { fetchAllBookings, cancelBooking } from "@/app/asyncThunk/bookingThunk";
+import { fetchAllBookings, cancelBooking} from "@/app/asyncThunk/bookingThunk";
 import PagingController from "../common/paging/PagingController";
 import Button from "../common/button/Button";
 import toast from "react-hot-toast";
+import dayjs from "dayjs";
+import ConfirmationModel from "../common/confirmationModel/confirmationModel";
 
 const BookingManagement = () => {
   const dispatch = useAppDispatch();
@@ -16,6 +18,8 @@ const BookingManagement = () => {
   const [searchUser, setSearchUser] = useState("");
   const [roomFilter, setRoomFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState(0);
+  const [ isConfirmationModelOpen ,setConfirmationModel] = useState(false);
+  const [bookingId , setBookingId] = useState<number | null>(null);
 
   const goToNextPage = () => {
     if (currentPage < Math.ceil(filteredBookings.length / itemsPerPage)) {
@@ -58,17 +62,18 @@ const BookingManagement = () => {
     dispatch(fetchAllBookings());
   }, [dispatch]);
 
-  const handleCancel = async (bookingId: number, checkInDate: string) => {
-    if (window.confirm("Are you sure you want to cancel this booking?")) {
+  const handleCancel = async () => {
       await dispatch(cancelBooking(bookingId))
-        .then(async () => {
+        .then(() => {
           toast.success("Booking cancelled successfully.");
-          await dispatch(fetchAllBookings());
         })
         .catch((error: any) => {
           toast.error(error?.message || "Failed to cancel booking.");
         });
-    }
+        
+      await dispatch(fetchAllBookings());
+      setBookingId(null);
+      setConfirmationModel(false);
   };
 
   const getStatusBadge = (status: number) => {
@@ -95,6 +100,8 @@ const BookingManagement = () => {
     );
   };
 
+  console.log(bookings);
+
   if (loading)
     return (
       <p className="p-6 text-center text-blue-600 font-medium">
@@ -108,7 +115,7 @@ const BookingManagement = () => {
       <h1 className="text-xl md:text-2xl font-bold mb-6 text-gray-800">
         Booking Management
       </h1>
-      <div className="flex flex-col lg:flex-row gap-4 mb-6">
+      <div className="bg-white rounded-2xl p-4 flex flex-col lg:flex-row gap-4 mb-6">
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <input
             type="text"
@@ -149,7 +156,7 @@ const BookingManagement = () => {
               <div className="flex justify-between items-start mb-3">
                 <div className="max-w-[70%]">
                   <span className="text-[10px] font-bold text-gray-400 uppercase">ID: #{b.id}</span>
-                  <p className="font-semibold text-gray-800 break-all text-sm leading-tight">{b.guestName}</p>
+                  <p className="font-semibold text-gray-800 break-all text-sm leading-tight">{b.guestName}{(b.guestEmail)}</p>
                 </div>
                 {getStatusBadge(b.status)}
               </div>
@@ -175,7 +182,10 @@ const BookingManagement = () => {
               {b.status === 1 && new Date(b.checkInDate) > new Date() && (
                 <Button
                   label="Cancel Booking"
-                  onClick={() => handleCancel(b.id, b.checkInDate)}
+                  onClick={() => {
+                    setBookingId(b.id)
+                    setConfirmationModel(true);
+                  }}
                   className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-md font-bold text-sm transition-colors mt-2"
                 />
               )}
@@ -208,10 +218,10 @@ const BookingManagement = () => {
                   <td className="py-4 px-4 font-medium text-gray-800">{b.guestName}</td>
                   <td className="py-4 px-4">{b.roomNumber}</td>
                   <td className="py-4 px-4 text-sm">
-                    {new Date(b.checkInDate).toLocaleDateString()}
+                    {dayjs(b.checkInDate).format("DD/MM/YYYY")}
                   </td>
                   <td className="py-4 px-4 text-sm">
-                    {new Date(b.checkOutDate).toLocaleDateString()}
+                    {dayjs(b.checkOutDate).format("DD/MM/YYYY")}
                   </td>
                   <td className="py-4 px-4">{getStatusBadge(b.status)}</td>
                   <td className="py-4 px-4 text-center">
@@ -219,7 +229,11 @@ const BookingManagement = () => {
                     1 /*&& new Date(b.checkInDate) > new Date()*/ ? (
                       <Button
                         label="Cancel"
-                        onClick={() => handleCancel(b.id, b.checkInDate)}
+                        onClick={() => {
+                          console.log(b.id);
+                          setBookingId(b.id);
+                          setConfirmationModel(true);
+                        }}
                         className="bg-red-500 hover:bg-red-600 hover:text-white text-red-600 px-4 py-1 rounded-full transition-all text-xs font-bold border border-red-200"
                       />
                     ) : (
@@ -248,6 +262,7 @@ const BookingManagement = () => {
           goToSpecificPage={goToSpecificPage}
         />
       </div>
+      { isConfirmationModelOpen && <ConfirmationModel label="Are you sure you want to cancel this booking?" actionText="Cancel Booking" isConfirmationModelOpen={setConfirmationModel} submitAction={handleCancel} />}
     </div>
   );
 };

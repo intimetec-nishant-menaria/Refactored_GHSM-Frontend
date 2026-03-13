@@ -8,7 +8,7 @@ const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
   const dispatch = useAppDispatch();
 
   const [name, setName] = useState(data.name);
-  const [email] = useState(data.email);
+  const [email , setEmail] = useState(data.email);
   const [role, setRole] = useState(data.role);
   const [isActive, setIsActive] = useState(data.isActive);
   const [error, setError] = useState(false);
@@ -119,14 +119,14 @@ const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
               htmlFor="email"
               className="text-sm font-semibold text-slate-700"
             >
-              Email (Cannot be changed)
+              Email
             </label>
             <input
               id="email"
               type="email"
               value={email}
-              disabled
-              className="border border-slate-200 px-4 py-2.5 rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed"
+              onChange={(e) => setEmail(e.target.value)}
+              className="border border-slate-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-100 outline-none rounded-xl cursor-not-allowed"
             />
           </div>
           <div className="flex flex-col lg:flex-row gap-6">
