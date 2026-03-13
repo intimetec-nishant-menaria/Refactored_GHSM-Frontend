@@ -52,7 +52,7 @@ const CheckInOutManagement = () => {
         activeTab === "checkin" ? b.status === 1 : b.status === 2;
       const matchesUser =
         !searchUser ||
-        b.userEmail.toLowerCase().includes(searchUser.toLowerCase());
+        b.guestEmail.toLowerCase().includes(searchUser.toLowerCase());
       const matchesRoom =
         !roomFilter || b.roomNumber.toString().includes(roomFilter);
 
@@ -62,12 +62,14 @@ const CheckInOutManagement = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchUser, roomFilter, activeTab, dateRange]);
+  }, [searchUser, roomFilter, activeTab]);
 
-  const currentItems = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredBookings.slice(start, start + itemsPerPage);
-  }, [filteredBookings, currentPage, itemsPerPage]);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const currentItems = useMemo(
+    () => filteredBookings.slice(startIndex, endIndex),
+    [filteredBookings, startIndex, endIndex],
+  );
 
   useEffect(() => {
     dispatch(
@@ -79,7 +81,6 @@ const CheckInOutManagement = () => {
   }, [dispatch]);
 
   const handleAction = async (booking : BookingPayload) => {
-    console.log(booking);
     const actionText = activeTab === "checkin" ? "Check-In" : "Check-Out";
     if (window.confirm(`Are you sure you want to process ${actionText} for this booking?`)) {
         if(activeTab === "checkin"){
@@ -148,15 +149,17 @@ const CheckInOutManagement = () => {
     );
   };
 
-  if(error) return <div>Error</div>
+  const goToNextPage = () => setCurrentPage((prev) => prev + 1);
+  const goToPrevPage = () => setCurrentPage((prev) => prev - 1);
+  const goToSpecificPage = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  if (loading)
+  if (loading){
     return (
       <p className="p-6 text-center text-blue-600 font-medium animate-pulse">
         Loading operations...
       </p>
     );
-
+  }
   return (
     <div className="p-4 md:p-8 min-h-screen w-full font-sans">
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-6">

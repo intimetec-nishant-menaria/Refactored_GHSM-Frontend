@@ -17,39 +17,6 @@ interface LoginResponse {
   };
 }
 
-interface LoginResponse {
-  token: string;
-  user: {
-    id: number;
-    name : string;
-    email: string;
-    role: number;
-    isActive : boolean;
-  };
-}
-
-interface LoginResponse {
-  token: string;
-  user: {
-    id: number;
-    name : string;
-    email: string;
-    role: number;
-    isActive : boolean;
-  };
-}
-
-interface LoginResponse {
-  token: string;
-  user: {
-    id: number;
-    name : string;
-    email: string;
-    role: number;
-    isActive : boolean;
-  };
-}
-
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (data: LoginInput, { rejectWithValue }) => {

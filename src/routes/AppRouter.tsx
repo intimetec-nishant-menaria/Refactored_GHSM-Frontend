@@ -9,7 +9,7 @@ import RoomManagement from "@/components/roomManagement/roomManagement";
 import ProtectedRoutes from "./protectedRoutes";
 import PublicRoutes from "./publicRoutes";
 import Home from "@/pages/home/home";
-import BookingManagement from "@/components/bookingManagement/bookingManagement";
+import BookingManagement from "@/components/bookingManagement/bookingManagement.tsx";
 import Calendar from "@/components/common/Calendar/calendar";
 import CheckInOutManagement from "@/pages/checkIn-Out/checkInOut";
 import GuestManagement from "@/components/guestManagement/guestManagement";

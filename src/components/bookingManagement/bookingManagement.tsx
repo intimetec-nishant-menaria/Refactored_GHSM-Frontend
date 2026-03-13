@@ -100,8 +100,6 @@ const BookingManagement = () => {
     );
   };
 
-  console.log(bookings);
-
   if (loading)
     return (
       <p className="p-6 text-center text-blue-600 font-medium">
