@@ -25,7 +25,6 @@ const UserManagement = () => {
 
   const openCreateModal = () => setIsCreateModalOpen(true);
   const closeCreateModal = () => setIsCreateModalOpen(false);
-
   const openUpdateModal = (user: User) => setEditingUser(user);
   const closeUpdateModal = () => setEditingUser(null);
 

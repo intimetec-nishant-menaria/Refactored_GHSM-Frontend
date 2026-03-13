@@ -90,12 +90,22 @@ function AddRoomModel({closeModel}:{closeModel:()=>void}){
               <button
                 type="button"
                 onClick={closeModel}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"></button>
+            <div className="flex-col flex gap-2">
+              <label htmlFor="RoomType" className="text-sm font-semibold text-slate-700">
+                Room Type
+              </label>
+              <select 
+                id="RoomType"
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => setRoomTypeId(Number(e.target.value))} 
+                value={roomTypeId}
+                className="border w-full border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-100 bg-white outline-none transition-all cursor-pointer"
               >
                 <option value={1}>Single Room</option>
                 <option value={2}>Double Room</option>
                 <option value={3}>Luxury Suite</option>
               </select>
+              </div>
             </div>
 
           </div>

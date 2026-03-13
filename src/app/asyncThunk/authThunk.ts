@@ -92,7 +92,9 @@ export const resetPassword = createAsyncThunk(
         body : data
       });
     } catch (error) {
-      if (error instanceof Error) return rejectWithValue(error.message);
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
       return rejectWithValue("Reset failed");
     }
   },

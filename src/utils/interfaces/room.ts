@@ -9,3 +9,8 @@ export interface UpdateRoomPayload{
     roomTypeId : number;
     roomStatus : number;
 }
+
+export interface RoomAvailabilityRequest{
+    checkInDate : string | null; 
+    checkOutDate : string | null;
+}
