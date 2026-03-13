@@ -46,7 +46,7 @@ const ResetPasswordForm = () => {
     ).then((resultAction) => {
       if (resetPassword.fulfilled.match(resultAction)) {
         toast.success("Password reset successful!");
-        navigate("/");
+        navigate("/" , {replace : true});
       } else {
         toast.error(
           (resultAction.payload as string) || "Failed to reset password",

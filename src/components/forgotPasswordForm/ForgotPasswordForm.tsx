@@ -60,6 +60,7 @@ const ForgotPasswordForm = () => {
         disabled={loading}
         ref={ref}
       ></Button>
+      <Button type="submit" label="Reset Password" className="w-full"></Button>
       <div className="text-center">
         <span
           onClick={() => navigate("/")}

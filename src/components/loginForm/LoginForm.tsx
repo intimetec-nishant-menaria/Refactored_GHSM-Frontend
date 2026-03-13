@@ -9,8 +9,9 @@ import { loginSchema } from "@/utils/schemas/loginSchema";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/app/store/store";
-import { loginUser } from "@/app/asyncThunk/authThunk";
 import { useRef } from "react";
+import { loginUser } from "@/app/asyncThunk/authThunk";
+import { useEffect } from "react";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -19,20 +20,37 @@ const LoginForm = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      rememberMe: false,
+    },
   });
 
-  const onSubmit = (data: LoginInput) => {
-    dispatch(loginUser(data)).then((resultAction) => {
-      if (loginUser.fulfilled.match(resultAction)) {
-        toast.success("Logged in successfully!");
-        navigate("/dashboard");
-      } else {
-        toast.error(resultAction.payload as string);
-      }
-    });
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+
+    if (savedEmail) {
+      setValue("email", savedEmail);
+      setValue("rememberMe", true);
+    }
+  }, [setValue]);
+
+  const onSubmit = async (data: LoginInput) => {
+    if (data.rememberMe) {
+      localStorage.setItem("rememberedEmail", data.email);
+    } else {
+      localStorage.removeItem("rememberedEmail");
+    }
+    const resultAction = await dispatch(loginUser(data));
+    if (loginUser.fulfilled.match(resultAction)) {
+      toast.success("Logged in successfully!");
+      navigate("/" , {replace:true});
+    } else {
+      toast.error(resultAction.payload as string);
+    }
   };
 
   return (
