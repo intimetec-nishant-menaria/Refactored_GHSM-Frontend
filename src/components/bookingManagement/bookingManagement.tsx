@@ -10,16 +10,13 @@ const BookingManagement = () => {
   const dispatch = useAppDispatch();
   const { bookings, loading, error } = useAppSelector((state) => state.booking);
 
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
 
-  // Filter State
   const [searchUser, setSearchUser] = useState("");
   const [roomFilter, setRoomFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState(0);
 
-  // 1. Pagination Functions
   const goToNextPage = () => {
     if (currentPage < Math.ceil(filteredBookings.length / itemsPerPage)) {
       setCurrentPage((prev) => prev + 1);
@@ -36,7 +33,6 @@ const BookingManagement = () => {
     setCurrentPage(pageNumber);
   };
 
-  // 2. Filter Logic
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
       const matchesUser = !searchUser || b.userEmail.toLowerCase().includes(searchUser.toLowerCase());
@@ -47,7 +43,6 @@ const BookingManagement = () => {
     });
   }, [bookings, searchUser, roomFilter, statusFilter]);
 
-  // 3. Reset to page 1 when any filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchUser, roomFilter, statusFilter]);

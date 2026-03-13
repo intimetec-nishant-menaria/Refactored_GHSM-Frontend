@@ -25,7 +25,6 @@ const UserManagement = () => {
 
   const openCreateModal = () => setIsCreateModalOpen(true);
   const closeCreateModal = () => setIsCreateModalOpen(false);
-
   const openUpdateModal = (user: User) => setEditingUser(user);
   const closeUpdateModal = () => setEditingUser(null);
 
@@ -91,10 +90,10 @@ const UserManagement = () => {
         </table>
       </div>
 
-      {isCreateModalOpen && <CreateUserModal closeModal={closeCreateModal} />}
+      {isCreateModalOpen && <CreateUserModal closeModel={closeCreateModal} />}
 
       {editingUser && (
-        <UpdateUserModal closeModal={closeUpdateModal} user={editingUser} />
+        <UpdateUserModal closeModel={closeUpdateModal} user={editingUser} />
       )}
     </div>
   );

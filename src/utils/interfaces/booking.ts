@@ -22,3 +22,10 @@ export interface BookingState{
     loading : boolean,
     error : string | null, 
 }
+
+export interface updateBookingPayload{
+    id : number;
+    checkIn : string;
+    checkOut : string;
+    status : number;
+}

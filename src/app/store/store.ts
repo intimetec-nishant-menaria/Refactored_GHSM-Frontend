@@ -5,6 +5,7 @@ import roomReducer from "@/app/slices/roomSlice";
 import roomTypeReducer from "@/app/slices/roomTypeSlice";
 import availableRoomReducer from "@/app/slices/availableRoomSlics";
 import bookingSliceReducer from "@/app/slices/bookingSlice"
+import amenitiesSlice from "@/app/slices/amenitiesSlice";
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ export const store = configureStore({
     roomType: roomTypeReducer,
     availableRooms : availableRoomReducer,
     booking : bookingSliceReducer,
+    amenities : amenitiesSlice,
   },
 });
 

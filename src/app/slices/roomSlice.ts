@@ -28,7 +28,6 @@ const RoomSlice = createSlice({
       });
 
       builder.addCase(deleteRoom.fulfilled , (state , action)=>{
-        console.log(action.payload);
         state.rooms = state.rooms.filter( room => room.id !=action.payload);
       });
   },
