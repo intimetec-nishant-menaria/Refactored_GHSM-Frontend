@@ -1,6 +1,6 @@
 import type { AuthState } from "@/utils/interfaces/authLayout";
 import { createSlice } from "@reduxjs/toolkit";
-import { checkMe, loginUser, logoutUser,forgotPassword } from "../asyncThunk/authThunk";
+import { checkMe, loginUser, logoutUser } from "../asyncThunk/authThunk";
 
 const initialState: AuthState = {
   user: null,
@@ -12,21 +12,13 @@ const initialState: AuthState = {
 const authSlice = createSlice({
   name: "auth",
   initialState,
-  reducers: {},
-  extraReducers: (builder) => {
-    builder
-      .addCase(forgotPassword.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(forgotPassword.fulfilled, (state, action) => {
-        state.loading = false;
-        state.message = action.payload;
-      })
-      .addCase(forgotPassword.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
+  reducers: {
+    clearError: (state) => {
+      state.error = null;
+    },
+    clearMessage: (state) => {
+      state.message = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -69,5 +61,5 @@ const authSlice = createSlice({
   },
 });
 
-// export const { clearError, clearMessage } = authSlice.actions;
+export const { clearError, clearMessage } = authSlice.actions;
 export default authSlice.reducer;

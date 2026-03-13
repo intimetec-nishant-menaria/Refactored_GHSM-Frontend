@@ -1,6 +1,7 @@
 export interface CreateBookingPayload{
     roomId : number ; 
-    userId : number ;
+    guestId : number ;
+    guestEmail : string;
     checkInDate : string ;
     checkOutDate : string;
     specialRequests?: string;

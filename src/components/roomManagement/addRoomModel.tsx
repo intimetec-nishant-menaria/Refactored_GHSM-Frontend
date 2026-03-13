@@ -1,13 +1,13 @@
 import { useState, type ChangeEvent } from "react";
-import Input from "@/components/common/input";
+import Input from "../common/input/Input";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { addRoom, fetchRooms } from "@/app/asyncThunk/roomThunk";
 import toast from "react-hot-toast";
 
 const numberRegex = /^\d*$/;
 
-function AddRoomModel({closeModel}:{closeModel:()=>void}){
-    const dispatch = useAppDispatch();
+function AddRoomModel({ closeModel }:{closeModel:()=>void}) {
+  const dispatch = useAppDispatch();
 
   const [roomNumber, setRoomNumber] = useState("");
   const [roomTypeId, setRoomTypeId] = useState(1);
@@ -86,11 +86,6 @@ function AddRoomModel({closeModel}:{closeModel:()=>void}){
                 </p>
               )}
             </div>
-            <div className="flex gap-1">
-              <button
-                type="button"
-                onClick={closeModel}
-                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"></button>
             <div className="flex-col flex gap-2">
               <label htmlFor="RoomType" className="text-sm font-semibold text-slate-700">
                 Room Type
@@ -105,7 +100,6 @@ function AddRoomModel({closeModel}:{closeModel:()=>void}){
                 <option value={2}>Double Room</option>
                 <option value={3}>Luxury Suite</option>
               </select>
-              </div>
             </div>
 
           </div>

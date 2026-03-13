@@ -5,8 +5,6 @@ import { useEffect, useState } from "react";
 import single from "@/assets/single.jpg";
 import double from "@/assets/double.jpg";
 import suite from "@/assets/suite.jpg";
-import leftArrow from "@/assets/left-arrow.svg";
-import rightArrow from "@/assets/right-arrow.svg";
 
 function Carousel() {
   const dispatch = useAppDispatch();
@@ -73,7 +71,7 @@ function Carousel() {
       </button>
       <div className="absolute left-10 bottom-4 text-2xl text-white font-bold">
         {roomTypes.map((type, i) => (
-          <div className={`${carousalIndex == i ? "" : "hidden"}`}>
+          <div key={i} className={`${carousalIndex == i ? "" : "hidden"}`}>
             <p>{type.roomTypeName}</p>
             <p className="text-sm font-semibold">Capacity : {type.capacity}</p>
           </div>
@@ -100,7 +98,7 @@ function Carousel() {
       </button>
       <div className="absolute bottom-2 left-1/2 flex gap-2 -translate-x-1.5">
         {roomTypes.map((_, i) => (
-          <div
+          <div key={i}
             className={`h-2 rounded-full transition-all ${carousalIndex == i ? "w-6 bg-white" : "w-2 bg-white/50"}`}
           ></div>
         ))}

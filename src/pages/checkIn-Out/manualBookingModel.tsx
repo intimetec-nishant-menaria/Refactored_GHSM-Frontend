@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { createManualBooking } from "@/app/asyncThunk/bookingThunk";
 import { fetchAvailableRooms } from "@/app/asyncThunk/availableRoomThunk";
-import DateRangePicker from "@/components/Bookings/DateRangePicker"; 
+import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker"; 
 import { manualBookingSchema, type ManualBookingData } from "@/utils/schemas/manualBookingSchema";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
@@ -20,6 +20,7 @@ const ManualBookingModal = ({ closeModel }: { closeModel: () => void}) => {
     resolver: zodResolver(manualBookingSchema),
     defaultValues: {
       guestId : 0,
+      guestEmail: "",
       checkInDate: null,
       checkOutDate: null,
       roomTypeId : 0,
@@ -124,7 +125,11 @@ const ManualBookingModal = ({ closeModel }: { closeModel: () => void}) => {
               {errors.roomId && <span className="text-red-500 text-xs italic">Please select a room</span>}
             </div>
           </div>
-          <GuestSearchField onSelect={(id)=>setValue("guestId" , id)} error={errors.guestId?.message}/>
+          <GuestSearchField onSelect={(id : number , email:string)=>{
+            setValue("guestId" , id);
+            setValue("guestEmail",email);
+            }} 
+            error={errors.guestId?.message}/>
 
           <div className="flex justify-end gap-3 mt-4 pt-6 border-t border-slate-100">
             <button type="button" onClick={closeModel} className="px-6 py-2.5 text-slate-500 font-bold hover:bg-slate-50 rounded-xl transition-all">

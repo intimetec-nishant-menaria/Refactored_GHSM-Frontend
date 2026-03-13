@@ -92,8 +92,9 @@ const Topbar = ({ onMenuClick }: TopbarProps) => {
           ) : (
             <div className="flex items-center gap-2">
               <Button
-                label="Register"
-                className="hidden xs:block w-20 h-9 text-sm"
+                label="SignUp"
+                className="w-20 h-9 text-sm bg-blue-600 text-white"
+                onClick={() => navigate("/register")}
               />
               <Button
                 label="Login"

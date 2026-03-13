@@ -4,7 +4,7 @@ import { useAppSelector } from "@/hooks/useAppSelector";
 import { useEffect, useState } from "react";
 
 interface GuestSearchProps {
-  onSelect: (id: number) => void;
+  onSelect: (id: number,email:string) => void;
   error?: string;
 }
 
@@ -48,7 +48,7 @@ const GuestSearchField = ({ onSelect, error }: GuestSearchProps) => {
                 const displayName = `${g.name} (${g.email})`;
                 setSearchTerm(displayName);
                 setShowDropdown(false);
-                onSelect(g.id);
+                onSelect(g.id , g.email);
               }}
               className="p-3 hover:bg-blue-50 cursor-pointer border-b last:border-0 transition-colors"
             >

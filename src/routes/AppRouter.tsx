@@ -13,12 +13,14 @@ import BookingManagement from "@/components/bookingManagement/bookingManagement.
 import Calendar from "@/components/common/Calendar/calendar";
 import CheckInOutManagement from "@/pages/checkIn-Out/checkInOut";
 import GuestManagement from "@/components/guestManagement/guestManagement";
+import SignUp from "@/pages/SignUp/SignUp";
 
 export default function AppRouter() {
   return (
     <Routes>
       <Route element={<PublicRoutes />}>
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<SignUp/>} />
       </Route>
 
       <Route path="/forgot-password" element={<ForgotPassword />} />

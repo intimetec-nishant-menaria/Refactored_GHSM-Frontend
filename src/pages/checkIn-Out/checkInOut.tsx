@@ -7,10 +7,9 @@ import {
   fetchBookingsByRange 
 } from "@/app/asyncThunk/bookingThunk";
 import PagingController from "@/components/common/paging/PagingController";
-import DateRangePicker from "@/components/Bookings/DateRangePicker"; 
+import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker"; 
 import ManualBookingModal from "./manualBookingModel"; 
 import toast from "react-hot-toast";
-import type { BookingPayload } from "@/utils/interfaces/booking";
 import dayjs from "dayjs";
 import ConfirmationModel from "@/components/common/confirmationModel/confirmationModel";
 
@@ -48,69 +47,34 @@ const CheckInOutManagement = () => {
 
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
-      const matchesStatus =
-        activeTab === "checkin" ? b.status === 1 : b.status === 2;
-      const matchesUser =
-        !searchUser ||
-        b.guestEmail.toLowerCase().includes(searchUser.toLowerCase());
-      const matchesRoom =
-        !roomFilter || b.roomNumber.toString().includes(roomFilter);
-
+      const matchesStatus = activeTab === "checkin" ? b.bookingStatus === 1 : b.bookingStatus === 2;
+      
+      const matchesUser = searchUser !== "" 
+        ? (b.guestName?.toLowerCase().includes(searchUser.toLowerCase()))
+        : true;
+      
+      const matchesRoom = roomFilter !== "" 
+        ? b.roomNumber.toString().includes(roomFilter) 
+        : true;
       return matchesStatus && matchesUser && matchesRoom;
     });
   }, [bookings, activeTab, searchUser, roomFilter]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchUser, roomFilter, activeTab]);
+  }, [searchUser, roomFilter, activeTab, dateRange]);
 
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentItems = useMemo(
-    () => filteredBookings.slice(startIndex, endIndex),
-    [filteredBookings, startIndex, endIndex],
-  );
+  const currentItems = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredBookings.slice(start, start + itemsPerPage);
+  }, [filteredBookings, currentPage, itemsPerPage]);
 
-  useEffect(() => {
-    dispatch(
-      fetchBookingsByRange({
-        startDate: dayjs().startOf("day").toISOString(),
-        endDate: dayjs().endOf("day").toISOString(),
-      }),
-    );
-  }, [dispatch]);
-
-  const handleAction = async (booking : BookingPayload) => {
-    const actionText = activeTab === "checkin" ? "Check-In" : "Check-Out";
-    if (window.confirm(`Are you sure you want to process ${actionText} for this booking?`)) {
-        if(activeTab === "checkin"){
-            try{
-                await dispatch(checkIn(booking.id)).unwrap();
-                toast.success(`${actionText} successful`);
-            }catch(error :any){
-                toast.error(error?.message || `${actionText} failed.`);
-            }
-        }else{
-            try{          
-                await dispatch(checkOut(booking.id)).unwrap();
-                toast.success(`${actionText} successful`);
-            }catch(error:any){
-                toast.error(error?.message || `${actionText} failed.`);
-            }
-        }
-      } else {
-        try {
-          await dispatch(
-            updateBooking({
-              id: booking.bookingId,
-              checkIn: booking.checkInDate,
-              checkOut: booking.checkOutDate,
-              status: 3,
-            }),
-          );
-          toast.success(`${actionText} successful`);
-        } catch (error: any) {
-          toast.error(error?.message || `${actionText} failed.`);
+  const handleAction = async () => {
+      try {
+        if (activeTab === "checkin") {
+          await dispatch(checkIn(bookingId)).unwrap();
+        } else {
+          await dispatch(checkOut(bookingId)).unwrap();
         }
         toast.success(`${activeTab} successful`);
         loadBookings(); 
@@ -149,17 +113,8 @@ const CheckInOutManagement = () => {
     );
   };
 
-  const goToNextPage = () => setCurrentPage((prev) => prev + 1);
-  const goToPrevPage = () => setCurrentPage((prev) => prev - 1);
-  const goToSpecificPage = (pageNumber: number) => setCurrentPage(pageNumber);
+  if(error) return <div>Error</div>
 
-  if (loading){
-    return (
-      <p className="p-6 text-center text-blue-600 font-medium animate-pulse">
-        Loading operations...
-      </p>
-    );
-  }
   return (
     <div className="p-4 md:p-8 min-h-screen w-full font-sans">
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-6">
@@ -231,7 +186,7 @@ const CheckInOutManagement = () => {
           <p className="text-slate-400 font-medium tracking-wide">Retrieving records from database...</p>
         </div>
       ) : (
-         <div className="hidden md:block overflow-x-auto bg-white rounded-lg shadow-md mb-6">
+         <div className="md:block overflow-x-auto bg-white rounded-lg shadow-md mb-6">
           <div className="overflow-x-auto">
             <table className="min-w-full text-left">
             <thead className="bg-gray-200 text-gray-600 border-b text-xs uppercase border-slate-100">
@@ -245,7 +200,7 @@ const CheckInOutManagement = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {currentItems.length > 0 ? currentItems.map((b) => (
-                  <tr key={b.id} className="hover:bg-blue-50/20 transition-colors group">
+                  <tr key={b.bookinId} className="hover:bg-blue-50/20 transition-colors group">
                     <td className="py-5 px-8">
                       <div className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors">{b.userName}</div>
                     </td>
@@ -307,7 +262,10 @@ const CheckInOutManagement = () => {
       )}
       {isConfirmationModelOpen && <ConfirmationModel 
             label={`Are you sure you want to process ${activeTab} for bookingId ${bookingId}?` }
-            isConfirmationModelOpen={setConfirmationModel} actionText={activeTab} submitAction={handleAction} className={activeTab === "checkin" ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-100" : 'bg-orange-500 hover:bg-orange-600 shadow-orange-100'}/>}
+            isConfirmationModelOpen={setConfirmationModel} 
+            actionText={activeTab}
+            submitAction={handleAction}
+            classname={activeTab === "checkin" ? "bg-emerald-500! hover:bg-emerald-600! shadow-emerald-100!" : 'bg-orange-500! hover:bg-orange-600! shadow-orange-100!'}/>}
     </div>
   );
 };

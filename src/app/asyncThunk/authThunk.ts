@@ -5,6 +5,7 @@ import type { ResetPasswordPayload } from "@/utils/interfaces/resetPassword";
 import apiThunk from "./apiThunkHelper";
 import type { User } from "@/utils/interfaces/user";
 import type { ChangePasswordPayload } from "@/utils/interfaces/changePassword";
+import type { RegisterInput } from "@/utils/schemas/registerSchema";
 
 interface LoginResponse {
   token: string;
@@ -110,3 +111,18 @@ export const changePassword = createAsyncThunk(
     }
   },
 );
+
+export const registerUser = createAsyncThunk(
+  "/api/register",
+  async( data : RegisterInput , {rejectWithValue})=>{
+    try{
+      return await apiThunk("/auth/register",{
+        method: "POST",
+        body : data
+      } )
+    }catch(error){
+      if(error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("something went wrong");
+    }
+  }
+)

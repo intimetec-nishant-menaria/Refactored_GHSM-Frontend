@@ -26,66 +26,34 @@ const CreateUserModal = ({ closeModel }: {closeModel:()=>void}) => {
     },
   });
 
-  const onSubmit = async (data:addUserInput) => {
-    await dispatch(createUser(data));
-    await dispatch(fetchUsers());
-    closeModel();
+  const onSubmit = async (data: addUserInput) => {
+    try {
+      const resultAction = await dispatch(createUser(data));
+      if (createUser.fulfilled.match(resultAction)) {
+        toast.success("User created successfully!");
+        await dispatch(fetchUsers());
+        closeModel();
+      } else {
+        toast.error("Failed to create user");
+      }
+    } catch {
+      toast.error("An unexpected error occurred");
+    }
   };
 
   return (
-    <div className="absolute top-0 right-0 mt-12 mr-4 w-96 bg-white p-6 rounded-lg shadow-lg z-50">
-      <h2 className="text-xl font-bold mb-4">Create User</h2>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
-        <input
-          type="text"
-          placeholder="Name"
-          className="border px-3 py-2 rounded"
-          {...register("name")}
-        />
-        {errors.name && (
-          <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-        )}
-        <input
-          type="email"
-          placeholder="Email"
-          className="border px-3 py-2 rounded"
-          {...register("email")}
-        />
-        {errors.email && (
-          <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-        )}
-        <select id="RoomType"
-            {...register('role')} 
-            className="border p-2 rounded focus:ring-2 focus:ring-blue-500">
-            <option key="1" value={1}>Admin</option>
-            <option key="2" value={2}>Staff</option>
-            <option key="3" value={3}>Guest</option>
-        </select>
-        {errors.role && (
-          <p className="text-red-500 text-sm mt-1">{errors.role.message}</p>
-        )}
-        <input
-          type="password"
-          placeholder="Password"
-          className="border px-3 py-2 rounded"
-          {...register("password")}
-        />
-        {errors.password && (
-          <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-        )}
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            {...register("isActive")}
-          />
-          Active
-        </label>
-
-        <div className="flex justify-end gap-2 mt-2">
+    <div className="fixed inset-0 z-100 flex justify-center items-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in duration-300">
+        <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-800">Add New User</h2>
+            <p className="text-slate-500 text-sm">
+              Assign roles and access for your team or guests.
+            </p>
+          </div>
           <button
-            type="button"
             onClick={closeModel}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-600 transition-all"
           >
             ✕
           </button>

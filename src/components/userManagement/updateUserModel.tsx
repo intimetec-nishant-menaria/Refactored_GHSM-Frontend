@@ -2,6 +2,7 @@ import { useState, type ChangeEvent } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { updateUser, fetchUsers } from "@/app/asyncThunk/userThunk";
 import type { User } from "@/utils/interfaces/user";
+import toast from "react-hot-toast";
 import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
 
 const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
@@ -30,61 +31,45 @@ const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
       return;
     }
 
-    await dispatch(
-      updateUser({
-        id: data.id,
-        name,
-        email,
-        role,
-        isActive,
-      }),
-    );
+    setLoading(true);
+    try {
+      const resultAction = await dispatch(
+        updateUser({
+          id: data.id,
+          name,
+          email,
+          role,
+          isActive,
+        }),
+      );
 
-    await dispatch(fetchUsers());
-
-    closeModel();
+      if (updateUser.fulfilled.match(resultAction)) {
+        toast.success("User updated successfully");
+        await dispatch(fetchUsers());
+        closeModel();
+      } else {
+        toast.error("Failed to update user");
+      }
+    } catch {
+      toast.error("An error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="absolute top-0 right-0 mt-12 mr-4 w-96 bg-white p-6 rounded-lg shadow-lg z-50">
-      <h2 className="text-xl font-bold mb-4">Update User</h2>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="border px-3 py-2 rounded"
-        />
-        {error == true ? "Name should not be empty" : ""}
-        <input
-          type="email"
-          value={email}
-          disabled
-          className="border px-3 py-2 rounded bg-gray-100 cursor-not-allowed"
-          required
-        />
-        <select
-          value={role}
-          onChange={(e) => setRole(Number(e.target.value))}
-          className="border px-3 py-2 rounded"
-        >
-          <option value={1}>Admin</option>
-          <option value={2}>Staff</option>
-        </select>
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={isActive}
-            onChange={(e) => setIsActive(e.target.checked)}
-          />
-          Active
-        </label>
-
-        <div className="flex justify-end gap-2 mt-2">
+    <div className="fixed inset-0 z-100 flex justify-center items-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+      <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in duration-300">
+        <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">Update User</h2>
+            <p className="text-slate-500 text-sm">
+              Modify account details for {data.name}.
+            </p>
+          </div>
           <button
-            type="button"
             onClick={closeModel}
-            className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-600 transition-all"
           >
             ✕
           </button>

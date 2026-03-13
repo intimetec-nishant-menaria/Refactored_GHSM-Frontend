@@ -4,7 +4,7 @@ import { useAppSelector } from "@/hooks/useAppSelector";
 import { fetchAvailableRooms } from "@/app/asyncThunk/availableRoomThunk";
 import dayjs, { Dayjs } from "dayjs";
 import Button from "@/components/common/button/Button";
-import DateRangePicker from "@/components/Bookings/DateRangePicker";
+import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker";
 import toast from "react-hot-toast";
 
 interface OfflineCheckInModalProps {

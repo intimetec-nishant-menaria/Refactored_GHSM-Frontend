@@ -99,6 +99,7 @@ const BookingManagement = () => {
       </span>
     );
   };
+  console.log(bookings);
 
   if (loading)
     return (
@@ -154,7 +155,11 @@ const BookingManagement = () => {
               <div className="flex justify-between items-start mb-3">
                 <div className="max-w-[70%]">
                   <span className="text-[10px] font-bold text-gray-400 uppercase">ID: #{b.id}</span>
-                  <p className="font-semibold text-gray-800 break-all text-sm leading-tight">{b.guestName}{(b.guestEmail)}</p>
+                  <p className="text-sm leading-tight break-all">
+                    <span className="font-semibold text-gray-800">{b.guestName}</span>
+                    <span className="mx-2 text-gray-300">|</span>
+                    <span className="text-gray-500 text-xs">{b.guestEmail}</span>
+                  </p>
                 </div>
                 {getStatusBadge(b.status)}
               </div>
@@ -213,7 +218,16 @@ const BookingManagement = () => {
               currentItems.map((b) => (
                 <tr key={b.id} className="hover:bg-gray-50 transition-colors">
                   <td className="py-4 px-4 text-gray-500 font-mono text-sm">#{b.id}</td>
-                  <td className="py-4 px-4 font-medium text-gray-800">{b.guestName}</td>
+                  <td className="py-4 px-4">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-semibold text-gray-800 leading-tight">
+                        {b.guestName}
+                      </span>
+                      <span className="text-xs text-gray-500 font-normal break-all">
+                        {b.guestEmail}
+                      </span>
+                    </div>
+                  </td>
                   <td className="py-4 px-4">{b.roomNumber}</td>
                   <td className="py-4 px-4 text-sm">
                     {dayjs(b.checkInDate).format("DD/MM/YYYY")}
@@ -228,7 +242,6 @@ const BookingManagement = () => {
                       <Button
                         label="Cancel"
                         onClick={() => {
-                          console.log(b.id);
                           setBookingId(b.id);
                           setConfirmationModel(true);
                         }}

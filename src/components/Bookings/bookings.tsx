@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { fetchAvailableRooms } from "@/app/asyncThunk/availableRoomThunk";
 import dayjs, { Dayjs } from "dayjs";
-import DateRangePicker from "./DateRangePicker";
+import DateRangePicker from "../common/DateRangePicker/DateRangePicker";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { fetchRoomType } from "@/app/asyncThunk/roomTypeThunk";
 import RoomCard from "../common/card/Card";
@@ -80,7 +80,8 @@ function Bookings() {
       await dispatch(
         createBooking({
           roomId: selectedRoom.id,
-          userId: user.id,
+          guestId: user.id,
+          guestEmail : user.email,
           checkInDate: dayjs(checkIn).toISOString(),
           checkOutDate: dayjs(checkOut).toISOString(),
         }),

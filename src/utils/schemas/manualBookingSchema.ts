@@ -5,6 +5,7 @@ export const manualBookingSchema = z.object({
   checkOutDate: z.any().refine((val) => val !== null, "Check-out is required"),
   roomId: z.coerce.number().min(1, "Please select a room"), 
   guestId: z.number().min(1, "Select a guest"),
+  guestEmail : z.email("Invalid email address"),
   roomTypeId: z.number().optional(), 
 });;
 

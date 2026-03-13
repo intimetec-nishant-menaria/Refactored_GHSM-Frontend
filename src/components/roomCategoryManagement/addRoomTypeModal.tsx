@@ -51,7 +51,6 @@ const AddRoomTypeModel = ({ closeModal }: AddRoomTypeModelProps) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-        {/* Header */}
         <div className="bg-blue-600 p-4 flex justify-between items-center text-white">
           <h3 className="text-lg font-bold">Add New Room Category</h3>
           <button onClick={closeModal} className="hover:text-gray-200 text-2xl">
@@ -60,7 +59,6 @@ const AddRoomTypeModel = ({ closeModal }: AddRoomTypeModelProps) => {
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Room Type Enum Select */}
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
               Room Type
@@ -84,7 +82,6 @@ const AddRoomTypeModel = ({ closeModal }: AddRoomTypeModelProps) => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {/* Capacity */}
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
                 Capacity (Persons)
@@ -100,8 +97,6 @@ const AddRoomTypeModel = ({ closeModal }: AddRoomTypeModelProps) => {
                 required
               />
             </div>
-
-            {/* Price */}
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
                 Price Per Night
@@ -124,8 +119,6 @@ const AddRoomTypeModel = ({ closeModal }: AddRoomTypeModelProps) => {
               </div>
             </div>
           </div>
-
-          {/* Amenities Multi-Select */}
           <div>
             <label className="block text-xs font-bold text-gray-500 uppercase mb-2">
               Amenities
