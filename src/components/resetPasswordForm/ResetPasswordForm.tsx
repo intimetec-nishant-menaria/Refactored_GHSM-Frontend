@@ -1,9 +1,9 @@
 import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Input from "@/components/common/input";
-import Label from "@/components/common/label";
-import Button from "@/components/common/button";
+import Input from "@/components/common/input/Input";
+import Label from "@/components/common/label/Label";
+import Button from "@/components/common/button/Button";
 import {
   resetPasswordSchema,
   type ResetPasswordInput,

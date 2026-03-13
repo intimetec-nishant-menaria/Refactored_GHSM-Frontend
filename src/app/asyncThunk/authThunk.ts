@@ -16,28 +16,6 @@ interface LoginResponse {
   };
 }
 
-interface LoginResponse {
-  token: string;
-  user: {
-    id: number;
-    name : string;
-    email: string;
-    role: number;
-    isActive : boolean;
-  };
-}
-
-interface LoginResponse {
-  token: string;
-  user: {
-    id: number;
-    name : string;
-    email: string;
-    role: number;
-    isActive : boolean;
-  };
-}
-
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async (data: LoginInput, {rejectWithValue }) => {
@@ -81,7 +59,9 @@ export const resetPassword = createAsyncThunk(
         body : data
       });
     } catch (error) {
-      if (error instanceof Error) return rejectWithValue(error.message);
+      if (error instanceof Error) {
+        return rejectWithValue(error.message);
+      }
       return rejectWithValue("Reset failed");
     }
   },

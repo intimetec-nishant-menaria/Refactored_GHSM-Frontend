@@ -1,6 +1,6 @@
-import Label from "@/components/common/label";
-import Input from "@/components/common/input";
-import Button from "@/components/common/button";
+import Label from "@/components/common/label/Label";
+import Input from "@/components/common/input/Input";
+import Button from "@/components/common/button/Button";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";

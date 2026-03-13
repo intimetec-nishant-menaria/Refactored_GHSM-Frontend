@@ -11,4 +11,4 @@ export interface AuthLayoutProps {
   children: React.ReactNode;
   iconSrc?: string;
   iconAlt?: string;
-};
+}
