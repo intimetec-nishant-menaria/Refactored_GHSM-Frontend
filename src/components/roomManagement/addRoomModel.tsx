@@ -61,7 +61,7 @@ function AddRoomModel({closeModel}:{closeModel:()=>void}){
             <p className="text-sm text-slate-500">Register a new unit in the guest house system.</p>
           </div>
           <button 
-            onClick={closeModal} 
+            onClick={closeModel} 
             className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-600 transition-colors"
           >
             ✕
