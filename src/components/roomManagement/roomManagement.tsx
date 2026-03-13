@@ -148,9 +148,9 @@ const RoomManagement = () => {
             goToNext={goToNextPage}
             goToSpecificPage={goToSpecificPage} /> }
       </div>
-      {isCreateRoomModalOpen && <AddRoomModel closeModal={closeModal}/>}
+      {isCreateRoomModalOpen && <AddRoomModel closeModel={closeModal}/>}
       {editingRoom && (
-        <UpdateRoomModel closeModal={closeUpdateRoomModel} room={editingRoom} />
+        <UpdateRoomModel closeModel={closeUpdateRoomModel} room={editingRoom} />
       )}
     </div>
   )
