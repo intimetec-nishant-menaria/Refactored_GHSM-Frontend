@@ -1,16 +1,16 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { deleteRoom, fetchRooms } from "@/app/asyncThunk/roomThunk";
-import PagingController from "../common/paging/PagingController";
+import { deleteRoom, fetchRooms } from "@/app/asyncThunk/room.ts";
+import PagingController from "../common/paging/PagingController.tsx";
 import deleteIcon from "@/assets/deleteIcon.png";
 import editIcon from "@/assets/editIcon.png";
-import Button from "../common/button/Button";
-import AddRoomModel from "./addRoomModel";
-import RoomCategoryManagement from "../roomCategoryManagement/roomCategoryManagement.tsx"
+import Button from "../common/button/Button.tsx";
+import AddRoomModel from "./addRoomModel.tsx";
+import RoomCategoryManagement from "../roomCategoryManagement/index.tsx"
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
-import UpdateRoomModel from "./UpdateRoomModel";
-import { fetchRoomType } from "@/app/asyncThunk/roomTypeThunk";
+import UpdateRoomModel from "./UpdateRoomModel.tsx";
+import { fetchRoomType } from "@/app/asyncThunk/roomType.ts";
 import RoomStatusDropDown from "../common/roomStatusDropDown/RoomStatusDropDown.tsx";
 import ConfirmationModel from "../common/confirmationModel/confirmationModel.tsx";
 

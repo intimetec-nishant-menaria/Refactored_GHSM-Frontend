@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
 import type { RoomData, UpdateRoomPayload } from "@/utils/interfaces/room";
-import apiThunk from "./apiThunkHelper";
+import apiThunk from ".";
 
 export const fetchRooms = createAsyncThunk<RoomTypesPayload[]>(
   "room/fetchRooms",

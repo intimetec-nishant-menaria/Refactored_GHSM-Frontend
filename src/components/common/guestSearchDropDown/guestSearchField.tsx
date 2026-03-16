@@ -1,4 +1,4 @@
-import { searchGuest } from "@/app/asyncThunk/guestThunk";
+import { searchGuest } from "@/app/asyncThunk/guest";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { useEffect, useState } from "react";

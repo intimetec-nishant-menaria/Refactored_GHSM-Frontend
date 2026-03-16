@@ -1,11 +1,11 @@
-import type { LoginInput } from "@/utils/schemas/loginSchema";
+import type { LoginInput } from "@/utils/schemas/login";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import type { ForgotPasswordInput } from "@/utils/schemas/forgotPasswordSchema";
+import type { ForgotPasswordInput } from "@/utils/schemas/forgotPassword";
 import type { ResetPasswordPayload } from "@/utils/interfaces/resetPassword";
-import apiThunk from "./apiThunkHelper";
+import apiThunk from ".";
 import type { User } from "@/utils/interfaces/user";
 import type { ChangePasswordPayload } from "@/utils/interfaces/changePassword";
-import type { RegisterInput } from "@/utils/schemas/registerSchema";
+import type { RegisterInput } from "@/utils/schemas/register";
 
 interface LoginResponse {
   token: string;

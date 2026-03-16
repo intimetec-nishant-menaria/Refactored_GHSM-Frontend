@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent } from "react";
 import Input from "../common/input/Input";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { addRoom, fetchRooms } from "@/app/asyncThunk/roomThunk";
+import { addRoom, fetchRooms } from "@/app/asyncThunk/room";
 import toast from "react-hot-toast";
 
 const numberRegex = /^\d*$/;

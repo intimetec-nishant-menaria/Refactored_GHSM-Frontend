@@ -5,9 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { registerUser } from "@/app/asyncThunk/authThunk";
+import { registerUser } from "@/app/asyncThunk/auth";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { registerSchema, type RegisterInput } from "@/utils/schemas/registerSchema";
+import { registerSchema, type RegisterInput } from "@/utils/schemas/register";
 
 const SignUpForm = () => {
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const SignUpForm = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 bg-white rounded-xl shadow-lg border border-gray-100">
+    <div className="w-full max-w-md mx-auto p-6 bg-white rounded-xl ">
       <div className="mb-8 text-center">
         <h2 className="text-2xl font-bold text-gray-800">Create an Account</h2>
         <p className="text-gray-500 mt-2">Join our Guest House Management system</p>

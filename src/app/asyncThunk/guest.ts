@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import apiThunk from "./apiThunkHelper";
+import apiThunk from ".";
 import type { GuestState, UpdateGuest } from "@/utils/interfaces/guest";
-import type { addGuestInput } from "@/utils/schemas/addGuestSchema";
+import type { addGuestInput } from "@/utils/schemas/addGuest";
 
 export const fetchAllGuest = createAsyncThunk(
     "api/fetchAllGuests",

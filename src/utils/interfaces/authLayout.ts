@@ -7,7 +7,7 @@ export interface AuthState {
 }
 
 export interface AuthLayoutProps {
-  title: string;
+  title?: string;
   children: React.ReactNode;
   iconSrc?: string;
   iconAlt?: string;

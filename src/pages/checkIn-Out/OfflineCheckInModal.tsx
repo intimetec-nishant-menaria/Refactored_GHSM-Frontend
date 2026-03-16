@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { fetchAvailableRooms } from "@/app/asyncThunk/availableRoomThunk";
+import { fetchAvailableRooms } from "@/app/asyncThunk/availableRoom";
 import dayjs, { Dayjs } from "dayjs";
 import Button from "@/components/common/button/Button";
 import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker";

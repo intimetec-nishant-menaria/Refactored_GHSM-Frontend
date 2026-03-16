@@ -1,6 +1,6 @@
 import type { GuestStatePayload } from "@/utils/interfaces/guest";
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAllGuest, searchGuest } from "../asyncThunk/guestThunk";
+import { fetchAllGuest, searchGuest } from "../asyncThunk/guest";
 
 const initialState : GuestStatePayload={
     Guests : [],

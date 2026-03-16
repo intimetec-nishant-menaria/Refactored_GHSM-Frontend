@@ -9,12 +9,12 @@ import Button from "@/components/common/button/Button";
 import {
   changePasswordSchema,
   type ChangePasswordInput,
-} from "@/utils/schemas/changePasswordSchema";
+} from "@/utils/schemas/changePassword";
 
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/app/store/store";
 
-import { changePassword } from "@/app/asyncThunk/authThunk";
+import { changePassword } from "@/app/asyncThunk/auth";
 import { useNavigate } from "react-router-dom";
 
 const ChangePasswordForm = () => {

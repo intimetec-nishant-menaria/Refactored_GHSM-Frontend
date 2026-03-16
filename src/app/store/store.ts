@@ -1,12 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "@/app/slices/authSlice";
-import userReducer from "@/app/slices/userSlice";
-import roomReducer from "@/app/slices/roomSlice";
-import roomTypeReducer from "@/app/slices/roomTypeSlice";
-import availableRoomReducer from "@/app/slices/availableRoomSlics";
-import bookingSliceReducer from "@/app/slices/bookingSlice";
-import amenitiesSlice from "@/app/slices/amenitiesSlice";
-import guestReducer from "@/app/slices/guestSlice";
+import authReducer from "@/app/slices/auth";
+import userReducer from "@/app/slices/user";
+import roomReducer from "@/app/slices/room";
+import roomTypeReducer from "@/app/slices/roomType";
+import availableRoomReducer from "@/app/slices/availableRoom";
+import bookingSliceReducer from "@/app/slices/booking";
+import amenitiesSlice from "@/app/slices/amenities";
+import guestReducer from "@/app/slices/guest";
 
 export const store = configureStore({
   reducer: {

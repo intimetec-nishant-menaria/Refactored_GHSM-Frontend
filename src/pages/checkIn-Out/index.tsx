@@ -5,7 +5,7 @@ import {
   checkIn, 
   checkOut, 
   fetchBookingsByRange 
-} from "@/app/asyncThunk/bookingThunk";
+} from "@/app/asyncThunk/booking";
 import PagingController from "@/components/common/paging/PagingController";
 import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker"; 
 import ManualBookingModal from "./manualBookingModel"; 

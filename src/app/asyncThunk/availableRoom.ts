@@ -1,6 +1,6 @@
 import type { RoomAvailabilityRequest } from "@/utils/interfaces/room";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import apiThunk from "./apiThunkHelper";
+import apiThunk from ".";
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
 
 export const fetchAvailableRooms = createAsyncThunk(

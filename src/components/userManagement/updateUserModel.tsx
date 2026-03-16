@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { updateUser, fetchUsers } from "@/app/asyncThunk/userThunk";
+import { updateUser, fetchUsers } from "@/app/asyncThunk/user";
 import type { User } from "@/utils/interfaces/user";
 import toast from "react-hot-toast";
 import type { UpdateModelProps } from "@/utils/interfaces/updateModel";

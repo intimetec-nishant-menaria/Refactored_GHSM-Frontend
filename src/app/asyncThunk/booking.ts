@@ -1,10 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import apiThunk from "./apiThunkHelper";
+import apiThunk from ".";
 import type {
   CreateBookingPayload,
   updateBookingPayload,
 } from "@/utils/interfaces/booking";
-import type { ManualBookingData } from "@/utils/schemas/manualBookingSchema";
+import type { ManualBookingData } from "@/utils/schemas/manualBooking";
 
 interface fetchBookingsArgs {
   startDate: string;

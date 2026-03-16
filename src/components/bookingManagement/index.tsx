@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { fetchAllBookings, cancelBooking} from "@/app/asyncThunk/bookingThunk";
+import { fetchAllBookings, cancelBooking} from "@/app/asyncThunk/booking";
 import PagingController from "../common/paging/PagingController";
 import Button from "../common/button/Button";
 import toast from "react-hot-toast";

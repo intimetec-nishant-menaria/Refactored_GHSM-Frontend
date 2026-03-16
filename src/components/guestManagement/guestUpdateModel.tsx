@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { updateGuest, fetchAllGuest } from "@/app/asyncThunk/guestThunk";
+import { updateGuest, fetchAllGuest } from "@/app/asyncThunk/guest";
 import type { GuestState } from "@/utils/interfaces/guest";
 import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
-import { updateGuestSchema, type GuestFormData } from "@/utils/schemas/updateGuestSchema";
+import { updateGuestSchema, type GuestFormData } from "@/utils/schemas/updateGuest";
 import toast from "react-hot-toast";
 
 const UpdateGuestModal = ({ closeModel, data }: UpdateModelProps<GuestState>) => {

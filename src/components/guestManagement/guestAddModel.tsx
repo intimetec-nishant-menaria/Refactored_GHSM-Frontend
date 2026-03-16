@@ -1,10 +1,10 @@
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { createGuest, fetchAllGuest } from "@/app/asyncThunk/guestThunk";
+import { createGuest, fetchAllGuest } from "@/app/asyncThunk/guest";
 import { useForm } from "react-hook-form";
 import {
   addGuestSchema,
   type addGuestInput,
-} from "@/utils/schemas/addGuestSchema";
+} from "@/utils/schemas/addGuest";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 

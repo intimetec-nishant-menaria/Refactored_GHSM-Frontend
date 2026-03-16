@@ -2,7 +2,7 @@ import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
 import Input from "../common/input/Input";
 import { useState, type ChangeEvent } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { fetchRooms, updateRoom } from "@/app/asyncThunk/roomThunk";
+import { fetchRooms, updateRoom } from "@/app/asyncThunk/room";
 import toast from "react-hot-toast";
 import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
 

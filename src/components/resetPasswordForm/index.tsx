@@ -7,10 +7,10 @@ import Button from "@/components/common/button/Button";
 import {
   resetPasswordSchema,
   type ResetPasswordInput,
-} from "@/utils/schemas/resetPasswordSchema";
+} from "@/utils/schemas/resetPassword";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/app/store/store";
-import { resetPassword } from "@/app/asyncThunk/authThunk";
+import { resetPassword } from "@/app/asyncThunk/auth";
 import { useNavigate } from "react-router-dom";
 import { useQueryParams } from "@/hooks/useQueryParams";
 import { useRef } from "react";

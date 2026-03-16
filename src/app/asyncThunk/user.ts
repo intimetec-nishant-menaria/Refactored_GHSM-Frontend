@@ -4,7 +4,7 @@ import type {
   CreateUserPayload,
   UpdateUserPayload,
 } from "@/utils/interfaces/user";
-import apiThunk from "./apiThunkHelper";
+import apiThunk from ".";
 
 export const fetchUsers = createAsyncThunk<User[]>(
   "user/fetchUsers",

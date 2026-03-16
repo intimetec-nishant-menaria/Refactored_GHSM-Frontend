@@ -1,6 +1,6 @@
 import type { AuthState } from "@/utils/interfaces/authLayout";
 import { createSlice } from "@reduxjs/toolkit";
-import { checkMe, loginUser, logoutUser } from "../asyncThunk/authThunk";
+import { checkMe, loginUser, logoutUser } from "../asyncThunk/auth";
 
 const initialState: AuthState = {
   user: null,

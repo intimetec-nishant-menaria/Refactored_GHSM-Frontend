@@ -1,6 +1,6 @@
 import type { BookingState } from "@/utils/interfaces/booking";
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAllBookings, fetchBookingsByRange } from "../asyncThunk/bookingThunk";
+import { fetchAllBookings, fetchBookingsByRange } from "../asyncThunk/booking";
 
 const initialState: BookingState = {
   bookings: [],

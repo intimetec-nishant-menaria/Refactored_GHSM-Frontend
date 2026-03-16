@@ -1,19 +1,19 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Login from "@/pages/login/Login";
-import ForgotPassword from "@/pages/forgotPassword/ForgotPassword";
-import ResetPassword from "@/pages/resetPassword/ResetPassword";
-import ChangePassword from "@/pages/changePassword/ChangePassword";
+import Login from "@/pages/login";
+import ForgotPassword from "@/pages/forgotPassword";
+import ResetPassword from "@/pages/resetPassword";
+import ChangePassword from "@/pages/changePassword";
 import AdminLayout from "@/components/layouts/AdminLayout";
-import UserManagement from "@/components/userManagement/userManagement";
-import RoomManagement from "@/components/roomManagement/roomManagement";
+import UserManagement from "@/components/userManagement";
+import RoomManagement from "@/components/roomManagement";
 import ProtectedRoutes from "./protectedRoutes";
 import PublicRoutes from "./publicRoutes";
 import Home from "@/pages/home/home";
-import BookingManagement from "@/components/bookingManagement/bookingManagement.tsx";
+import BookingManagement from "@/components/bookingManagement";
 import Calendar from "@/components/common/Calendar/calendar";
-import CheckInOutManagement from "@/pages/checkIn-Out/checkInOut";
-import GuestManagement from "@/components/guestManagement/guestManagement";
-import SignUp from "@/pages/SignUp/SignUp";
+import CheckInOutManagement from "@/pages/checkIn-Out";
+import GuestManagement from "@/components/guestManagement";
+import SignUp from "@/pages/SignUp";
 
 export default function AppRouter() {
   return (

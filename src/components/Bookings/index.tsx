@@ -1,16 +1,16 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { fetchAvailableRooms } from "@/app/asyncThunk/availableRoomThunk";
+import { fetchAvailableRooms } from "@/app/asyncThunk/availableRoom";
 import dayjs, { Dayjs } from "dayjs";
 import DateRangePicker from "../common/DateRangePicker/DateRangePicker";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { fetchRoomType } from "@/app/asyncThunk/roomTypeThunk";
+import { fetchRoomType } from "@/app/asyncThunk/roomType";
 import RoomCard from "../common/card/Card";
 import Button from "../common/button/Button";
 import LoginModel from "./loginModel";
 import BookingSummary from "./bookingSummary";
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
-import { createBooking } from "@/app/asyncThunk/bookingThunk";
+import { createBooking } from "@/app/asyncThunk/booking";
 import toast from "react-hot-toast";
 
 function Bookings() {

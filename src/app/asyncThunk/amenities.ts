@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import apiThunk from "./apiThunkHelper";
+import apiThunk from ".";
 import type { Amenity } from "@/utils/interfaces/amenity";
 
 export const fetchAmenitis = createAsyncThunk(

@@ -1,6 +1,6 @@
 import type { RoomTypeState } from "@/utils/interfaces/roomTypes";
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchRoomType } from "../asyncThunk/roomTypeThunk";
+import { fetchRoomType } from "../asyncThunk/roomType";
 
 const initialState: RoomTypeState = {
   roomTypes: [],

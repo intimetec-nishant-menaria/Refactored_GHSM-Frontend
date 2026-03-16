@@ -4,7 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import type { DatesSetArg } from "@fullcalendar/core";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { fetchBookingsByRange } from "@/app/asyncThunk/bookingThunk";
+import { fetchBookingsByRange } from "@/app/asyncThunk/booking";
 import calendarIcon from "@/assets/calendarIcon.png";
 import crossIcon from "@/assets/crossIcon.png";
 

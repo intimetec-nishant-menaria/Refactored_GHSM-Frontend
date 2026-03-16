@@ -26,5 +26,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src", "src/utils/schemas/addUser/.ts", "src/utils/schemas/changePassword/.ts"]
 }

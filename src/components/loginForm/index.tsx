@@ -4,12 +4,12 @@ import Button from "@/components/common/button/Button";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { LoginInput } from "@/utils/schemas/loginSchema";
-import { loginSchema } from "@/utils/schemas/loginSchema";
+import type { LoginInput } from "@/utils/schemas/login";
+import { loginSchema } from "@/utils/schemas/login";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/app/store/store";
-import { loginUser } from "@/app/asyncThunk/authThunk";
+import { loginUser } from "@/app/asyncThunk/auth";
 import { useEffect } from "react";
 
 const LoginForm = () => {
@@ -52,7 +52,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 bg-white rounded-xl shadow-lg border border-gray-100">
+    <div className="w-full max-w-md mx-auto p-6 bg-white rounded-xl ">
       <div className="mb-8 text-center">
         <h2 className="text-2xl font-bold text-gray-800">Welcome Back</h2>
         <p className="text-gray-500 mt-2">Sign in to manage your Guest House</p>

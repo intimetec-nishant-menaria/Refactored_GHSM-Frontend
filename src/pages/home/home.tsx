@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import Bookings from "@/components/Bookings/bookings";
+import Bookings from "@/components/Bookings";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import toast from "react-hot-toast";
 import Carousel from "@/components/common/carousel/Carousel";

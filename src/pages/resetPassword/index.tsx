@@ -1,4 +1,4 @@
-import ResetPasswordForm from "@/components/resetPasswordForm/ResetPasswordForm";
+import ResetPasswordForm from "@/components/resetPasswordForm";
 import AuthLayout from "@/components/layouts/AuthLayout";
 import { useQueryParams } from "@/hooks/useQueryParams";
 

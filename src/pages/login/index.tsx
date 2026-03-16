@@ -1,9 +1,9 @@
-import LoginForm from "@/components/loginForm/LoginForm";
+import LoginForm from "@/components/loginForm";
 import AuthLayout from "@/components/layouts/AuthLayout";
 
 const Login = () => {
   return (
-    <AuthLayout title="Login">
+    <AuthLayout>
       <LoginForm />
     </AuthLayout>
   );

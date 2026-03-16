@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { fetchRoomType } from "@/app/asyncThunk/roomTypeThunk";
+import { fetchRoomType } from "@/app/asyncThunk/roomType";
 import PagingController from "../common/paging/PagingController";
 import Button from "../common/button/Button";
 import deleteIcon from "@/assets/deleteIcon.png";

@@ -2,7 +2,7 @@ import crossIcon from "@/assets/crossIcon.png";
 import SidebarItem from "./SidebarItem";
 import { menuByRole } from "./menuConfig";
 import { useNavigate } from "react-router-dom";
-import { logoutUser } from "@/app/asyncThunk/authThunk";
+import { logoutUser } from "@/app/asyncThunk/auth";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
 

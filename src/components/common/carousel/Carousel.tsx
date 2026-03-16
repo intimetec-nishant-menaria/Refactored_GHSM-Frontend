@@ -1,4 +1,4 @@
-import { fetchRoomType } from "@/app/asyncThunk/roomTypeThunk";
+import { fetchRoomType } from "@/app/asyncThunk/roomType";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { useEffect, useState } from "react";

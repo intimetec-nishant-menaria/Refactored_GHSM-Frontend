@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { fetchAmenitis } from "../asyncThunk/amenitiesThunk";
+import { fetchAmenitis } from "../asyncThunk/amenities";
 import type { AmenitiesState } from "@/utils/interfaces/amenity";
 
 const initialState: AmenitiesState = {
