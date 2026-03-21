@@ -43,7 +43,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       >
         <div className="h-16 p-6 border-b border-slate-700 flex justify-between items-center shrink-0">
           <div>
-            <h2 className="text-lg font-semibold leading-tight">Guesthouse</h2>
+            <h2 className="text-2xl font-serif font-semibold leading-tight">Guest House</h2>
             <p className="text-xs text-slate-300 capitalize">{role}</p>
           </div>
           <button className="md:hidden p-1 hover:bg-slate-600 rounded" onClick={() => setIsOpen(false)}>

@@ -7,8 +7,8 @@ import { useAppSelector } from "@/hooks/useAppSelector";
 import { fetchRoomType } from "@/app/asyncThunk/roomType";
 import RoomCard from "../common/card/Card";
 import Button from "../common/button/Button";
-import LoginModel from "./loginModel";
-import BookingSummary from "./bookingSummary";
+import LoginModel from "./authRequiredModel";
+import BookingSummary from "./bookingSummary/bookingSummary";
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
 import { createBooking } from "@/app/asyncThunk/booking";
 import toast from "react-hot-toast";
@@ -22,9 +22,7 @@ function Bookings() {
   const [filter, setFilter] = useState(0);
   const [checkIn, setCheckIn] = useState<Dayjs | null>(null);
   const [checkOut, setCheckOut] = useState<Dayjs | null>(null);
-  const [selectedRoom, setSelectedRoom] = useState<RoomTypesPayload | null>(
-    null,
-  );
+  const [selectedRoom, setSelectedRoom] = useState<RoomTypesPayload | null>(null);
   const [bookingStep, setBookingStep] = useState(1);
   const [isRedirectToLoginModelOpen, setLoginModel] = useState(false);
 
@@ -50,7 +48,6 @@ function Bookings() {
 
   const handleDateClick = (newValue: Dayjs | null) => {
     if (!newValue) return;
-    console.log(dayjs(newValue).format("YYYY-MM-DD"));
     if (!checkIn || (checkIn && checkOut)) {
       setCheckIn(newValue);
       setCheckOut(null);
@@ -76,14 +73,13 @@ function Bookings() {
   async function onConfirmBooking() {
     try {
       if (!selectedRoom || !user || !checkIn || !checkOut) return;
-      console.log(dayjs(checkIn).toISOString());
       await dispatch(
         createBooking({
           roomId: selectedRoom.id,
           guestId: user.id,
           guestEmail : user.email,
-          checkInDate: dayjs(checkIn).toISOString(),
-          checkOutDate: dayjs(checkOut).toISOString(),
+          checkInDate: dayjs(checkIn).format("YYYY-MM-DD"),
+          checkOutDate: dayjs(checkOut).format("YYYY-MM-DD"),
         }),
       ).unwrap();
 

@@ -1,5 +1,5 @@
 import dayjs, { Dayjs } from "dayjs";
-import Button from "../common/button/Button";
+import Button from "../../common/button/Button";
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
 import { useAppSelector } from "@/hooks/useAppSelector";
 
@@ -103,7 +103,7 @@ function BookingSummary({
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Price / Night</span>
                 <span className="font-medium">
-                  ${selectedRoom.pricePerNight}
+                  ₹{selectedRoom.pricePerNight}
                 </span>
               </div>
             </div>
@@ -112,7 +112,7 @@ function BookingSummary({
               <div className="flex justify-between items-center">
                 <span className="text-gray-700 font-medium">Total Amount</span>
                 <span className="text-2xl font-bold text-blue-600">
-                  ${totalPrice}
+                  ₹{totalPrice}
                 </span>
               </div>
               <p className="text-[10px] text-gray-400 mt-1 text-right italic">

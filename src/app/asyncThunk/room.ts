@@ -1,13 +1,22 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
 import type { RoomData, UpdateRoomPayload } from "@/utils/interfaces/room";
 import apiThunk from ".";
 
-export const fetchRooms = createAsyncThunk<RoomTypesPayload[]>(
+export const fetchRooms = createAsyncThunk(
   "room/fetchRooms",
-  async (_, { rejectWithValue }) => {
+  async ({
+    currentPage,
+    pageSize,
+    roomStatusFilter,
+    roomTypeFilter
+  }:{
+    currentPage:number,
+    pageSize:number,
+    roomStatusFilter:number,
+    roomTypeFilter:number
+  }, { rejectWithValue }) => {
     try {
-      return await apiThunk("/Rooms/getAllRooms");
+      return await apiThunk(`/Rooms/getAllRooms?pageNumber=${currentPage}&pageSize=${pageSize}&roomStatus=${roomStatusFilter}&roomType=${roomTypeFilter}`);
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("something went wrong");
@@ -55,4 +64,11 @@ export const updateRoom = createAsyncThunk(
       return rejectWithValue("Something went wrong");
     }
   },
+);
+
+export const fetchSummary = createAsyncThunk(
+  "api/summary",
+  async ()=>{
+    return await apiThunk("/Rooms/getSummary");
+  }
 );

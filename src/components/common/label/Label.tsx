@@ -1,4 +1,4 @@
-import type { LabelProps } from "@/utils/interfaces/label";
+import type { LabelProps } from "./labelProps";
 
 const Label = ({ children, className = "", ...props }: LabelProps) => {
   return (

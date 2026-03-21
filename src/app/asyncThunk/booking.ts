@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import apiThunk from ".";
 import type {
+  BookingState,
   CreateBookingPayload,
   updateBookingPayload,
 } from "@/utils/interfaces/booking";
@@ -43,9 +44,21 @@ export const createManualBooking = createAsyncThunk(
 
 export const fetchAllBookings = createAsyncThunk(
   "api/fetchBookings",
-  async (_, { rejectWithValue }) => {
+  async ({
+    currentPage,
+    pageSize,
+    searchUser,
+    roomFilter,
+    statusFilter,
+  }:{
+    currentPage:number,
+    pageSize :number,
+    searchUser:string,
+    roomFilter:string,
+    statusFilter:number
+  }, { rejectWithValue }) => {
     try {
-      return await apiThunk("/booking/getAllBookings");
+      return await apiThunk(`/booking/getAllBookings?pageNumber=${currentPage}&pageSize=${pageSize}&searchUser=${searchUser}&roomNumber=${roomFilter}&statusFilter=${statusFilter}`);
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       rejectWithValue("something went wrong");
@@ -125,4 +138,26 @@ export const checkOut = createAsyncThunk(
             return rejectWithValue("something went wrong");
         }
     }
+)
+
+export const fetchUserBookings = createAsyncThunk(
+  "api/fetchUserBookings",
+  async({
+    currentPage,
+    pageSize,
+    roomFilter,
+    statusFilter
+  }:{
+    currentPage:number,
+    pageSize:number,
+    roomFilter:string,
+    statusFilter:number
+  } , {rejectWithValue})=>{
+    try{
+      return await apiThunk<BookingState>(`/booking/myBookings?pageNumber=${currentPage}&pageSize=${pageSize}&roomNumber=${roomFilter}&statusFilter=${statusFilter}`);
+    }catch(error){
+      if(error instanceof Error) return rejectWithValue(error.message);
+      return rejectWithValue("something went wrong");
+    }
+  }
 )

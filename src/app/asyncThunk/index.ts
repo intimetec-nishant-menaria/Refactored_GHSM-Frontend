@@ -28,7 +28,6 @@ const apiThunk = async <T>(
   if (!response.ok) {
     throw new Error(result.message || "Request failed");
   }
-
   return result;
 };
 

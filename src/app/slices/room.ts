@@ -4,6 +4,13 @@ import { deleteRoom, fetchRooms } from "../asyncThunk/room";
 
 const initialState: RoomState = {
   rooms: [],
+  paging:{
+    totalCount : 0,
+    currentPage : 1,
+    pageSize : 10,
+    hasNext : false,
+    hasPrev : false
+  },
   loading: false,
   error: null,
 };
@@ -19,9 +26,8 @@ const RoomSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchRooms.fulfilled, (state, action) => {
-        state.rooms = action.payload.sort(
-          (a, b) => Number(a.roomNumber) - Number(b.roomNumber),
-        );
+        state.rooms = action.payload?.data;
+        state.paging = action.payload?.metaData;
         state.loading = false;
       })
       .addCase(fetchRooms.rejected, (state, action) => {

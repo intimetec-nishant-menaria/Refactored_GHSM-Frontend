@@ -1,3 +1,5 @@
+import type { PagingMetaData } from "./paging";
+
 export interface CreateBookingPayload{
     roomId : number ; 
     guestId : number ;
@@ -20,9 +22,10 @@ export interface BookingPayload{
 }
 
 export interface BookingState{
-    bookings : BookingPayload[],
-    loading : boolean,
-    error : string | null, 
+    bookings : BookingPayload[];
+    paging : PagingMetaData;
+    loading : boolean;
+    error : string | null; 
 }
 
 export interface updateBookingPayload{

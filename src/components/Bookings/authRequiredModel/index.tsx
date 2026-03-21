@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import Button from "../common/button/Button";
+import Button from "../../common/button/Button";
 
 interface Props {
   setLoginModel: (state: boolean) => void;

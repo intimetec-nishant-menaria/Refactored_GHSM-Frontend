@@ -6,7 +6,7 @@ import PagingController from "../common/paging/PagingController";
 import Button from "../common/button/Button";
 import deleteIcon from "@/assets/deleteIcon.png";
 import editIcon from "@/assets/editIcon.png";
-import AddRoomTypeModal from "./AddRoomTypeModal";
+import AddRoomTypeModal from "./addRoomTypeModel";
 
 function RoomCategoryManagement() {
   const dispatch = useAppDispatch();

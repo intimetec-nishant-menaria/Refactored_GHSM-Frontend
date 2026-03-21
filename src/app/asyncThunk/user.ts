@@ -1,22 +1,31 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import type {
-  User,
   CreateUserPayload,
   UpdateUserPayload,
+  UserState,
 } from "@/utils/interfaces/user";
 import apiThunk from ".";
 
-export const fetchUsers = createAsyncThunk<User[]>(
+export const fetchUsers = createAsyncThunk(
   "user/fetchUsers",
-  async (_, { rejectWithValue }) => {
+  async ( {
+    currentPage,
+    pageSize,
+    searchUser
+  }:{
+    currentPage:number,
+    pageSize:number,
+    searchUser:string
+  } ,{ rejectWithValue }) => {
     try {
-      return await apiThunk<User[]>("/UserManagement/getAllUsers");
+      return await apiThunk<UserState>(`/UserManagement/getAllUsers?pageNumber=${currentPage}&pageSize=${pageSize}&searchUser=${searchUser}`);
     } catch (error) {
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("something went wrong");
     }
   },
 );
+
 export const fetchUserById = createAsyncThunk(
   "users/fetchUserById",
   async (id: number) => {

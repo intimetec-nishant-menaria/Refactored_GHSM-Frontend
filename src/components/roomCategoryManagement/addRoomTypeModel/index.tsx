@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import Button from "../common/button/Button";
+import Button from "../../common/button/Button";
 import { fetchRoomType } from "@/app/asyncThunk/roomType";
 
 interface AddRoomTypeModelProps {

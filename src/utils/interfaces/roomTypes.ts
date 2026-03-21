@@ -1,3 +1,5 @@
+import type { PagingMetaData } from "./paging";
+
 export interface RoomTypesPayload {
   id: number;
   roomNumber:string;
@@ -10,6 +12,7 @@ export interface RoomTypesPayload {
 
 export interface RoomState {
   rooms: RoomTypesPayload[];
+  paging : PagingMetaData;
   loading: boolean;
   error: string | null;
 }

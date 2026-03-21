@@ -4,12 +4,7 @@ import type { Amenity } from "@/utils/interfaces/amenity";
 
 export const fetchAmenitis = createAsyncThunk(
   "api/fetchAmenities",
-  async (_, { rejectWithValue }) => {
-    try {
+  async () => {
       return await apiThunk<Amenity[]>("/roomtypes/amenities");
-    } catch (error) {
-      if (error instanceof Error) return rejectWithValue(error.message);
-      return rejectWithValue("something went wrong");
-    }
   },
 );

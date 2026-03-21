@@ -48,7 +48,6 @@ export const forgotPassword = createAsyncThunk(
       if (error instanceof Error) return rejectWithValue(error.message);
       return rejectWithValue("Failed to send reset link");
     }
-    return rejectWithValue("Failed to send reset link");
   }
 );
 
@@ -56,7 +55,7 @@ export const resetPassword = createAsyncThunk(
   "auth/resetPassword",
   async (data: ResetPasswordPayload, { rejectWithValue }) => {
     try {
-      return await apiThunk("/auth/resetPassword", {
+      return await apiThunk(`/auth/resetPassword?email=${data.email}&token=${data.token}`, {
         method: "POST",
         body: data,
       });

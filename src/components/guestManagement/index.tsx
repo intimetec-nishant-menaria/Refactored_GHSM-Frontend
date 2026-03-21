@@ -7,33 +7,70 @@ import deleteIcon from "@/assets/deleteIcon.png";
 import editIcon from "@/assets/editIcon.png";
 import { deleteGuest, fetchAllGuest } from "@/app/asyncThunk/guest";
 import type { GuestState } from "@/utils/interfaces/guest";
-import CreateGuestModal from "./guestAddModel";
-import UpdateGuestModal from "./guestUpdateModel";
 import ConfirmationModel from "../common/confirmationModel/confirmationModel";
+import PagingController from "../common/paging/PagingController";
+import toast from "react-hot-toast";
+import Modal from "../common/modal";
+import AddUserForm from "./addGuestForm";
+import UpdateGuestForm from "./updateGuestForm";
 
 const GuestManagement = () => {
   const dispatch = useAppDispatch();
-  const { Guests, loading, error } = useSelector(
+  const { Guests, paging,loading, error } = useSelector(
     (state: RootState) => state.guest,
   );
 
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<GuestState | null>(null);
   const [isConfirmationModelOpen , setConfirmationModel] = useState(false);
   const [deleteId , setDeleteId] = useState<number | null>(null);
 
-  useEffect(() => {
-    dispatch(fetchAllGuest());
-  }, [dispatch]);
+  const [searchUser ,setSearchUser] = useState("");
+  const [pageSize ,setPageSize] = useState(5);
+  const [currentPage , setCurrentPage] = useState(1);
 
-  const openCreateModal = () => setIsCreateModalOpen(true);
-  const closeCreateModal = () => setIsCreateModalOpen(false);
-  const openUpdateModal = (guest : GuestState) => setEditingUser(guest);
-  const closeUpdateModel = () => setEditingUser(null);
+  const goToNextPage = () => {
+    if(paging.hasNext){
+      setCurrentPage(currentPage+1);
+    }
+  };
+
+  const goToPrevPage = () => {
+    if(paging.hasPrev){
+      setCurrentPage(currentPage-1);
+    }
+  };
+
+  const goToSpecificPage = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
+  useEffect(()=>{
+    setCurrentPage(1);
+  },[dispatch])
+
+  useEffect(() => {
+    let id = setTimeout(()=>{
+      dispatch(fetchAllGuest({currentPage , pageSize , searchUser}));
+    },500);
+
+    return ()=>clearTimeout(id);
+  }, [dispatch,currentPage,searchUser]);
+
+  const openCreateForm = () => setIsCreateFormOpen(true);
+  const closeCreateForm = () => setIsCreateFormOpen(false);
+  const openUpdateForm = (guest : GuestState) => setEditingUser(guest);
+  const closeUpdateForm = () => setEditingUser(null);
 
   const handleDelete = async (guestId: number) => {
-      await dispatch(deleteGuest(guestId));
-      await dispatch(fetchAllGuest());
+      await dispatch(deleteGuest(guestId)).then((resultAction)=>{
+        if(deleteGuest.fulfilled.match(resultAction)){
+          toast.success("Guest Deleted Successfully");
+        }else{
+          toast.error(resultAction.payload as string || "something went wrong");
+        }
+      });
+      await dispatch(fetchAllGuest({currentPage , pageSize , searchUser}));
       setDeleteId(null);
       setConfirmationModel(false);
   };
@@ -43,13 +80,24 @@ const GuestManagement = () => {
 
   return (
     <div className="p-4 md:p-6 bg-gray-100 min-h-screen">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div>
         <h1 className="text-xl md:text-2xl font-bold">Guest Management</h1>
-        <Button
-          onClick={openCreateModal}
-          label="Add Guest"
-          className="w-full sm:w-32 h-10 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition-colors"
-        />
+      </div>
+      <div className="mt-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <input
+            type="text"
+            placeholder="Search by user email or contact Number"
+            value={searchUser}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setSearchUser(e.target.value)
+            }
+            className="border p-2 rounded focus:ring-2 focus:ring-blue-500 flex-grow sm:w-64 outline-none bg-white shadow-sm"
+          />
+          <Button
+            onClick={openCreateForm}
+            label="Add Guest"
+            className="w-full sm:w-32 h-10 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition-colors"
+          />
       </div>
       <div className="grid grid-cols-1 gap-4 md:hidden">
         {Guests.map((guest) => (
@@ -118,7 +166,7 @@ const GuestManagement = () => {
                       src={editIcon}
                       alt="Update"
                       className="cursor-pointer w-5 h-5 opacity-70 hover:opacity-100"
-                      onClick={() => openUpdateModal(guest)}
+                      onClick={() => openUpdateForm(guest)}
                     />
                     <img
                       src={deleteIcon}
@@ -136,11 +184,29 @@ const GuestManagement = () => {
           </tbody>
         </table>
       </div>
-
-      {isCreateModalOpen && <CreateGuestModal closeModal={closeCreateModal} />}
-      {editingUser && (
-        <UpdateGuestModal closeModel={closeUpdateModel} data={editingUser} />
-      )}
+      <div className="mt-4 flex justify-center md:justify-end">
+        <PagingController
+          dataLength={paging.totalCount}
+          itemPerPage={pageSize}
+          currentPage={currentPage}
+          goToPrevious={goToPrevPage}
+          goToNext={goToNextPage}
+          goToSpecificPage={goToSpecificPage}
+        />
+      </div>
+        <Modal title="Add User"
+          subTitle="Enter guest details for booking and stay records."
+          isOpen={isCreateFormOpen} 
+          closeModal={closeCreateForm}
+        >
+          <AddUserForm closeModal={closeCreateForm}/>
+        </Modal>
+        <Modal title="Update Guest Profile"
+          subTitle={`Editing ID: ${editingUser?.id}`}
+            isOpen={editingUser}
+          >
+            <UpdateGuestForm closeModel={closeUpdateForm} data={editingUser} />
+        </Modal>
       {isConfirmationModelOpen && <ConfirmationModel label="Are you sure you want to delete this Guest? " isConfirmationModelOpen={setConfirmationModel} submitAction={()=>handleDelete(deleteId)}/>}
     </div>
   );

@@ -8,11 +8,10 @@ import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
 import { updateGuestSchema, type GuestFormData } from "@/utils/schemas/updateGuest";
 import toast from "react-hot-toast";
 
-const UpdateGuestModal = ({ closeModel, data }: UpdateModelProps<GuestState>) => {
+const UpdateGuestForm = ({ closeModel, data }: UpdateModelProps<GuestState>) => {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
 
-  // Initialize useForm
   const {
     register,
     handleSubmit,
@@ -24,7 +23,7 @@ const UpdateGuestModal = ({ closeModel, data }: UpdateModelProps<GuestState>) =>
       email: data.email,
       contact: data.contact,
       idProof: data.idProof,
-      Address: data.Address,
+      Address: data.address,
       emergencyContact: data.emergencyContact,
     },
   });
@@ -41,10 +40,10 @@ const UpdateGuestModal = ({ closeModel, data }: UpdateModelProps<GuestState>) =>
 
       if (updateGuest.fulfilled.match(resultAction)) {
         toast.success("Guest updated successfully");
-        await dispatch(fetchAllGuest());
+        await dispatch(fetchAllGuest({currentPage:1 , pageSize:5 , searchUser:""}));
         closeModel();
       } else {
-        toast.error("Failed to update guest");
+        toast.error(resultAction.payload as string || "Failed to update guest");
       }
     } catch (err) {
       toast.error("An unexpected error occurred");
@@ -53,16 +52,7 @@ const UpdateGuestModal = ({ closeModel, data }: UpdateModelProps<GuestState>) =>
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-100 flex justify-center items-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in duration-300">
-        <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-slate-800">Update Guest Profile</h2>
-            <p className="text-slate-500 text-sm">Editing ID: {data.id}</p>
-          </div>
-          <button onClick={closeModel} className="p-2 hover:bg-slate-200 rounded-full text-slate-400 transition-all">✕</button>
-        </div>
+  return(
         <form onSubmit={handleSubmit(onSubmit)} className="p-8 max-h-[80vh] overflow-y-auto flex flex-col gap-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="flex flex-col gap-1.5">
@@ -79,8 +69,9 @@ const UpdateGuestModal = ({ closeModel, data }: UpdateModelProps<GuestState>) =>
               <label className="text-sm font-semibold text-slate-700">Email Address</label>
               <input
                 {...register("email")}
-                disabled
-                className="border border-slate-200 px-4 py-2 rounded-xl bg-slate-100 text-slate-500 cursor-not-allowed italic"
+                className={`border px-4 py-2 rounded-xl outline-none focus:ring-2 transition-all ${
+                  errors.email ? "border-red-400 focus:ring-red-100" : "border-slate-200 focus:ring-blue-100"
+                }`}
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -134,9 +125,7 @@ const UpdateGuestModal = ({ closeModel, data }: UpdateModelProps<GuestState>) =>
             </button>
           </div>
         </form>
-      </div>
-    </div>
   );
 };
 
-export default UpdateGuestModal;
+export default UpdateGuestForm;

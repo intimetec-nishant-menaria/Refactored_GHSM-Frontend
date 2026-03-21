@@ -19,7 +19,7 @@ const DateRangePicker = ({ checkIn, checkOut, handleDateClick , allowPast = fals
           label="Check In"
           value={checkIn}
           onChange={(newDate) => handleDateClick(newDate)}
-          disablePast
+          disablePast={!allowPast}
           sx={{ width: { xs: "100%", md: 250 } }}
         />
         <DatePicker

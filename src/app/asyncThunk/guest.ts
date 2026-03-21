@@ -5,9 +5,17 @@ import type { addGuestInput } from "@/utils/schemas/addGuest";
 
 export const fetchAllGuest = createAsyncThunk(
     "api/fetchAllGuests",
-    async(_ , {rejectWithValue})=>{
+    async({
+        currentPage,
+        pageSize,
+        searchUser
+    }:{
+        currentPage:number,
+        pageSize:number,
+        searchUser:string
+    } , {rejectWithValue})=>{
         try{
-            return await apiThunk<GuestState[]>("/guest/getAllGuests");
+            return await apiThunk<GuestState[]>(`/guest/getAllGuests?pageNumber=${currentPage}&pageSize=${pageSize}&searchUser=${searchUser}`);
         }catch(error){
             if(error instanceof Error) return rejectWithValue(error.message);
             return rejectWithValue("Something went wrrong");
@@ -45,7 +53,7 @@ export const updateGuest = createAsyncThunk(
     }
 )
 
-export const searchGuest = createAsyncThunk(
+export const    searchGuest = createAsyncThunk(
     "api/searchguest",
     async ( data : string , {rejectWithValue})=>{
         try{

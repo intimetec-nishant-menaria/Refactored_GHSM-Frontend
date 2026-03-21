@@ -36,6 +36,7 @@ const ResetPasswordForm = () => {
       toast.error("Invalid or expired reset link");
       return;
     }
+    console.log(email ,token);
     dispatch(
       resetPassword({
         email,

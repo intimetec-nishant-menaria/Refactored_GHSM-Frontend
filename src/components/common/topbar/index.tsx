@@ -1,9 +1,9 @@
 import profile from "@/assets/profile.png";
-import inTimeTeclogo from "@/assets/inTimeTecLogo.png";
 import menuIcon from "@/assets/menuIcon.png";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import Button from "../button/Button";
 import { useNavigate } from "react-router-dom";
+import logo from "@/assets/logo.png"
 
 interface TopbarProps {
   onMenuClick?: () => void;
@@ -30,7 +30,7 @@ const Topbar = ({ onMenuClick }: TopbarProps) => {
           <div className="h-8 md:h-10 flex items-center">
             <img
               className="h-full w-auto object-contain cursor-pointer"
-              src={inTimeTeclogo}
+              src={logo}
               alt="logo"
               onClick={() => navigate("/")}
             />
@@ -69,7 +69,6 @@ const Topbar = ({ onMenuClick }: TopbarProps) => {
                       {user.role}
                     </span>
                   </div>
-
                   <div className="p-2">
                     <button
                       onClick={() => navigate("/change-password")}

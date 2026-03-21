@@ -1,35 +1,34 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { fetchAllBookings, cancelBooking} from "@/app/asyncThunk/booking";
-import PagingController from "../common/paging/PagingController";
-import Button from "../common/button/Button";
-import toast from "react-hot-toast";
+import { cancelBooking, fetchUserBookings} from "@/app/asyncThunk/booking";
+import PagingController from "@/components/common/paging/PagingController";
 import dayjs from "dayjs";
-import ConfirmationModel from "../common/confirmationModel/confirmationModel";
+import Button from "@/components/common/button/Button";
+import ConfirmationModel from "@/components/common/confirmationModel/confirmationModel";
+import toast from "react-hot-toast";
 
-const BookingManagement = () => {
+const MyBookings = () => {
   const dispatch = useAppDispatch();
   const { bookings, paging ,loading, error } = useAppSelector((state) => state.booking);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(5);
-
-  const [searchUser, setSearchUser] = useState("");
-  const [roomFilter, setRoomFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState<number>(0);
-  const [ isConfirmationModelOpen ,setConfirmationModel] = useState(false);
   const [bookingId , setBookingId] = useState<number | null>(null);
+  const [isConfirmationModelOpen , setConfirmationModel] = useState(false);
+  const [pageSize] = useState(2);
+
+  const [roomFilter, setRoomFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState(0);
 
   const goToNextPage = () => {
     if(paging.hasNext){
-      setCurrentPage(currentPage+1);
+        setCurrentPage(currentPage+1);
     }
   };
 
   const goToPrevPage = () => {
     if(paging.hasPrev){
-      setCurrentPage(currentPage-1);
+        setCurrentPage(currentPage-1);
     }
   };
 
@@ -39,25 +38,26 @@ const BookingManagement = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchUser, roomFilter, statusFilter]);
+  }, [roomFilter, statusFilter]);
 
   useEffect(() => {
     let id = setTimeout(()=>{
-      dispatch(fetchAllBookings({currentPage,pageSize,searchUser,roomFilter,statusFilter}));
-    },500);
+        dispatch(fetchUserBookings({currentPage, pageSize , roomFilter ,statusFilter}));
+    } , 500);
 
     return ()=>clearTimeout(id);
-  }, [dispatch,currentPage,searchUser,roomFilter,statusFilter]);
+  }, [dispatch,currentPage , roomFilter , statusFilter]);
 
-  const handleCancel = async () => {
-      const resultAction = await dispatch(cancelBooking(bookingId))
-      if(cancelBooking.fulfilled.match(resultAction)){
+   const handleCancel = async () => {
+      await dispatch(cancelBooking(bookingId))
+        .then(() => {
           toast.success("Booking cancelled successfully.");
-      }else{
-        toast.error(resultAction.payload as string || "Failed to cancel booking.");
-      }
-      
-      await dispatch(fetchAllBookings({currentPage , pageSize,searchUser,roomFilter,statusFilter}));
+        })
+        .catch((error: any) => {
+          toast.error(error?.message || "Failed to cancel booking.");
+        });
+        
+      await dispatch(fetchUserBookings({currentPage , pageSize,roomFilter,statusFilter}));
       setBookingId(null);
       setConfirmationModel(false);
   };
@@ -80,7 +80,7 @@ const BookingManagement = () => {
       styles[status as keyof typeof styles] || "bg-gray-100 text-gray-700";
 
     return (
-      <span className={`px-2 py-1 rounded-full text-xs font-bold ${style}`}>
+      <span className={`px-2 py-1 rounded text-xs font-bold ${style}`}>
         {label}
       </span>
     );
@@ -101,15 +101,6 @@ const BookingManagement = () => {
       </h1>
       <div className="bg-white rounded-2xl p-4 flex flex-col lg:flex-row gap-4 mb-6">
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
-          <input
-            type="text"
-            placeholder="Search by user email..."
-            value={searchUser}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setSearchUser(e.target.value)
-            }
-            className="border p-2 rounded focus:ring-2 focus:ring-blue-500 flex-grow sm:w-64 outline-none bg-white shadow-sm"
-          />
           <input
             type="text"
             placeholder="Room #"
@@ -136,8 +127,8 @@ const BookingManagement = () => {
       </div>
       <div className="grid grid-cols-1 gap-4 md:hidden">
         {bookings.length > 0 ? (
-          bookings.map((b,i) => (
-            <div key={i} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          bookings.map((b) => (
+            <div key={b.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
               <div className="flex justify-between items-start mb-3">
                 <div className="max-w-[70%]">
                   <span className="text-[10px] font-bold text-gray-400 uppercase">ID: #{b.id}</span>
@@ -167,17 +158,6 @@ const BookingManagement = () => {
                   </p>
                 </div>
               </div>
-
-              {b.status === 1 && (
-                <Button
-                  label="Cancel Booking"
-                  onClick={() => {
-                    setBookingId(b.id)
-                    setConfirmationModel(true);
-                  }}
-                  className="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-md font-bold text-sm transition-colors mt-2"
-                />
-              )}
             </div>
           ))
         ) : (
@@ -196,13 +176,13 @@ const BookingManagement = () => {
               <th className="py-3 px-4">Check In</th>
               <th className="py-3 px-4">Check Out</th>
               <th className="py-3 px-4">Status</th>
-              <th className="py-3 px-4 text-center">Action</th>
+              <th className="py-3 px-4">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {bookings.length > 0 ? (
-              bookings.map((b,i) => (
-                <tr key={i} className="hover:bg-gray-50 transition-colors">
+              bookings.map((b) => (
+                <tr key={b.id} className="hover:bg-gray-50 transition-colors">
                   <td className="py-4 px-4 text-gray-500 font-mono text-sm">#{b.id}</td>
                   <td className="py-4 px-4">
                     <div className="flex flex-col gap-0.5">
@@ -259,9 +239,12 @@ const BookingManagement = () => {
           goToSpecificPage={goToSpecificPage}
         />
       </div>
-      { isConfirmationModelOpen && <ConfirmationModel label="Are you sure you want to cancel this booking?" actionText="Cancel Booking" isConfirmationModelOpen={setConfirmationModel} submitAction={handleCancel} />}
+      {isConfirmationModelOpen &&
+        <ConfirmationModel label="Are you sure you want to cancel this booking?" isConfirmationModelOpen={()=>setConfirmationModel(false)}
+          submitAction={handleCancel}
+        />}
     </div>
   );
 };
 
-export default BookingManagement;
+export default MyBookings;

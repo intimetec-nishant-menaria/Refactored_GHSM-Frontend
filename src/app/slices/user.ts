@@ -4,6 +4,13 @@ import type { UserState } from "@/utils/interfaces/user";
 
 const initialState: UserState = {
   users: [],
+    paging : {
+    totalCount : 0,
+    currentPage : 1,
+    pageSize : 10,
+    hasNext : false,
+    hasPrev : false
+  },
   loading: false,
   error: null,
 };
@@ -19,7 +26,8 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchUsers.fulfilled, (state, action) => {
-        state.users = action.payload;
+        state.users = action.payload?.data;
+        state.paging = action.payload?.metaData;
         state.loading = false;
       })
       .addCase(fetchUsers.rejected, (state, action) => {

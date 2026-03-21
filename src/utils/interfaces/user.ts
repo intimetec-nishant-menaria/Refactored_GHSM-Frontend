@@ -1,13 +1,16 @@
+import type { PagingMetaData } from "./paging";
+
 export interface User {
   id: number;
   name: string;
   email: string;
-  role: number;
+  role: string;
   isActive: boolean;
 }
 
 export interface UserState {
   users: User[];
+  paging : PagingMetaData;
   loading: boolean;
   error: string | null;
 }

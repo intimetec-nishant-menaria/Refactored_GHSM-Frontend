@@ -10,6 +10,7 @@ function App() {
   useEffect(() => {
     dispatch(checkMe());
   }, [dispatch]);
+  
   return (
     <>
       <Toaster position="top-right" reverseOrder={false} />

@@ -15,7 +15,7 @@ const GuestSearchField = ({ onSelect, error }: GuestSearchProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
-    if (searchTerm.length <= 2 || searchTerm.includes("(")) return; 
+    if (searchTerm.length <= 2) return; 
 
     const id = setTimeout(() => {
       dispatch(searchGuest(searchTerm)).unwrap().catch(() => {});

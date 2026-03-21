@@ -12,7 +12,7 @@ interface Props {
   closeModal: () => void;
 }
 
-const CreateGuestModal = ({ closeModal }: Props) => {
+const AddUserForm = ({ closeModal }: Props) => {
   const dispatch = useAppDispatch();
 
   const {
@@ -37,7 +37,7 @@ const CreateGuestModal = ({ closeModal }: Props) => {
 
       if (createGuest.fulfilled.match(resultAction)) {
         toast.success("Guest created successfully!");
-        await dispatch(fetchAllGuest());
+        await dispatch(fetchAllGuest({currentPage:1 , pageSize:5 ,searchUser:""}));
         closeModal();
       } else {
         toast.error("Failed to create guest");
@@ -48,24 +48,6 @@ const CreateGuestModal = ({ closeModal }: Props) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-center items-center bg-slate-900/60 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 max-h-[90vh] flex flex-col">
-        <div className="p-6 bg-slate-50 border-b rounded-2xl  border-slate-100 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800">Add New Guest</h2>
-            <p className="text-slate-500 text-sm">
-              Enter guest details for booking and stay records.
-            </p>
-          </div>
-
-          <button
-            onClick={closeModal}
-            className="p-2 hover:bg-slate-200 rounded-full text-slate-400"
-          >
-            ✕
-          </button>
-        </div>
-
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="p-8 flex flex-col gap-5 overflow-y-auto"
@@ -169,9 +151,7 @@ const CreateGuestModal = ({ closeModal }: Props) => {
             </button>
           </div>
         </form>
-      </div>
-    </div>
   );
 };
 
-export default CreateGuestModal;
+export default AddUserForm;

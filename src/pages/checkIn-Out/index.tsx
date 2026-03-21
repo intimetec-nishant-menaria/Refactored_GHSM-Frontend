@@ -87,14 +87,10 @@ const CheckInOutManagement = () => {
 
   const handleDateChange = (date: dayjs.Dayjs | null) => {
     if (!date) return;
-    if (!dateRange.startDate || (dateRange.startDate && dateRange.endDate)) {
-      setDateRange({ startDate: date, endDate: date });
-    } else {
-      if (date.isBefore(dateRange.startDate)) {
-        setDateRange({ startDate: date, endDate: dateRange.startDate });
-      } else {
-        setDateRange({ ...dateRange, endDate: date });
-      }
+    if(date.isBefore(dateRange.startDate)){
+      setDateRange({startDate:date , endDate : dateRange.endDate});
+    }else{
+      setDateRange({startDate:dateRange.startDate , endDate : date});
     }
   };
 
@@ -160,15 +156,15 @@ const CheckInOutManagement = () => {
           />
         </div>
         
-        <div className="h-10 w-[1px] bg-slate-100 hidden lg:block" />
+        <div className="h-10  bg-slate-100 hidden lg:block" />
 
-        <div className="flex flex-wrap gap-4 flex-grow w-full lg:w-auto">
+        <div className="flex flex-wrap gap-4 w-full lg:w-auto">
           <input
             type="text"
             placeholder="Search by Guest Name"
             value={searchUser}
             onChange={(e) => setSearchUser(e.target.value)}
-            className="flex-grow border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-blue-50 outline-none text-sm transition-all bg-slate-50/30"
+            className="border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-blue-50 outline-none text-sm transition-all bg-slate-50/30"
           />
           <input
             type="text"
@@ -190,7 +186,7 @@ const CheckInOutManagement = () => {
           <div className="overflow-x-auto">
             <table className="min-w-full text-left">
             <thead className="bg-gray-200 text-gray-600 border-b text-xs uppercase border-slate-100">
-                <tr>
+                <tr key={0}>
                   <th className="py-5 px-8">Guest Name</th>
                   <th className="py-5 px-8">Room</th>
                   <th className="py-5 px-8">Stay Period</th>
@@ -200,7 +196,7 @@ const CheckInOutManagement = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {currentItems.length > 0 ? currentItems.map((b) => (
-                  <tr key={b.bookinId} className="hover:bg-blue-50/20 transition-colors group">
+                  <tr key={b.bookingId} className="hover:bg-blue-50/20 transition-colors group">
                     <td className="py-5 px-8">
                       <div className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors">{b.userName}</div>
                     </td>
@@ -209,9 +205,9 @@ const CheckInOutManagement = () => {
                     </td>
                     <td className="py-5 px-8 text-xs text-slate-500 font-medium">
                       <div className="flex items-center gap-2">
-                         <span>{dayjs(b.checkInDate).format("DD MMM")}</span>
+                         <span>{dayjs(b.start).format("DD MMM")}</span>
                          <span className="text-slate-300">→</span>
-                         <span>{dayjs(b.checkOutDate).format("DD MMM")}</span>
+                         <span>{dayjs(b.end).format("DD MMM")}</span>
                       </div>
                     </td>
                     <td className="py-5 px-8">{getStatusBadge(b.bookingStatus)}</td>

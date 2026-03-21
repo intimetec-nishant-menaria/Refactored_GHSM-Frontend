@@ -8,7 +8,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 
-const CreateUserModal = ({ closeModel }: {closeModel:()=>void}) => {
+const CreateUserForm = ({ closeModel }: {closeModel:()=>void}) => {
   const dispatch = useAppDispatch();
 
   const {
@@ -31,10 +31,10 @@ const CreateUserModal = ({ closeModel }: {closeModel:()=>void}) => {
       const resultAction = await dispatch(createUser(data));
       if (createUser.fulfilled.match(resultAction)) {
         toast.success("User created successfully!");
-        await dispatch(fetchUsers());
+        await dispatch(fetchUsers({currentPage:1 , pageSize:5 , searchUser:""}));
         closeModel();
       } else {
-        toast.error("Failed to create user");
+        toast.error(resultAction.payload as string ||  "Failed to create user");
       }
     } catch {
       toast.error("An unexpected error occurred");
@@ -42,22 +42,6 @@ const CreateUserModal = ({ closeModel }: {closeModel:()=>void}) => {
   };
 
   return (
-    <div className="fixed inset-0 z-100 flex justify-center items-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in duration-300">
-        <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800">Add New User</h2>
-            <p className="text-slate-500 text-sm">
-              Assign roles and access for your team or guests.
-            </p>
-          </div>
-          <button
-            onClick={closeModel}
-            className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-600 transition-all"
-          >
-            ✕
-          </button>
-        </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="p-8 flex flex-col gap-5"
@@ -169,9 +153,7 @@ const CreateUserModal = ({ closeModel }: {closeModel:()=>void}) => {
             </button>
           </div>
         </form>
-      </div>
-    </div>
   );
 };
 
-export default CreateUserModal;
+export default CreateUserForm;

@@ -1,12 +1,12 @@
 import { useState, type ChangeEvent } from "react";
-import Input from "../common/input/Input";
+import Input from "../../common/input/Input";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { addRoom, fetchRooms } from "@/app/asyncThunk/room";
 import toast from "react-hot-toast";
 
 const numberRegex = /^\d*$/;
 
-function AddRoomModel({ closeModel }:{closeModel:()=>void}) {
+function AddRoomForm({ closeModel }:{closeModel:()=>void}) {
   const dispatch = useAppDispatch();
 
   const [roomNumber, setRoomNumber] = useState("");
@@ -29,7 +29,7 @@ function AddRoomModel({ closeModel }:{closeModel:()=>void}) {
         
         if (addRoom.fulfilled.match(resultAction)) {
           toast.success("Room added successfully!");
-          await dispatch(fetchRooms());
+          await dispatch(fetchRooms({currentPage:1 , pageSize:5 , roomStatusFilter:0 , roomTypeFilter:0}));
           closeModel();
         } else {
           toast.error((resultAction.payload as string) || "Failed to add room");
@@ -53,20 +53,6 @@ function AddRoomModel({ closeModel }:{closeModel:()=>void}) {
   }
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in duration-300">
-        <div className="bg-slate-50 p-6 border-b border-slate-100 flex justify-between items-center">
-          <div>
-            <h2 className="text-xl font-bold text-slate-800">Add New Room</h2>
-            <p className="text-sm text-slate-500">Register a new unit in the guest house system.</p>
-          </div>
-          <button 
-            onClick={closeModel} 
-            className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-600 transition-colors"
-          >
-            ✕
-          </button>
-        </div>
         <form onSubmit={handleOnSubmit} className="p-8 flex flex-col gap-6">
           <div className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
@@ -121,9 +107,7 @@ function AddRoomModel({ closeModel }:{closeModel:()=>void}) {
             </button>
           </div>
         </form>
-      </div>
-    </div>
   );
 }
 
-export default AddRoomModel;
+export default AddRoomForm;

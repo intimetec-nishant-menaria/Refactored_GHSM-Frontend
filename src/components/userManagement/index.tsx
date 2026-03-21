@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { useSelector } from "react-redux";
 import { fetchUsers, deleteUser } from "@/app/asyncThunk/user";
 import type { RootState } from "@/app/store/store";
@@ -6,34 +6,59 @@ import { useAppDispatch } from "@/hooks/useAppDispatch";
 import Button from "@/components/common/button/Button";
 import deleteIcon from "@/assets/deleteIcon.png";
 import editIcon from "@/assets/editIcon.png";
-import CreateUserModal from "@/components/userManagement/createUserModel";
-import UpdateUserModal from "@/components/userManagement/updateUserModel";
 import type { User } from "@/utils/interfaces/user";
 import ConfirmationModel from "../common/confirmationModel/confirmationModel";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import toast from "react-hot-toast";
+import PagingController from "../common/paging/PagingController";
+import Modal from "../common/modal";
+import CreateUserForm from "./createUserForm";
+import UpdateUserForm from "./updateUserForm";
 
 const UserManagement = () => {
   const dispatch = useAppDispatch();
-  const { users, loading, error } = useSelector(
+  const { users, paging, loading, error } = useSelector(
     (state: RootState) => state.user,
   );
 
   const {user} = useAppSelector(state=>state.auth); 
 
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isConfirmationModelOpen ,setConfirmationModel ] = useState(false);
   const [userId , setUserId] = useState<number | null>(null);
+  const [searchUser , setSearchUser] = useState("");
+  const [currentPage , setCurrentPage ] = useState(1);
+  const [pageSize , setPageSize] = useState(5);
 
   useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
+    let id = setTimeout(()=>{
+      dispatch(fetchUsers({currentPage , pageSize , searchUser}));
+    },500)
 
-  const openCreateModal = () => setIsCreateModalOpen(true);
-  const closeCreateModel = () => setIsCreateModalOpen(false);
-  const openUpdateModal = (user: User) => setEditingUser(user);
-  const closeUpdateModal = () => setEditingUser(null);
+    return ()=>clearTimeout(id);
+  }, [dispatch,currentPage,searchUser]);
+
+  function goToNext(){
+    if(paging.hasNext){
+      setCurrentPage(currentPage+1);
+    }
+  }
+
+  function goToPrev(){
+    if(paging.hasPrev){
+      setCurrentPage(currentPage-1);
+    }
+  }
+
+  function goToSpecificPage(pageNumber : number){
+    setCurrentPage(pageNumber);
+  }
+
+  const openCreateForm = () => setIsCreateFormOpen(true);
+  const closeCreateForm = () => setIsCreateFormOpen(false);
+  const openUpdateForm = (user: User) => setEditingUser(user);
+  const closeUpdateForm = () => setEditingUser(null);
 
   const handleDelete = async (userId: number) => {
     if(userId == user?.id){
@@ -41,7 +66,7 @@ const UserManagement = () => {
       return;
     }
       await dispatch(deleteUser(userId));
-      await dispatch(fetchUsers());
+      await dispatch(fetchUsers({currentPage , pageSize , searchUser}));
       setUserId(null);
       setConfirmationModel(false);
   };
@@ -51,10 +76,19 @@ const UserManagement = () => {
 
   return (
     <div className="p-4 md:p-6 bg-gray-100 min-h-screen">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <h1 className="text-xl md:text-2xl font-bold">User Management</h1>
+      <h1 className="text-xl md:text-2xl font-bold">User Management</h1>
+      <div className="p-4 rounded-2xl mt-2 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <input
+            type="text"
+            placeholder="Search by user email..."
+            value={searchUser}
+            onChange={(e: ChangeEvent<HTMLInputElement>) =>
+              setSearchUser(e.target.value)
+            }
+            className="border p-2 rounded focus:ring-2 focus:ring-blue-500 flex-grow sm:w-64 outline-none bg-white shadow-sm"
+          />
         <Button
-          onClick={openCreateModal}
+          onClick={openCreateForm}
           label="Add User"
           className="w-full sm:w-32 h-10 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition-colors"
         />
@@ -75,7 +109,7 @@ const UserManagement = () => {
                   src={editIcon}
                   alt="Edit"
                   className="w-5 h-5 cursor-pointer"
-                  onClick={() => openUpdateModal(user)}
+                  onClick={() => openUpdateForm(user)}
                 />
                 <img
                   src={deleteIcon}
@@ -89,7 +123,7 @@ const UserManagement = () => {
               <div>
                 <span className="text-gray-500 block">Role</span>
                 <span className="font-medium">
-                  {user.role === 1 ? "Admin" : "Staff"}
+                  {user.role === 1 ? "Admin" : (user.role === 2 ? "Staff" : "Guest")}
                 </span>
               </div>
               <div>
@@ -122,9 +156,9 @@ const UserManagement = () => {
                 <td className="py-3 px-4 text-gray-600">{user.email}</td>
                 <td className="py-3 px-4">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs ${user.role === 1 ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}
+                    className={`px-2 py-1 rounded-full text-xs ${user.role === "Admin" ? "bg-purple-100 text-purple-700" : "bg-gray-100 text-gray-700"}`}
                   >
-                    {user.role === 1 ? "Admin" : user.role === 2 ? "Staff" : "Guest"}
+                    {user.role === 1 ? "Admin" : (user.role === 2 ? "Staff" : "Guest")}
                   </span>
                 </td>
                 <td className="py-3 px-4">{user.isActive ? "✅" : "❌"}</td>
@@ -134,7 +168,7 @@ const UserManagement = () => {
                       src={editIcon}
                       alt="Update"
                       className="cursor-pointer w-5 h-5 opacity-70 hover:opacity-100"
-                      onClick={() => openUpdateModal(user)}
+                      onClick={() => openUpdateForm(user)}
                     />
                     <img
                       src={deleteIcon}
@@ -152,11 +186,30 @@ const UserManagement = () => {
           </tbody>
         </table>
       </div>
-
-      {isCreateModalOpen && <CreateUserModal closeModel={closeCreateModel} />}
-      {editingUser && (
-        <UpdateUserModal closeModel={closeUpdateModal} data={editingUser} />
-      )}
+      <div className="mt-4 flex justify-center md:justify-end">
+        <PagingController
+          dataLength={paging.totalCount}
+          currentPage={currentPage}
+          itemPerPage={pageSize}
+          goToPrevious={goToPrev}
+          goToNext={goToNext}
+          goToSpecificPage={goToSpecificPage}
+        />
+      </div>
+      <Modal title="Add New User"
+        subTitle="Assign roles and access for your team or guests."
+        isOpen={isCreateFormOpen}
+        closeModal={closeCreateForm}
+        >
+          <CreateUserForm closeModel={closeCreateForm}/>
+      </Modal>
+      <Modal title="Update User"
+        subTitle={`Modify account details for ${editingUser?.name}.`}
+        isOpen={editingUser}
+        closeModal={closeUpdateForm}
+        >
+          <UpdateUserForm closeModel={closeUpdateForm} data={editingUser}/>
+      </Modal>
       {isConfirmationModelOpen && <ConfirmationModel label="Are you sure you want to delete this user?" isConfirmationModelOpen={setConfirmationModel} submitAction={()=>handleDelete(userId)}/>}
     </div>
   );

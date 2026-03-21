@@ -1,3 +1,5 @@
+import type { PagingMetaData } from "./paging";
+
 export interface GuestState{
     id : number ;
     name : string;
@@ -10,6 +12,7 @@ export interface GuestState{
 
 export interface GuestStatePayload{
     Guests : GuestState[];
+    paging : PagingMetaData;
     loading : boolean;
     error : string | null;
 }

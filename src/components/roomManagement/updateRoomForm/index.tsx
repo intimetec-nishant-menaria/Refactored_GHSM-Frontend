@@ -1,5 +1,5 @@
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
-import Input from "../common/input/Input";
+import Input from "../../common/input/Input";
 import { useState, type ChangeEvent } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { fetchRooms, updateRoom } from "@/app/asyncThunk/room";
@@ -8,7 +8,7 @@ import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
 
 const numberRegex = /^\d*$/;
 
-function UpdateRoomModel({ closeModel, data }: UpdateModelProps<RoomTypesPayload>) {
+function UpdateRoomForm({ closeModel, data }: UpdateModelProps<RoomTypesPayload>) {
   const dispatch = useAppDispatch();
 
   const [numberError, setNumberError] = useState(false);
@@ -40,7 +40,7 @@ function UpdateRoomModel({ closeModel, data }: UpdateModelProps<RoomTypesPayload
       dispatch(updateRoom({ id: data.id, roomNumber, roomTypeId, roomStatus })).then((resultAction) => {
         if (updateRoom.fulfilled.match(resultAction)) {
           toast.success("Room Updated successfully!");
-          dispatch(fetchRooms());
+          dispatch(fetchRooms({currentPage:1 , pageSize:5 , roomStatusFilter:0 , roomTypeFilter:0}));
           closeModel();
         } else {
           toast.error((resultAction.payload as string) || "Failed to update room");
@@ -50,12 +50,6 @@ function UpdateRoomModel({ closeModel, data }: UpdateModelProps<RoomTypesPayload
   }
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in duration-300" >
-        <div className="bg-slate-50 p-6 border-b border-slate-100 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-slate-800">Update Room Details</h2>
-          <button onClick={closeModel} className="text-slate-400 hover:text-slate-600 transition-colors">✕</button>
-        </div>
         <form onSubmit={handleOnSubmit} className="p-6 flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <label htmlFor="RoomNumber" className="text-sm font-semibold text-slate-600">Room Number</label>
@@ -114,9 +108,7 @@ function UpdateRoomModel({ closeModel, data }: UpdateModelProps<RoomTypesPayload
             </button>
           </div>
         </form>
-      </div>
-    </div>
   );
 }
 
-export default UpdateRoomModel;
+export default UpdateRoomForm;

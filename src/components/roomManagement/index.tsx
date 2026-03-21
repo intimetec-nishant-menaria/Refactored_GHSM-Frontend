@@ -1,4 +1,4 @@
-import { type ChangeEvent, useEffect, useMemo, useState } from "react";
+import { type ChangeEvent, useEffect, useState } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { deleteRoom, fetchRooms } from "@/app/asyncThunk/room.ts";
@@ -6,24 +6,23 @@ import PagingController from "../common/paging/PagingController.tsx";
 import deleteIcon from "@/assets/deleteIcon.png";
 import editIcon from "@/assets/editIcon.png";
 import Button from "../common/button/Button.tsx";
-import AddRoomModel from "./addRoomModel.tsx";
 import RoomCategoryManagement from "../roomCategoryManagement/index.tsx"
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
-import UpdateRoomModel from "./UpdateRoomModel.tsx";
 import { fetchRoomType } from "@/app/asyncThunk/roomType.ts";
 import RoomStatusDropDown from "../common/roomStatusDropDown/RoomStatusDropDown.tsx";
 import ConfirmationModel from "../common/confirmationModel/confirmationModel.tsx";
+import Modal from "../common/modal/index.tsx";
+import AddRoomForm from "./addRoomForm/index.tsx";
+import UpdateRoomForm from "./updateRoomForm/index.tsx";
 
 const RoomManagement = () => {
   const dispatch = useAppDispatch();
 
-  const { rooms, loading, error } = useAppSelector((state) => state.room);
+  const { rooms,paging, loading, error } = useAppSelector((state) => state.room);
   const { roomTypes, loading: roomTypesLoading, error: roomTypesError } = useAppSelector((state) => state.roomType);
-  
+
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemPerPage] = useState(5); 
-  const startIndex = (currentPage - 1) * itemPerPage;
-  const endIndex = startIndex + itemPerPage;
+  const [pageSize] = useState(5); 
 
   const [roomTypeFilter, setRoomTypeFilter] = useState(0);
   const [roomStatusFilter, setRoomStatusFilter] = useState(0);
@@ -31,31 +30,26 @@ const RoomManagement = () => {
   const [isConfirmationModelOpen , setConfirmationModel] = useState(false);
   const [roomId , setRoomId] = useState<number | null>(null);
 
-  const filteredItems = useMemo(() => {
-    let temp = roomTypeFilter === 0 ? rooms : rooms.filter(room => room.roomTypeId === roomTypeFilter);
-    return roomStatusFilter === 0 ? temp : temp.filter(room => room.roomStatus === roomStatusFilter);
-  }, [roomTypeFilter, rooms, roomStatusFilter]);
-
-  const currentItems = useMemo(() => {
-    return filteredItems.slice(startIndex, endIndex);
-  }, [filteredItems, startIndex, endIndex]);
-
-  const [isCreateRoomModalOpen, setIsCreateModalOpen] = useState(false);
-  const openCreateRoomModal = () => setIsCreateModalOpen(true);
-  const closeModel = () => setIsCreateModalOpen(false);
+  const [isCreateRoomFormOpen, setIsCreateFormOpen] = useState(false);
+  const openCreateRoomForm = () => setIsCreateFormOpen(true);
+  const closeCreateRoomForm = () => setIsCreateFormOpen(false);
 
   const [editingRoom, setEditingRoom] = useState<RoomTypesPayload | null>(null);
-  const openUpdateRoomModel = (room: RoomTypesPayload) => setEditingRoom(room);
-  const closeUpdateRoomModel = () => setEditingRoom(null);
+  const openUpdateRoomForm = (room: RoomTypesPayload) => setEditingRoom(room);
+  const closeUpdateRoomForm = () => setEditingRoom(null);
 
   useEffect(() => {
-    dispatch(fetchRooms());
-    dispatch(fetchRoomType());
-  }, [dispatch]);
+    let id = setTimeout(()=>{
+      dispatch(fetchRooms({currentPage , pageSize , roomStatusFilter , roomTypeFilter}));
+      dispatch(fetchRoomType());
+    },500);
+
+    return ()=>clearTimeout(id);
+  }, [dispatch , roomStatusFilter , roomTypeFilter , currentPage]);
 
   const handleDelete = async (roomid: number) => {
       await dispatch(deleteRoom(roomid));
-      await dispatch(fetchRooms());
+      await dispatch(fetchRooms({currentPage , pageSize , roomStatusFilter , roomTypeFilter}));
       setRoomId(null);
       setConfirmationModel(false);
   };
@@ -78,16 +72,37 @@ const RoomManagement = () => {
 
   return (
     <div className="p-4 md:p-6 bg-gray-100 min-h-screen w-full">
-      <div className="h-10 w-full flex justify-center items-center">
-        <button onClick={()=>setIsRoomManagementOpen(true)} className={`w-1/2 h-full ${isRoomManagementOpen ? "bg-gray-100" : "bg-white shadow-2xl rounded-2xl"} cursor-pointer`}>Room Management</button>
-        <button onClick={()=>setIsRoomManagementOpen(false)} className={`w-1/2 h-full ${isRoomManagementOpen ? "bg-white shadow-2xl rounded-2xl" : "bg-gray-100"} cursor-pointer`}>Room Category Management</button>
+      <div className="h-12 w-full flex justify-center items-center border-b border-gray-200 bg-gray-100 rounded-t-2xl overflow-hidden relative z-10 -mb-px">
+        <button
+          onClick={() => setIsRoomManagementOpen(true)}
+          className={`w-1/2 h-full flex justify-center items-center text-sm font-medium transition-all duration-150 cursor-pointer ${
+            isRoomManagementOpen
+              ? "bg-gray-100 text-blue-600 border-b-2 border-blue-600 font-semibold"
+              : "bg-gray-200/70 text-gray-600 hover:bg-gray-200 border-b border-gray-200"
+          }`}
+        >
+          Room Management
+        </button>
+        <button
+          onClick={() => setIsRoomManagementOpen(false)}
+          className={`w-1/2 h-full flex justify-center items-center text-sm font-medium transition-all duration-150 cursor-pointer ${
+            !isRoomManagementOpen
+              ? "bg-gray-100 text-blue-600 border-b-2 border-blue-600 font-semibold"
+              : "bg-gray-200/70 text-gray-600 hover:bg-gray-200 border-b border-gray-200"
+          }`}
+        >
+          Room Category Management
+        </button>
       </div>
       {
         isRoomManagementOpen ? (
           <>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-6 mb-6">
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">Room management</h2>
+            </div>
             <Button
-              onClick={openCreateRoomModal}
+              onClick={openCreateRoomForm}
               label="Add Room"
               className="w-full sm:w-32 h-10 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition-all"
             />
@@ -109,12 +124,12 @@ const RoomManagement = () => {
             <RoomStatusDropDown roomStatus={roomStatusFilter}  setRoomStatus={setRoomStatusFilter}/>
           </div>
           <div className="grid grid-cols-1 gap-4 md:hidden">
-            {currentItems.map((room) => (
+            {rooms.map((room) => (
               <div key={room.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex justify-between items-center mb-3">
                   <span className="text-lg font-bold text-blue-600">Room {room.roomNumber}</span>
                   <div className="flex gap-4">
-                    <img src={editIcon} alt="Edit" className="w-5 h-5" onClick={() => openUpdateRoomModel(room)} />
+                    <img src={editIcon} alt="Edit" className="w-5 h-5" onClick={() => openUpdateRoomForm(room)} />
                     <img src={deleteIcon} alt="Delete" className="w-5 h-5" onClick={() => handleDelete(room.id)} />
                   </div>
                 </div>
@@ -144,12 +159,12 @@ const RoomManagement = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {currentItems.map(room => (
+                {rooms.map(room => (
                   <tr key={room.id} className="hover:bg-gray-50 transition-colors">
                     <td className="py-4 px-4 font-medium">{room.roomNumber}</td>
                     <td className="py-4 px-4">{room.roomTypeName}</td>
                     <td className="py-4 px-4 text-center">{room.capacity}</td>
-                    <td className="py-4 px-4 font-semibold">${room.pricePerNight}</td>
+                    <td className="py-4 px-4 font-semibold">₹{room.pricePerNight}</td>
                     <td className="py-4 px-4">
                       <span className={`px-2 py-1 rounded text-xs font-bold ${
                         room.roomStatus === 1 ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
@@ -159,7 +174,7 @@ const RoomManagement = () => {
                     </td>
                     <td className="py-4 px-4">
                       <div className="flex justify-center items-center gap-3">
-                        <img src={editIcon} alt="Edit" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={() => openUpdateRoomModel(room)} />
+                        <img src={editIcon} alt="Edit" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={() => openUpdateRoomForm(room)} />
                         <span className="text-gray-300">|</span>
                         <img src={deleteIcon} alt="Delete" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={()=>{
                           setRoomId(room.id)
@@ -174,17 +189,23 @@ const RoomManagement = () => {
           </div>
           <div className="mt-4">
             <PagingController
-              dataLength={filteredItems.length}
-              itemPerPage={itemPerPage}
+              dataLength={paging.totalCount}
+              itemPerPage={pageSize}
               currentPage={currentPage}
               goToPrevious={goToPrevPage}
               goToNext={goToNextPage}
               goToSpecificPage={goToSpecificPage}
             />
-            {isCreateRoomModalOpen && <AddRoomModel closeModel={closeModel} />}
-            {editingRoom && (
-              <UpdateRoomModel closeModel={closeUpdateRoomModel} data={editingRoom} />
-            )}
+            <Modal title="Add New Room"
+              subTitle="Register a new unit in the guest house system."
+              isOpen={isCreateRoomFormOpen}
+              closeModal={closeCreateRoomForm}
+              >
+                <AddRoomForm closeModel={closeCreateRoomForm}/>
+            </Modal>
+            <Modal title="Update Room Details" isOpen={editingRoom} closeModal={closeUpdateRoomForm}>
+                <UpdateRoomForm closeModel={closeUpdateRoomForm} data={editingRoom}/>
+            </Modal>
           </div>
         </>
         ):(

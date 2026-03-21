@@ -11,7 +11,7 @@ function PagingController({dataLength,currentPage , itemPerPage , goToPrevious ,
             <div className="flex justify-between gap-1">
                 {
                     Array.from({length : totalPages} , (_ ,i)=>(
-                        <Button className={`w-10 h-10 px-3 py-1 text-sm ${currentPage - 1 == i ? "bg-gray-300" : "bg-blue-600 hover:bg-blue-700"} text-white font-bold rounded `} key={i}
+                        <Button className={`w-10 h-10 px-3 py-1 text-sm ${currentPage - 1 !== i ? "bg-gray-300" : "bg-blue-600 hover:bg-blue-700"} text-white font-bold rounded `} key={i}
                             onClick={()=>goToSpecificPage(i+1)}
                             label={`${i+1}`}
                         >

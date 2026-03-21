@@ -65,7 +65,7 @@ function Calendar() {
   }
 
   return (
-    <div className="flex flex-col h-screen p-4 md:p-8  font-sans">
+    <div className="flex flex-col min-h-fit p-4  font-sans">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">

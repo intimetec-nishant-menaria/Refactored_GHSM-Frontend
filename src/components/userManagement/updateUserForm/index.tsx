@@ -5,7 +5,7 @@ import type { User } from "@/utils/interfaces/user";
 import toast from "react-hot-toast";
 import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
 
-const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
+const UpdateUserForm = ({ closeModel, data }: UpdateModelProps<User>) => {
   const dispatch = useAppDispatch();
 
   const [name, setName] = useState(data.name);
@@ -24,7 +24,8 @@ const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
     setError(false);
     if (
       name === data.name &&
-      role === data.role &&
+      email === data.email &&
+      role === data.role  &&
       isActive === data.isActive
     ) {
       closeModel();
@@ -45,10 +46,10 @@ const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
 
       if (updateUser.fulfilled.match(resultAction)) {
         toast.success("User updated successfully");
-        await dispatch(fetchUsers());
+        await dispatch(fetchUsers({currentPage:1 , pageSize:5 , searchUser:""}));
         closeModel();
       } else {
-        toast.error("Failed to update user");
+        toast.error(resultAction.payload as string || "Failed to update user");
       }
     } catch {
       toast.error("An error occurred");
@@ -58,22 +59,6 @@ const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
   };
 
   return (
-    <div className="fixed inset-0 z-100 flex justify-center items-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden animate-in zoom-in duration-300">
-        <div className="p-6 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-slate-800">Update User</h2>
-            <p className="text-slate-500 text-sm">
-              Modify account details for {data.name}.
-            </p>
-          </div>
-          <button
-            onClick={closeModel}
-            className="p-2 hover:bg-slate-200 rounded-full text-slate-400 hover:text-slate-600 transition-all"
-          >
-            ✕
-          </button>
-        </div>
         <form onSubmit={handleSubmit} className="p-8 flex flex-col gap-6">
           <div className="flex flex-col gap-1.5">
             <label
@@ -111,7 +96,7 @@ const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="border border-slate-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-100 outline-none rounded-xl cursor-not-allowed"
+              className="border border-slate-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-100 outline-none rounded-xl"
             />
           </div>
           <div className="flex flex-col lg:flex-row gap-6">
@@ -165,9 +150,7 @@ const UpdateUserModal = ({ closeModel, data }: UpdateModelProps<User>) => {
             </button>
           </div>
         </form>
-      </div>
-    </div>
   );
 };
 
-export default UpdateUserModal;
+export default UpdateUserForm;

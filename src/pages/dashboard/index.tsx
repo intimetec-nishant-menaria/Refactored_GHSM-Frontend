@@ -1,9 +1,11 @@
-import AdminLayout from "@/components/layouts/AdminLayout";
+import RoomStatusDashboard from "@/pages/dashboard/dashBoardCards";
+import Calendar from "./Calendar";
 
 const Dashboard = () => {
   return (
     <>
-      <AdminLayout />
+      <Calendar/>
+      <RoomStatusDashboard/>
     </>
   );
 };

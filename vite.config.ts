@@ -11,7 +11,10 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  server :{
-    https:{}
-  }
+  server: {
+    hmr: {
+      protocol: "ws",
+      host: "localhost",
+    },
+  },
 });
