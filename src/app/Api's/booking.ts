@@ -1,0 +1,83 @@
+import type { BookingPayload, CreateBookingPayload, fetchBookingArgs, fetchBookingsByRangeArgs, fetchUserBookingArgs, updateBookingPayload } from "@/utils/interfaces/booking";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import type { paging } from "@/utils/interfaces/paging";
+
+export const bookingApi = createApi({
+    reducerPath : "bookingApi",
+    baseQuery : fetchBaseQuery({
+        baseUrl : `${import.meta.env.VITE_API_BASE_URL}/booking`,
+        credentials: "include"
+    }),
+    tagTypes:["booking"],
+    endpoints : (builder)=>({
+        createBooking : builder.mutation<void,CreateBookingPayload>({
+            query: (data)=>({
+                url: "/createBooking",
+                method : "POST",
+                body : data
+            }),
+            invalidatesTags : ["booking"]
+        }),
+        fetchAllBookings : builder.query<paging<BookingPayload[]>, fetchBookingArgs>({
+            query:(data)=>({
+                url : `/getAllBookings?pageNumber=${data.currentPage}&pageSize=${data.pageSize}&searchUser=${data.searchUser}&roomNumber=${data.roomFilter}&statusFilter=${data.statusFilter}`
+            }),
+            providesTags:["booking"]
+        }),
+        cancelBooking : builder.mutation<void , number>({
+            query : (id)=>({
+                url:`/${id}/cancelBooking`,
+                method:"POST"
+            }),
+            invalidatesTags:["booking"]
+        }),
+        fetchBookingByRange : builder.query<BookingPayload[],fetchBookingsByRangeArgs>({
+            query : (dates)=>({
+                url : `/getBookingsByRange?start=${dates.startDate}&end=${dates.endDate}`,
+            }),
+            providesTags:["booking"]
+        }),
+        updateBooking : builder.mutation<void,updateBookingPayload>({
+            query : (data)=>({
+                url : `/updateBooking/${data.id}`,
+                method: "PUT",
+                body: data,
+            }),
+            invalidatesTags : ["booking"]
+        }),
+        checkIn : builder.mutation<void,number>({
+            query : (id)=>({
+                url : `checkIn/${id}`,
+                method : "PUT",
+                body:id,
+            }),
+            invalidatesTags : ["booking"],
+        }),
+        checkOut : builder.mutation<void,number>({
+            query : (id)=>({
+                url: `/checkOut/${id}`,
+                method : "PUT",
+                body : id,
+            }),
+            invalidatesTags: ["booking"]
+        }),
+        fetchUserBookings : builder.query<paging<BookingPayload[]>,fetchUserBookingArgs>({
+            query : (data)=>({
+                url: `/myBookings?pageNumber=${data.currentPage}&pageSize=${data.pageSize}&roomNumber=${data.roomFilter}&statusFilter=${data.statusFilter}`
+            }),
+            providesTags : ["booking"],
+        })
+    })
+})
+
+export const {
+    useCreateBookingMutation,
+    useFetchAllBookingsQuery,
+    useCancelBookingMutation,
+    useFetchBookingByRangeQuery,
+    useLazyFetchBookingByRangeQuery,
+    useUpdateBookingMutation,
+    useCheckInMutation,
+    useCheckOutMutation,
+    useFetchUserBookingsQuery,
+} = bookingApi;

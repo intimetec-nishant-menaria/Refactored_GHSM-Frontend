@@ -1,10 +1,10 @@
-import crossIcon from "@/assets/crossIcon.png";
 import SidebarItem from "./SidebarItem";
 import { menuByRole } from "./menuConfig";
-import { useNavigate } from "react-router-dom";
-import { logoutUser } from "@/app/asyncThunk/auth";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
+import { authAPi, useLogoutUserMutation } from "@/app/Api's/auth";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { removeuser } from "@/app/slices/auth";
+import { useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -12,16 +12,19 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
-  const navigate = useNavigate();
-  const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [logoutUser] = useLogoutUserMutation();
+
   const role = user?.role || "Guest";
   const menuItems = menuByRole[role as keyof typeof menuByRole] || [];
 
-  function handleLogout() {
+  async function handleLogout() {
     try {
-      dispatch(logoutUser()).unwrap();
+      await logoutUser().unwrap();
+      dispatch(removeuser());
+      dispatch(authAPi.util.resetApiState());
       navigate("/");
     } catch (error) {
       console.error("Logout failed", error);
@@ -32,25 +35,16 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity"
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
           onClick={() => setIsOpen(false)}
         />
       )}
       <div
-        className={`fixed top-0 left-0 z-50 w-64 h-full bg-slate-500 text-white transform transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full"} 
-        md:translate-x-0 md:static md:flex md:flex-col md:w-full`}
+        className={`fixed top-16 border-r border-gray-300 left-0 z-50 w-64 h-[calc(100vh-4rem)] bg-white shadow-xl transform transition-transform duration-300 ease-in-out
+          ${isOpen ? "translate-x-0" : "-translate-x-full"}
+          md:translate-x-0 md:static md:flex md:flex-col md:w-full md:h-full`}
       >
-        <div className="h-16 p-6 border-b border-slate-700 flex justify-between items-center shrink-0">
-          <div>
-            <h2 className="text-2xl font-serif font-semibold leading-tight">Guest House</h2>
-            <p className="text-xs text-slate-300 capitalize">{role}</p>
-          </div>
-          <button className="md:hidden p-1 hover:bg-slate-600 rounded" onClick={() => setIsOpen(false)}>
-            <img src={crossIcon} alt="close" className="w-5 h-5 invert" />
-          </button>
-        </div>
-        <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+        <nav className="flex-1 w-full overflow-y-auto p-4 pr-0 space-y-1">
           {menuItems.map((item) => (
             <SidebarItem
               key={item.path}
@@ -60,6 +54,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
             />
           ))}
         </nav>
+
         <div className="p-4 border-t border-slate-700 shrink-0">
           <button
             onClick={handleLogout}

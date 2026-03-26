@@ -3,42 +3,33 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import type { DatesSetArg } from "@fullcalendar/core";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { fetchBookingsByRange } from "@/app/asyncThunk/booking";
 import calendarIcon from "@/assets/calendarIcon.png";
 import crossIcon from "@/assets/crossIcon.png";
+import type { BookingPayload } from "@/utils/interfaces/booking";
+import { useLazyFetchBookingByRangeQuery } from "@/app/Api's/booking";
 
-interface BookingDto {
-  bookingId: number;
-  userId: number;
-  userName: string;
-  roomNumber: string;
-  start: string;
-  end: string;
-  bookingStatus: number;
-}
 
 function Calendar() {
   const [events, setEvents] = useState<unknown[]>([]);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
-  const dispatch = useAppDispatch();
+  const [triggerFetchBookingByRange ] = useLazyFetchBookingByRangeQuery();
 
   const handleDatesSet = async (dateInfo: DatesSetArg) => {
     const startDate = new Date(dateInfo.startStr).toISOString();
     const endDate = new Date(dateInfo.endStr).toISOString();
 
-    const res: BookingDto[] = (await dispatch(fetchBookingsByRange({ startDate, endDate })).unwrap()) ?? [];
+    const res: BookingPayload[] = (await triggerFetchBookingByRange({ startDate, endDate }).unwrap()) ?? [];
 
     const formatedData = res.map((booking) => ({
-      id: booking.bookingId.toString(),
-      title: `${booking.userName} (Room ${booking.roomNumber})`,
-      start: booking.start,
-      end: booking.end,
-      backgroundColor: getStatusColor(booking.bookingStatus),
-      borderColor: getStatusColor(booking.bookingStatus),
+      id: booking.id.toString(),
+      title: `${booking.guestName} (Room ${booking.roomNumber})`,
+      start: booking.checkInDate,
+      end: booking.checkOutDate,
+      backgroundColor: getStatusColor(booking.status),
+      borderColor: getStatusColor(booking.status),
       extendedProps: {
-        status: booking.bookingStatus,
-        userId: booking.userId,
+        status: booking.status,
+        userId: booking.guestId,
       },
     }));
     setEvents(formatedData ?? []);

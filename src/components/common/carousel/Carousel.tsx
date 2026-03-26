@@ -1,38 +1,37 @@
-import { fetchRoomType } from "@/app/asyncThunk/roomType";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { useAppSelector } from "@/hooks/useAppSelector";
 import { useEffect, useState } from "react";
 import single from "@/assets/single.jpg";
 import double from "@/assets/double.jpg";
 import suite from "@/assets/suite.jpg";
+import { useFetchAllRoomTypesQuery } from "@/app/Api's/roomType";
 
 function Carousel() {
   const dispatch = useAppDispatch();
-  const { roomTypes, loading } = useAppSelector((state) => state.roomType);
+  // const { roomTypes, loading } = useAppSelector((state) => state.roomType);
+  const {data:roomTypes , isLoading , isError ,error} = useFetchAllRoomTypesQuery();
   const [carousalIndex, setCarousalIndex] = useState(0);
   const imgArray = [single, double, suite];
 
-  useEffect(() => {
-    dispatch(fetchRoomType());
-  }, [dispatch]);
 
   useEffect(() => {
     const id = setInterval(() => {
       handleNext();
     }, 6000);
     return () => clearInterval(id);
-  }, [carousalIndex, roomTypes.length]);
+  }, [carousalIndex, roomTypes?.length]);
 
-  if (loading) return <div>loading...</div>;
+  if (isLoading) return <div>loading...</div>;
+
+  if(isError) return <div>{error?.data.message}</div>
 
   function handlePrev() {
     carousalIndex == 0
-      ? setCarousalIndex(roomTypes.length - 1)
+      ? setCarousalIndex(roomTypes?.length ?? 1 - 1)
       : setCarousalIndex(carousalIndex - 1);
   }
 
   function handleNext() {
-    carousalIndex == roomTypes.length - 1
+    carousalIndex == (roomTypes?.length ?? 1) - 1
       ? setCarousalIndex(0)
       : setCarousalIndex(carousalIndex + 1);
   }
@@ -70,7 +69,7 @@ function Carousel() {
         </svg>
       </button>
       <div className="absolute left-10 bottom-4 text-2xl text-white font-bold">
-        {roomTypes.map((type, i) => (
+        {roomTypes?.map((type, i) => (
           <div key={i} className={`${carousalIndex == i ? "" : "hidden"}`}>
             <p>{type.roomTypeName}</p>
             <p className="text-sm font-semibold">Capacity : {type.capacity}</p>
@@ -97,7 +96,7 @@ function Carousel() {
         </svg>
       </button>
       <div className="absolute bottom-2 left-1/2 flex gap-2 -translate-x-1.5">
-        {roomTypes.map((_, i) => (
+        {roomTypes?.map((_, i) => (
           <div key={i}
             className={`h-2 rounded-full transition-all ${carousalIndex == i ? "w-6 bg-white" : "w-2 bg-white/50"}`}
           ></div>

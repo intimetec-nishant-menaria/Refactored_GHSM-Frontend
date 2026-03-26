@@ -13,13 +13,13 @@ import {
 
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "@/app/store/store";
-
-import { changePassword } from "@/app/asyncThunk/auth";
 import { useNavigate } from "react-router-dom";
+import { useChangePasswordMutation } from "@/app/Api's/auth";
 
 const ChangePasswordForm = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+
+  const [changePassword] = useChangePasswordMutation();
 
   const {
     register,
@@ -29,24 +29,14 @@ const ChangePasswordForm = () => {
     resolver: zodResolver(changePasswordSchema),
   });
 
-  const onSubmit = (data: ChangePasswordInput) => {
-    dispatch(
-      changePassword({
-        OldPassword: data.OldPassword,
-        NewPassword: data.NewPassword,
-      }),
-    ).then((resultAction) => {
-      if (changePassword.fulfilled.match(resultAction)) {
-        toast.success("Password changed successfully!", {
-          duration: 2000,
-        });
-        navigate("/");
-      } else {
-        toast.error(
-          (resultAction.payload as string) || "Failed to change password",
-        );
-      }
-    });
+  const onSubmit = async(data: ChangePasswordInput) => {
+     try{
+      await changePassword({ OldPassword: data.OldPassword,NewPassword: data.NewPassword,}).unwrap();
+      toast.success("Password changed successfully!", {duration: 2000})
+      navigate("/");
+     }catch(err){
+       toast.error(err?.data.message || "Failed to change password",)
+     }
   };
 
   return (

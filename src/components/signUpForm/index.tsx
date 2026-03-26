@@ -5,13 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { registerUser } from "@/app/asyncThunk/auth";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { registerSchema, type RegisterInput } from "@/utils/schemas/register";
+import {  useRegisterUserMutation } from "@/app/Api's/auth";
 
 const SignUpForm = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
+  const [registerUser] = useRegisterUserMutation();
   const {
     register,
     handleSubmit,
@@ -21,12 +20,12 @@ const SignUpForm = () => {
   });
 
   const onSubmit = async (data: RegisterInput) => {
-    const resultAction = await dispatch(registerUser(data));
-    if (registerUser.fulfilled.match(resultAction)) {
+    try{
+      await registerUser(data).unwrap();
       toast.success("User registered successfully!");
       navigate("/login", { replace: true });
-    } else {
-      toast.error(resultAction.payload as string || "Registration failed");
+    }catch(err){
+      toast.error(err?.data.message || "Registration failed");
     }
   };
 

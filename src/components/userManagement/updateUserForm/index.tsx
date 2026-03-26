@@ -1,19 +1,18 @@
 import { useState, type ChangeEvent } from "react";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { updateUser, fetchUsers } from "@/app/asyncThunk/user";
 import type { User } from "@/utils/interfaces/user";
 import toast from "react-hot-toast";
 import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
+import { useUpdateUserMutation } from "@/app/Api's/user";
 
 const UpdateUserForm = ({ closeModel, data }: UpdateModelProps<User>) => {
-  const dispatch = useAppDispatch();
-
   const [name, setName] = useState(data.name);
   const [email , setEmail] = useState(data.email);
   const [role, setRole] = useState(data.role);
   const [isActive, setIsActive] = useState(data.isActive);
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const [updateUser] = useUpdateUserMutation();
 
   const handleSubmit = async (e: ChangeEvent) => {
     e.preventDefault();
@@ -34,25 +33,11 @@ const UpdateUserForm = ({ closeModel, data }: UpdateModelProps<User>) => {
 
     setLoading(true);
     try {
-      const resultAction = await dispatch(
-        updateUser({
-          id: data.id,
-          name,
-          email,
-          role,
-          isActive,
-        }),
-      );
-
-      if (updateUser.fulfilled.match(resultAction)) {
-        toast.success("User updated successfully");
-        await dispatch(fetchUsers({currentPage:1 , pageSize:5 , searchUser:""}));
-        closeModel();
-      } else {
-        toast.error(resultAction.payload as string || "Failed to update user");
-      }
-    } catch {
-      toast.error("An error occurred");
+      await updateUser({ id: data.id, name, email, role, isActive,}).unwrap();
+      toast.success("User updated successfully");
+      closeModel();
+    } catch (err){
+      toast.error(err?.data.message || "An error occurred");
     } finally {
       setLoading(false);
     }

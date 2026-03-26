@@ -1,5 +1,3 @@
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { createGuest, fetchAllGuest } from "@/app/asyncThunk/guest";
 import { useForm } from "react-hook-form";
 import {
   addGuestSchema,
@@ -7,14 +5,13 @@ import {
 } from "@/utils/schemas/addGuest";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
+import { useCreateGuestMutation } from "@/app/Api's/guest";
 
 interface Props {
   closeModal: () => void;
 }
 
 const AddUserForm = ({ closeModal }: Props) => {
-  const dispatch = useAppDispatch();
-
   const {
     register,
     handleSubmit,
@@ -31,26 +28,22 @@ const AddUserForm = ({ closeModal }: Props) => {
     },
   });
 
+  const [createGuest] = useCreateGuestMutation(); 
+
   const onSubmit = async (data: addGuestInput) => {
     try {
-      const resultAction = await dispatch(createGuest(data));
-
-      if (createGuest.fulfilled.match(resultAction)) {
+      await createGuest(data).unwrap();
         toast.success("Guest created successfully!");
-        await dispatch(fetchAllGuest({currentPage:1 , pageSize:5 ,searchUser:""}));
         closeModal();
-      } else {
-        toast.error("Failed to create guest");
-      }
-    } catch {
-      toast.error("An unexpected error occurred");
+    } catch(err) {
+      toast.error(err?.data.message || "An unexpected error occurred");
     }
   };
 
   return (
-        <form
+        <form 
           onSubmit={handleSubmit(onSubmit)}
-          className="p-8 flex flex-col gap-5 overflow-y-auto"
+          className="p-8 flex flex-col gap-5 max-h-[80vh] overflow-y-auto "
         >
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-semibold text-slate-700">

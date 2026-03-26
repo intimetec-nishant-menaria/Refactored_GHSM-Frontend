@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { useAppSelector } from "@/hooks/useAppSelector";
 import Button from "../../common/button/Button";
-import { fetchRoomType } from "@/app/asyncThunk/roomType";
+import { useFetchAllAmenitiesQuery } from "@/app/Api's/amenities";
 
 interface AddRoomTypeModelProps {
   closeModal: () => void;
@@ -17,7 +16,7 @@ const RoomTypeOptions = [
 
 const AddRoomTypeModel = ({ closeModal }: AddRoomTypeModelProps) => {
   const dispatch = useAppDispatch();
-  const { amenities } = useAppSelector((state) => state.amenities); // Assuming you have an amenity slice
+  const {data : amenities} = useFetchAllAmenitiesQuery();
 
   const [formData, setFormData] = useState({
     roomTypeName: 1,

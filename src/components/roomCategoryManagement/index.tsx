@@ -1,32 +1,24 @@
-import { useEffect, useMemo, useState } from "react";
-import { useAppSelector } from "@/hooks/useAppSelector";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { fetchRoomType } from "@/app/asyncThunk/roomType";
+import { useMemo, useState } from "react";
 import PagingController from "../common/paging/PagingController";
 import Button from "../common/button/Button";
 import deleteIcon from "@/assets/deleteIcon.png";
 import editIcon from "@/assets/editIcon.png";
 import AddRoomTypeModal from "./addRoomTypeModel";
+import { useFetchAllRoomTypesQuery } from "@/app/Api's/roomType";
 
 function RoomCategoryManagement() {
-  const dispatch = useAppDispatch();
-  const { roomTypes, loading, error } = useAppSelector((state) => state.roomType);
-
-  // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
+  const {data:roomTypes , isLoading , isError , error} = useFetchAllRoomTypesQuery();
+
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<any | null>(null);
 
-  useEffect(() => {
-    // dispatch(fetchRoomType());
-  }, [dispatch]);
-
   const currentItems = useMemo(() => {
-    return roomTypes.slice(startIndex, endIndex);
+    return roomTypes?.slice(startIndex, endIndex);
   }, [roomTypes, startIndex, endIndex]);
 
   const handleDelete = async (id: number) => {
@@ -40,8 +32,8 @@ function RoomCategoryManagement() {
   const goToPrevPage = () => setCurrentPage((prev) => prev - 1);
   const goToSpecificPage = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  if (loading) return <p className="p-6 text-center text-gray-500 font-medium">Loading Room Categories...</p>;
-  if (error) return <p className="p-6 text-center text-red-500 font-medium">{error}</p>;
+  if (isLoading) return <p className="p-6 text-center text-gray-500 font-medium">Loading Room Categories...</p>;
+  if (isError) return <p className="p-6 text-center text-red-500 font-medium">{error?.data.message}</p>;
 
   return (
     <div className="mt-6 animate-in fade-in duration-500">
@@ -57,7 +49,7 @@ function RoomCategoryManagement() {
         />
       </div>
       <div className="grid grid-cols-1 gap-4 md:hidden">
-        {currentItems.map((type) => (
+        {currentItems?.map((type) => (
           <div key={type.id} className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
             <div className="flex justify-between items-start mb-3">
               <div>
@@ -97,7 +89,7 @@ function RoomCategoryManagement() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 text-sm">
-            {currentItems.map((type) => (
+            {currentItems?.map((type) => (
               <tr key={type.id} className="hover:bg-blue-50/30 transition-colors group">
                 <td className="py-4 px-6">
                    <div className="font-bold text-gray-800">{type.roomTypeName}</div>
@@ -148,7 +140,7 @@ function RoomCategoryManagement() {
       </div>
       <div className="bg-white p-4 rounded-lg border border-gray-100 flex justify-center">
         <PagingController
-          dataLength={roomTypes.length}
+          dataLength={roomTypes?.length ?? 0}
           itemPerPage={itemsPerPage}
           currentPage={currentPage}
           goToPrevious={goToPrevPage}

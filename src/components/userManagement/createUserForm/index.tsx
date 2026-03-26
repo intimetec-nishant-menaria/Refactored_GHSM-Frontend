@@ -1,16 +1,14 @@
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { createUser, fetchUsers } from "@/app/asyncThunk/user";
-import { useForm } from "react-hook-form";
+import { useForm  } from "react-hook-form";
 import {
   addUserSchema,
   type addUserInput,
 } from "@/utils/schemas/addUser";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
+import { useCreateUserMutation } from "@/app/Api's/user";
 
 const CreateUserForm = ({ closeModel }: {closeModel:()=>void}) => {
-  const dispatch = useAppDispatch();
-
+  const [createUser] = useCreateUserMutation();
   const {
     register,
     handleSubmit,
@@ -28,16 +26,11 @@ const CreateUserForm = ({ closeModel }: {closeModel:()=>void}) => {
 
   const onSubmit = async (data: addUserInput) => {
     try {
-      const resultAction = await dispatch(createUser(data));
-      if (createUser.fulfilled.match(resultAction)) {
-        toast.success("User created successfully!");
-        await dispatch(fetchUsers({currentPage:1 , pageSize:5 , searchUser:""}));
-        closeModel();
-      } else {
-        toast.error(resultAction.payload as string ||  "Failed to create user");
-      }
-    } catch {
-      toast.error("An unexpected error occurred");
+      await createUser(data).unwrap();
+      toast.success("User created successfully!");
+      closeModel();
+    } catch(err) {
+      toast.error(err?.data.message || "An unexpected error occurred");
     }
   };
 

@@ -1,6 +1,4 @@
-import { searchGuest } from "@/app/asyncThunk/guest";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { useAppSelector } from "@/hooks/useAppSelector";
+import { useSearchGuestQuery } from "@/app/Api's/guest";
 import { useEffect, useState } from "react";
 
 interface GuestSearchProps {
@@ -9,20 +7,20 @@ interface GuestSearchProps {
 }
 
 const GuestSearchField = ({ onSelect, error }: GuestSearchProps) => {
-  const dispatch = useAppDispatch();
-  const { Guests } = useAppSelector((state) => state.guest);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debounceSearch , setDebounceSearch] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
+  const {data:Guests} = useSearchGuestQuery( debounceSearch );
 
   useEffect(() => {
     if (searchTerm.length <= 2) return; 
 
     const id = setTimeout(() => {
-      dispatch(searchGuest(searchTerm)).unwrap().catch(() => {});
+      setDebounceSearch(searchTerm);
       setShowDropdown(true);
     }, 500);
     return () => clearTimeout(id);
-  }, [searchTerm, dispatch]);
+  }, [searchTerm]);
 
   return (
     <div className="flex flex-col gap-1.5 relative">
@@ -39,9 +37,9 @@ const GuestSearchField = ({ onSelect, error }: GuestSearchProps) => {
         }}
       />
       
-      {showDropdown && Guests.length > 0 && (
-        <div className="absolute top-[100%] left-0 right-0 bg-white border border-slate-200 rounded-xl mt-1 shadow-2xl z-50 max-h-48 overflow-y-auto">
-          {Guests.map((g) => (
+      {showDropdown && (Guests?.length ?? 0) > 0 && (
+        <div className="absolute  left-0 right-0 bg-white border border-slate-200 rounded-xl mt-1 shadow-2xl z-50 max-h-48 overflow-y-auto">
+          {Guests?.map((g) => (
             <div
               key={g.id}
               onClick={() => {

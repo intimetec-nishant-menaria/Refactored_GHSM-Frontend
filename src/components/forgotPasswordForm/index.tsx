@@ -8,16 +8,15 @@ import {
   forgotPasswordSchema,
   type ForgotPasswordInput,
 } from "@/utils/schemas/forgotPassword";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispatch } from "@/app/store/store";
-import { forgotPassword } from "@/app/asyncThunk/auth";
+import {  useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import type { RootState } from "@/app/store/store";
+import { useForgotPasswordMutation } from "@/app/Api's/auth";
 
 const ForgotPasswordForm = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
   const { loading } = useSelector((state: RootState) => state.auth);
+  const [forgotPassword] = useForgotPasswordMutation(); 
 
   const {
     register,
@@ -27,17 +26,14 @@ const ForgotPasswordForm = () => {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = (data: ForgotPasswordInput) => {
-    dispatch(forgotPassword(data)).then((resultAction) => {
-      if (forgotPassword.fulfilled.match(resultAction)) {
-        toast.success("Reset link sent to your email!");
-      } else {
-        toast.error(
-          (resultAction.payload as string) || "Failed to send reset link"
-        );
-      }
-    });
-  };
+const onSubmit =async (data: ForgotPasswordInput) => {
+   try{
+      await forgotPassword(data).unwrap();
+      toast.success("Reset link sent to your email!");
+   }catch(err){
+     toast.error(err?.data.message || "Failed to send reset link");
+   }
+};
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-y-5 w-full max-w-md mx-auto">

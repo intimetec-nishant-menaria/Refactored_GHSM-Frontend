@@ -26,3 +26,9 @@ export interface UpdateGuest{
     address : string;
     emergencyContact : string;
 }
+
+export interface fetchAllGuestsAgrs{
+    currentPage:number;
+    pageSize:number;
+    searchUser:string;
+}

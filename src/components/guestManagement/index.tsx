@@ -1,11 +1,8 @@
-import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import type { RootState } from "@/app/store/store";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import Button from "@/components/common/button/Button";
 import deleteIcon from "@/assets/deleteIcon.png";
 import editIcon from "@/assets/editIcon.png";
-import { deleteGuest, fetchAllGuest } from "@/app/asyncThunk/guest";
 import type { GuestState } from "@/utils/interfaces/guest";
 import ConfirmationModel from "../common/confirmationModel/confirmationModel";
 import PagingController from "../common/paging/PagingController";
@@ -13,12 +10,10 @@ import toast from "react-hot-toast";
 import Modal from "../common/modal";
 import AddUserForm from "./addGuestForm";
 import UpdateGuestForm from "./updateGuestForm";
+import { useDeleteGuestMutation, useFetchAllGuestsQuery } from "@/app/Api's/guest";
 
 const GuestManagement = () => {
   const dispatch = useAppDispatch();
-  const { Guests, paging,loading, error } = useSelector(
-    (state: RootState) => state.guest,
-  );
 
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<GuestState | null>(null);
@@ -26,17 +21,24 @@ const GuestManagement = () => {
   const [deleteId , setDeleteId] = useState<number | null>(null);
 
   const [searchUser ,setSearchUser] = useState("");
-  const [pageSize ,setPageSize] = useState(5);
+  const [pageSize] = useState(5);
   const [currentPage , setCurrentPage] = useState(1);
 
+  const {data:Guests , isLoading , isError ,error} = useFetchAllGuestsQuery({
+    currentPage,
+    pageSize,
+    searchUser,    
+  })
+  const [deleteGuest] = useDeleteGuestMutation();
+
   const goToNextPage = () => {
-    if(paging.hasNext){
+    if(Guests?.metaData.hasNext){
       setCurrentPage(currentPage+1);
     }
   };
 
   const goToPrevPage = () => {
-    if(paging.hasPrev){
+    if(Guests?.metaData.hasPrev){
       setCurrentPage(currentPage-1);
     }
   };
@@ -49,34 +51,24 @@ const GuestManagement = () => {
     setCurrentPage(1);
   },[dispatch])
 
-  useEffect(() => {
-    let id = setTimeout(()=>{
-      dispatch(fetchAllGuest({currentPage , pageSize , searchUser}));
-    },500);
-
-    return ()=>clearTimeout(id);
-  }, [dispatch,currentPage,searchUser]);
-
   const openCreateForm = () => setIsCreateFormOpen(true);
   const closeCreateForm = () => setIsCreateFormOpen(false);
   const openUpdateForm = (guest : GuestState) => setEditingUser(guest);
   const closeUpdateForm = () => setEditingUser(null);
 
   const handleDelete = async (guestId: number) => {
-      await dispatch(deleteGuest(guestId)).then((resultAction)=>{
-        if(deleteGuest.fulfilled.match(resultAction)){
-          toast.success("Guest Deleted Successfully");
-        }else{
-          toast.error(resultAction.payload as string || "something went wrong");
-        }
-      });
-      await dispatch(fetchAllGuest({currentPage , pageSize , searchUser}));
-      setDeleteId(null);
-      setConfirmationModel(false);
+    try{
+      await deleteGuest(guestId).unwrap();
+      toast.success("Guest Deleted Successfully");
+    }catch(err:any){
+      toast.error(err?.data.message || "something went wrong");
+    }
+    setDeleteId(null);
+    setConfirmationModel(false);
   };
 
-  if (loading) return <p className="p-6 text-center">Loading users...</p>;
-  if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
+  if (isLoading) return <p className="p-6 text-center">Loading users...</p>;
+  if (isError) return <p className="p-6 text-center text-red-500">{error?.data.message}</p>;
 
   return (
     <div className="p-4 md:p-6 bg-gray-100 min-h-screen">
@@ -86,12 +78,12 @@ const GuestManagement = () => {
       <div className="mt-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <input
             type="text"
-            placeholder="Search by user email or contact Number"
+            placeholder="Search by user email"
             value={searchUser}
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setSearchUser(e.target.value)
             }
-            className="border p-2 rounded focus:ring-2 focus:ring-blue-500 flex-grow sm:w-64 outline-none bg-white shadow-sm"
+            className="border p-2 rounded focus:ring-2 focus:ring-blue-500 sm:w-64 outline-none bg-white shadow-sm"
           />
           <Button
             onClick={openCreateForm}
@@ -100,7 +92,7 @@ const GuestManagement = () => {
           />
       </div>
       <div className="grid grid-cols-1 gap-4 md:hidden">
-        {Guests.map((guest) => (
+        {Guests?.data.map((guest) => (
           <div
             key={guest.id}
             className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
@@ -115,7 +107,7 @@ const GuestManagement = () => {
                   src={editIcon}
                   alt="Edit"
                   className="w-5 h-5 cursor-pointer"
-                  onClick={() => openUpdateModal(guest)}
+                  onClick={() => openUpdateForm(guest)}
                 />
                 <img
                   src={deleteIcon}
@@ -154,7 +146,7 @@ const GuestManagement = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {Guests.map((guest) => (
+            {Guests?.data.map((guest) => (
               <tr key={guest.id} className="hover:bg-gray-50 transition-colors">
                 <td className="py-3 px-4">{guest.name}</td>
                 <td className="py-3 px-4 text-gray-600">{guest.email}</td>
@@ -186,7 +178,7 @@ const GuestManagement = () => {
       </div>
       <div className="mt-4 flex justify-center md:justify-end">
         <PagingController
-          dataLength={paging.totalCount}
+          dataLength={Guests?.metaData.totalCount ?? 0}
           itemPerPage={pageSize}
           currentPage={currentPage}
           goToPrevious={goToPrevPage}
@@ -202,12 +194,13 @@ const GuestManagement = () => {
           <AddUserForm closeModal={closeCreateForm}/>
         </Modal>
         <Modal title="Update Guest Profile"
-          subTitle={`Editing ID: ${editingUser?.id}`}
+            subTitle={`Editing ID: ${editingUser?.id}`}
             isOpen={editingUser}
+            closeModal={closeUpdateForm}
           >
-            <UpdateGuestForm closeModel={closeUpdateForm} data={editingUser} />
+            <UpdateGuestForm closeModel={closeUpdateForm} data={editingUser!} />
         </Modal>
-      {isConfirmationModelOpen && <ConfirmationModel label="Are you sure you want to delete this Guest? " isConfirmationModelOpen={setConfirmationModel} submitAction={()=>handleDelete(deleteId)}/>}
+      {isConfirmationModelOpen && <ConfirmationModel label="Are you sure you want to delete this Guest? " isConfirmationModelOpen={setConfirmationModel} submitAction={()=>handleDelete(deleteId!)}/>}
     </div>
   );
 };

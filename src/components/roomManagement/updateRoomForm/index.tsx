@@ -1,15 +1,14 @@
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
 import Input from "../../common/input/Input";
 import { useState, type ChangeEvent } from "react";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { fetchRooms, updateRoom } from "@/app/asyncThunk/room";
 import toast from "react-hot-toast";
 import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
+import { useUpdateRoomMutation } from "@/app/Api's/room";
 
 const numberRegex = /^\d*$/;
 
 function UpdateRoomForm({ closeModel, data }: UpdateModelProps<RoomTypesPayload>) {
-  const dispatch = useAppDispatch();
+  const [updateRoom] =useUpdateRoomMutation();
 
   const [numberError, setNumberError] = useState(false);
   const [roomNumber, setRoomNumber] = useState(data.roomNumber);
@@ -37,15 +36,13 @@ function UpdateRoomForm({ closeModel, data }: UpdateModelProps<RoomTypesPayload>
     }
 
     if (!numberError) {
-      dispatch(updateRoom({ id: data.id, roomNumber, roomTypeId, roomStatus })).then((resultAction) => {
-        if (updateRoom.fulfilled.match(resultAction)) {
-          toast.success("Room Updated successfully!");
-          dispatch(fetchRooms({currentPage:1 , pageSize:5 , roomStatusFilter:0 , roomTypeFilter:0}));
-          closeModel();
-        } else {
-          toast.error((resultAction.payload as string) || "Failed to update room");
-        }
-      });
+     try{
+        await updateRoom({ id: data.id, roomNumber, roomTypeId, roomStatus }).unwrap();
+        toast.success("Room Updated successfully!");
+        closeModel();
+     }catch(err){
+        toast.error(err?.data.message || "Failed to update room");
+     }
     }
   }
 

@@ -1,26 +1,11 @@
-import { useState, useEffect } from 'react';
-import type { RoomSummary } from './cardInterfaces';
-import { useAppDispatch } from '@/hooks/useAppDispatch';
-import { fetchSummary } from '@/app/asyncThunk/room';
+import { useRoomSummaryQuery } from '@/app/Api\'s/room';
 
 const RoomStatusDashboard = () => {
-  const dispatch = useAppDispatch();
-  const [data, setData] = useState<RoomSummary| null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const {data , isLoading , isError ,error} = useRoomSummaryQuery();
 
-  useEffect(() => {
-  dispatch(fetchSummary()).unwrap()
-      .then((res) => {
-        setData(res);
-      })
-      .catch((error) => {
-        console.error("Local component error handling:", error);
-      });
-      setIsLoading(false);
-  }, [dispatch]);
 
   if (isLoading) return <div className="p-6 text-gray-400">Loading Dashboard...</div>;
-  if (!data) return <div className="p-6 text-red-500">Error loading data.</div>;
+  if (isError) return <div className="p-6 text-red-500">{error?.data.message}</div>;
 
   const renderCard = (label: string, value: number, borderClass: string, textColor: string) => (
     <div className={`bg-white p-5 rounded-2xl border-l-4 ${borderClass} shadow-sm hover:shadow-md transition-all`}>

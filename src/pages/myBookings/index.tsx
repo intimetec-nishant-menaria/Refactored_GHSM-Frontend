@@ -1,17 +1,12 @@
 import { useEffect, useState, type ChangeEvent } from "react";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { useAppSelector } from "@/hooks/useAppSelector";
-import { cancelBooking, fetchUserBookings} from "@/app/asyncThunk/booking";
 import PagingController from "@/components/common/paging/PagingController";
 import dayjs from "dayjs";
 import Button from "@/components/common/button/Button";
 import ConfirmationModel from "@/components/common/confirmationModel/confirmationModel";
 import toast from "react-hot-toast";
+import { useCancelBookingMutation, useFetchUserBookingsQuery } from "@/app/Api's/booking";
 
 const MyBookings = () => {
-  const dispatch = useAppDispatch();
-  const { bookings, paging ,loading, error } = useAppSelector((state) => state.booking);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [bookingId , setBookingId] = useState<number | null>(null);
   const [isConfirmationModelOpen , setConfirmationModel] = useState(false);
@@ -20,14 +15,23 @@ const MyBookings = () => {
   const [roomFilter, setRoomFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState(0);
 
+  const { data:bookings , isLoading , isError , error } = useFetchUserBookingsQuery({
+    currentPage,
+    pageSize,
+    roomFilter,
+    statusFilter
+  });
+
+  const [cancelBooking] = useCancelBookingMutation();
+
   const goToNextPage = () => {
-    if(paging.hasNext){
+    if(bookings?.metaData.hasNext){
         setCurrentPage(currentPage+1);
     }
   };
 
   const goToPrevPage = () => {
-    if(paging.hasPrev){
+    if(bookings?.metaData.hasPrev){
         setCurrentPage(currentPage-1);
     }
   };
@@ -40,24 +44,18 @@ const MyBookings = () => {
     setCurrentPage(1);
   }, [roomFilter, statusFilter]);
 
-  useEffect(() => {
-    let id = setTimeout(()=>{
-        dispatch(fetchUserBookings({currentPage, pageSize , roomFilter ,statusFilter}));
-    } , 500);
-
-    return ()=>clearTimeout(id);
-  }, [dispatch,currentPage , roomFilter , statusFilter]);
 
    const handleCancel = async () => {
-      await dispatch(cancelBooking(bookingId))
+    if(!bookingId) return;
+
+      await cancelBooking(bookingId)
         .then(() => {
           toast.success("Booking cancelled successfully.");
         })
-        .catch((error: any) => {
-          toast.error(error?.message || "Failed to cancel booking.");
+        .catch((error: unknown) => {
+          toast.error(error?.data.message || "Failed to cancel booking.");
         });
-        
-      await dispatch(fetchUserBookings({currentPage , pageSize,roomFilter,statusFilter}));
+
       setBookingId(null);
       setConfirmationModel(false);
   };
@@ -86,13 +84,13 @@ const MyBookings = () => {
     );
   };
 
-  if (loading)
+  if (isLoading)
     return (
       <p className="p-6 text-center text-blue-600 font-medium">
         Loading bookings...
       </p>
     );
-  if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
+  if (isError) return <p className="p-6 text-center text-red-500">{error}</p>;
 
   return (
     <div className="p-4 md:p-6 bg-gray-100 min-h-screen w-full">
@@ -126,8 +124,8 @@ const MyBookings = () => {
         </select>
       </div>
       <div className="grid grid-cols-1 gap-4 md:hidden">
-        {bookings.length > 0 ? (
-          bookings.map((b) => (
+        {bookings?.data.length ?? 0 > 0 ? (
+          bookings?.data.map((b) => (
             <div key={b.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
               <div className="flex justify-between items-start mb-3">
                 <div className="max-w-[70%]">
@@ -180,8 +178,8 @@ const MyBookings = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {bookings.length > 0 ? (
-              bookings.map((b) => (
+            {bookings?.data.length ?? 0 > 0 ? (
+              bookings?.data.map((b) => (
                 <tr key={b.id} className="hover:bg-gray-50 transition-colors">
                   <td className="py-4 px-4 text-gray-500 font-mono text-sm">#{b.id}</td>
                   <td className="py-4 px-4">
@@ -231,7 +229,7 @@ const MyBookings = () => {
       </div>
       <div className="mt-4 flex justify-center md:justify-end">
         <PagingController
-          dataLength={paging.totalCount}
+          dataLength={bookings?.metaData.totalCount ?? 0}
           itemPerPage={pageSize}
           currentPage={currentPage}
           goToPrevious={goToPrevPage}

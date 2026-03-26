@@ -11,6 +11,13 @@ export interface UpdateRoomPayload{
 }
 
 export interface RoomAvailabilityRequest{
-    checkInDate : string | null; 
-    checkOutDate : string | null;
+    checkIn : string | null; 
+    checkOut : string | null;
+}
+
+export interface fetchAllRoomArgs{
+    currentPage:number;
+    pageSize:number;
+    roomStatusFilter:number;
+    roomTypeFilter:number;
 }

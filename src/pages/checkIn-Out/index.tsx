@@ -1,22 +1,13 @@
 import {useEffect, useMemo, useState } from "react";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { useAppSelector } from "@/hooks/useAppSelector";
-import { 
-  checkIn, 
-  checkOut, 
-  fetchBookingsByRange 
-} from "@/app/asyncThunk/booking";
 import PagingController from "@/components/common/paging/PagingController";
 import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker"; 
 import ManualBookingModal from "./manualBookingModel"; 
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import ConfirmationModel from "@/components/common/confirmationModel/confirmationModel";
+import { useCheckInMutation, useCheckOutMutation, useFetchBookingByRangeQuery } from "@/app/Api's/booking";
 
 const CheckInOutManagement = () => {
-  const dispatch = useAppDispatch();
-  const { bookings, loading , error } = useAppSelector((state) => state.booking);
-
   const [activeTab, setActiveTab] = useState<"checkin" | "checkout">("checkin");
   const [isManualModalOpen, setIsManualModalOpen] = useState(false);
   const [searchUser, setSearchUser] = useState("");
@@ -29,25 +20,21 @@ const CheckInOutManagement = () => {
     endDate: dayjs().endOf("month"),
   });
 
+  const {data:bookings , isLoading ,isError} = useFetchBookingByRangeQuery({
+      startDate: dateRange.startDate.format("YYYY-MM-DD"),
+      endDate: dateRange.endDate.format("YYYY-MM-DD"),
+  })
+  const [checkIn] = useCheckInMutation();
+  const [checkOut] = useCheckOutMutation();
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
 
-  const loadBookings = () => {
-    dispatch(
-      fetchBookingsByRange({
-        startDate: dateRange.startDate.format("YYYY-MM-DD"),
-        endDate: dateRange.endDate.format("YYYY-MM-DD"),
-      })
-    ).unwrap().catch((err) => toast.error(err || "Failed to sync bookings"));
-  }
-
-  useEffect(() => {
-    loadBookings();
-  }, [dispatch, dateRange]);
-
   const filteredBookings = useMemo(() => {
+    if(!bookings) return [];
+
     return bookings.filter((b) => {
-      const matchesStatus = activeTab === "checkin" ? b.bookingStatus === 1 : b.bookingStatus === 2;
+      const matchesStatus = activeTab === "checkin" ? b.status === 1 : b.status === 2;
       
       const matchesUser = searchUser !== "" 
         ? (b.guestName?.toLowerCase().includes(searchUser.toLowerCase()))
@@ -70,16 +57,16 @@ const CheckInOutManagement = () => {
   }, [filteredBookings, currentPage, itemsPerPage]);
 
   const handleAction = async () => {
+    if(!bookingId) return;
       try {
         if (activeTab === "checkin") {
-          await dispatch(checkIn(bookingId)).unwrap();
+          await checkIn(bookingId).unwrap();
         } else {
-          await dispatch(checkOut(bookingId)).unwrap();
+          await checkOut(bookingId).unwrap();
         }
         toast.success(`${activeTab} successful`);
-        loadBookings(); 
       } catch (error: any) {
-        toast.error(error?.message || "Operation failed");
+        toast.error(error?.data.message || "Operation failed");
       }
       setBookingId(null);
       setConfirmationModel(false);
@@ -109,7 +96,7 @@ const CheckInOutManagement = () => {
     );
   };
 
-  if(error) return <div>Error</div>
+  if(isError) return <div>Error</div>
 
   return (
     <div className="p-4 md:p-8 min-h-screen w-full font-sans">
@@ -176,7 +163,7 @@ const CheckInOutManagement = () => {
         </div>
       </div>
 
-      {loading && bookings.length === 0 ? (
+      {isLoading && bookings?.length === 0 ? (
         <div className="py-32 text-center">
           <div className="inline-block animate-bounce mb-4 text-blue-600 font-black text-2xl">...</div>
           <p className="text-slate-400 font-medium tracking-wide">Retrieving records from database...</p>
@@ -196,25 +183,25 @@ const CheckInOutManagement = () => {
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {currentItems.length > 0 ? currentItems.map((b) => (
-                  <tr key={b.bookingId} className="hover:bg-blue-50/20 transition-colors group">
+                  <tr key={b.id} className="hover:bg-blue-50/20 transition-colors group">
                     <td className="py-5 px-8">
-                      <div className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors">{b.userName}</div>
+                      <div className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors">{b.guestName}</div>
                     </td>
                     <td className="py-5 px-8">
                         Room {b.roomNumber}
                     </td>
                     <td className="py-5 px-8 text-xs text-slate-500 font-medium">
                       <div className="flex items-center gap-2">
-                         <span>{dayjs(b.start).format("DD MMM")}</span>
+                         <span>{dayjs(b.checkInDate).format("DD MMM")}</span>
                          <span className="text-slate-300">→</span>
-                         <span>{dayjs(b.end).format("DD MMM")}</span>
+                         <span>{dayjs(b.checkOutDate).format("DD MMM")}</span>
                       </div>
                     </td>
-                    <td className="py-5 px-8">{getStatusBadge(b.bookingStatus)}</td>
+                    <td className="py-5 px-8">{getStatusBadge(b.status)}</td>
                     <td className="py-5 px-8 text-right">
                       <button 
                         onClick={() => {
-                          setBookingId(b.bookingId)
+                          setBookingId(b.id)
                           setConfirmationModel(true);
                         }} 
                         className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-white transition-all shadow-md active:scale-95 ${activeTab === 'checkin' ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-100' : 'bg-orange-500 hover:bg-orange-600 shadow-orange-100'}`}
@@ -251,8 +238,7 @@ const CheckInOutManagement = () => {
       {isManualModalOpen && (
         <ManualBookingModal 
           closeModel={() => { 
-            setIsManualModalOpen(false); 
-            loadBookings(); 
+            setIsManualModalOpen(false);
           }} 
         />
       )}

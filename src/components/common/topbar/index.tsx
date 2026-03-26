@@ -1,17 +1,24 @@
 import profile from "@/assets/profile.png";
 import menuIcon from "@/assets/menuIcon.png";
+import crossIcon from "@/assets/crossIcon.png";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import Button from "../button/Button";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png"
+import { useLogoutUserMutation } from "@/app/Api's/auth";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { removeuser } from "@/app/slices/auth";
 
 interface TopbarProps {
+  isMenuOpen : boolean;
   onMenuClick?: () => void;
 }
 
-const Topbar = ({ onMenuClick }: TopbarProps) => {
+const Topbar = ({ onMenuClick , isMenuOpen}: TopbarProps) => {
   const { user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [logoutUser] = useLogoutUserMutation();
 
   return (
     <div className="h-16 w-full bg-white shadow-sm flex items-center px-4 md:px-6 shrink-0 z-30">
@@ -23,7 +30,11 @@ const Topbar = ({ onMenuClick }: TopbarProps) => {
               className="p-2 hover:bg-gray-100 rounded-md md:hidden transition-colors"
               aria-label="Open Menu"
             >
-              <img src={menuIcon} alt="menu" className="w-6 h-6" />
+              <img
+                src={isMenuOpen ? crossIcon : menuIcon} 
+                alt={isMenuOpen ? "close menu" : "open menu"}
+                className="w-6 h-6"
+              />
             </button>
           )}
 
@@ -80,7 +91,10 @@ const Topbar = ({ onMenuClick }: TopbarProps) => {
 
                     <button
                       className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium flex items-center gap-2 cursor-pointer"
-                      onClick={() => {}}
+                      onClick={async() => {
+                        await logoutUser().unwrap();
+                        dispatch(removeuser());
+                      }}
                     >
                       <span>🚪</span> Log Out
                     </button>

@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { updateGuest, fetchAllGuest } from "@/app/asyncThunk/guest";
 import type { GuestState } from "@/utils/interfaces/guest";
 import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
 import { updateGuestSchema, type GuestFormData } from "@/utils/schemas/updateGuest";
 import toast from "react-hot-toast";
+import { useUpdateGuestMutation } from "@/app/Api's/guest";
 
 const UpdateGuestForm = ({ closeModel, data }: UpdateModelProps<GuestState>) => {
-  const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(false);
+  const [updateGuest] = useUpdateGuestMutation();
 
   const {
     register,
@@ -31,22 +30,15 @@ const UpdateGuestForm = ({ closeModel, data }: UpdateModelProps<GuestState>) => 
   const onSubmit = async (formData: GuestFormData) => {
     setLoading(true);
     try {
-      const resultAction = await dispatch(
-        updateGuest({
+       await updateGuest({
           id: data.id,
           ...formData,
-        })
-      );
+        });
 
-      if (updateGuest.fulfilled.match(resultAction)) {
         toast.success("Guest updated successfully");
-        await dispatch(fetchAllGuest({currentPage:1 , pageSize:5 , searchUser:""}));
         closeModel();
-      } else {
-        toast.error(resultAction.payload as string || "Failed to update guest");
-      }
     } catch (err) {
-      toast.error("An unexpected error occurred");
+      toast.error(err?.data.message || "An unexpected error occurred");
     } finally {
       setLoading(false);
     }

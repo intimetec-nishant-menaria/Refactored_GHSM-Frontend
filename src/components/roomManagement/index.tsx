@@ -1,26 +1,21 @@
-import { type ChangeEvent, useEffect, useState } from "react";
+import { type ChangeEvent,useState } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { useAppSelector } from "@/hooks/useAppSelector";
-import { deleteRoom, fetchRooms } from "@/app/asyncThunk/room.ts";
 import PagingController from "../common/paging/PagingController.tsx";
 import deleteIcon from "@/assets/deleteIcon.png";
 import editIcon from "@/assets/editIcon.png";
 import Button from "../common/button/Button.tsx";
 import RoomCategoryManagement from "../roomCategoryManagement/index.tsx"
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
-import { fetchRoomType } from "@/app/asyncThunk/roomType.ts";
 import RoomStatusDropDown from "../common/roomStatusDropDown/RoomStatusDropDown.tsx";
 import ConfirmationModel from "../common/confirmationModel/confirmationModel.tsx";
 import Modal from "../common/modal/index.tsx";
 import AddRoomForm from "./addRoomForm/index.tsx";
 import UpdateRoomForm from "./updateRoomForm/index.tsx";
+import { useDeleteRoomMutation, useFetchAllRoomsQuery } from "@/app/Api's/room.ts";
+import { useFetchAllRoomTypesQuery } from "@/app/Api's/roomType.ts";
+import toast from "react-hot-toast";
 
 const RoomManagement = () => {
-  const dispatch = useAppDispatch();
-
-  const { rooms,paging, loading, error } = useAppSelector((state) => state.room);
-  const { roomTypes, loading: roomTypesLoading, error: roomTypesError } = useAppSelector((state) => state.roomType);
-
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(5); 
 
@@ -30,6 +25,15 @@ const RoomManagement = () => {
   const [isConfirmationModelOpen , setConfirmationModel] = useState(false);
   const [roomId , setRoomId] = useState<number | null>(null);
 
+  const {data:rooms , isLoading , isError ,error} = useFetchAllRoomsQuery({
+    currentPage,
+    pageSize,
+    roomStatusFilter,
+    roomTypeFilter
+  })
+  const {data : roomTypes , isLoading :roomTypesLoading , isError : roomTypesError  } = useFetchAllRoomTypesQuery();
+  const [deleteRoom] = useDeleteRoomMutation();
+
   const [isCreateRoomFormOpen, setIsCreateFormOpen] = useState(false);
   const openCreateRoomForm = () => setIsCreateFormOpen(true);
   const closeCreateRoomForm = () => setIsCreateFormOpen(false);
@@ -38,18 +42,14 @@ const RoomManagement = () => {
   const openUpdateRoomForm = (room: RoomTypesPayload) => setEditingRoom(room);
   const closeUpdateRoomForm = () => setEditingRoom(null);
 
-  useEffect(() => {
-    let id = setTimeout(()=>{
-      dispatch(fetchRooms({currentPage , pageSize , roomStatusFilter , roomTypeFilter}));
-      dispatch(fetchRoomType());
-    },500);
-
-    return ()=>clearTimeout(id);
-  }, [dispatch , roomStatusFilter , roomTypeFilter , currentPage]);
 
   const handleDelete = async (roomid: number) => {
-      await dispatch(deleteRoom(roomid));
-      await dispatch(fetchRooms({currentPage , pageSize , roomStatusFilter , roomTypeFilter}));
+      try{
+        await deleteRoom(roomid).unwrap();
+        toast.success("room deleted successfully"); 
+      }catch(err){
+        toast.error(err?.data.message || "something went wrong");
+      }
       setRoomId(null);
       setConfirmationModel(false);
   };
@@ -67,8 +67,8 @@ const RoomManagement = () => {
     }
   };
 
-  if (loading || roomTypesLoading) return <p className="p-6 text-center">Loading...</p>;
-  if (error || roomTypesError) return <p className="p-6 text-center text-red-500">{error || roomTypesError}</p>;
+  if (isLoading || roomTypesLoading) return <p className="p-6 text-center">Loading...</p>;
+  if (error || roomTypesError) return <p className="p-6 text-center text-red-500">{error || roomTypesError?.data.message}</p>;
 
   return (
     <div className="p-4 md:p-6 bg-gray-100 min-h-screen w-full">
@@ -116,7 +116,7 @@ const RoomManagement = () => {
                className="w-full border border-slate-200 p-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white outline-none transition-all cursor-pointer"
               >
                 <option value={0}>All Types</option>
-                {roomTypes.map((type) => (
+                {roomTypes?.map((type) => (
                   <option key={type.id} value={type.id}>{type.roomTypeName}</option>
                 ))}
               </select>
@@ -124,7 +124,7 @@ const RoomManagement = () => {
             <RoomStatusDropDown roomStatus={roomStatusFilter}  setRoomStatus={setRoomStatusFilter}/>
           </div>
           <div className="grid grid-cols-1 gap-4 md:hidden">
-            {rooms.map((room) => (
+            {rooms?.data.map((room) => (
               <div key={room.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                 <div className="flex justify-between items-center mb-3">
                   <span className="text-lg font-bold text-blue-600">Room {room.roomNumber}</span>
@@ -159,7 +159,7 @@ const RoomManagement = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {rooms.map(room => (
+                {rooms?.data.map(room => (
                   <tr key={room.id} className="hover:bg-gray-50 transition-colors">
                     <td className="py-4 px-4 font-medium">{room.roomNumber}</td>
                     <td className="py-4 px-4">{room.roomTypeName}</td>
@@ -189,7 +189,7 @@ const RoomManagement = () => {
           </div>
           <div className="mt-4">
             <PagingController
-              dataLength={paging.totalCount}
+              dataLength={rooms?.metaData.totalCount ?? 0}
               itemPerPage={pageSize}
               currentPage={currentPage}
               goToPrevious={goToPrevPage}
@@ -204,7 +204,7 @@ const RoomManagement = () => {
                 <AddRoomForm closeModel={closeCreateRoomForm}/>
             </Modal>
             <Modal title="Update Room Details" isOpen={editingRoom} closeModal={closeUpdateRoomForm}>
-                <UpdateRoomForm closeModel={closeUpdateRoomForm} data={editingRoom}/>
+                <UpdateRoomForm closeModel={closeUpdateRoomForm} data={editingRoom!}/>
             </Modal>
           </div>
         </>
@@ -212,7 +212,7 @@ const RoomManagement = () => {
           <RoomCategoryManagement/>
         )
       }
-      {isConfirmationModelOpen && <ConfirmationModel label="Are you sure you want to delete this Room?" isConfirmationModelOpen={setConfirmationModel} submitAction={()=>handleDelete(roomId)}/>}
+      {isConfirmationModelOpen && <ConfirmationModel label="Are you sure you want to delete this Room?" isConfirmationModelOpen={setConfirmationModel} submitAction={()=>handleDelete(roomId!)}/>}
     </div>
   );
 };

@@ -29,3 +29,9 @@ export interface UpdateUserPayload {
   role: number;
   isActive: boolean;
 }
+
+export interface fetchUsersArgs{
+  currentPage:number;
+  pageSize:number;
+  searchUser:string;
+}

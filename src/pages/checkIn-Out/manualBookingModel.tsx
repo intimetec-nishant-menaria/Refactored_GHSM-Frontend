@@ -1,19 +1,17 @@
 import { useState, useEffect , useMemo} from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { createManualBooking } from "@/app/asyncThunk/booking";
-import { fetchAvailableRooms } from "@/app/asyncThunk/availableRoom";
 import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker"; 
 import { manualBookingSchema, type ManualBookingData } from "@/utils/schemas/manualBooking";
 import dayjs from "dayjs";
 import toast from "react-hot-toast";
-import { useAppSelector } from "@/hooks/useAppSelector";
 import GuestSearchField from "@/components/common/guestSearchDropDown/guestSearchField";
+import { useGetAllAvailableRoomsMutation } from "@/app/Api's/availableRoom";
+import { useCreateBookingMutation } from "@/app/Api's/booking";
 
 const ManualBookingModal = ({ closeModel }: { closeModel: () => void}) => {
-  const dispatch = useAppDispatch();
-  const { rooms } = useAppSelector((state) => state.availableRooms);
+  const [fetchAvailableRooms , {data:rooms } ] = useGetAllAvailableRoomsMutation();
+  const [createBooking] = useCreateBookingMutation();
   const [loader, setLoader] = useState(false);
 
   const { register, handleSubmit, control, setValue, formState: { errors } } = useForm<ManualBookingData>({
@@ -32,6 +30,8 @@ const ManualBookingModal = ({ closeModel }: { closeModel: () => void}) => {
   const roomTypeId = useWatch({ control, name: "roomTypeId" });
 
   const filteredRooms = useMemo(() => {
+    if(!rooms)
+      return [];
     if (roomTypeId === 0) return rooms; 
     return rooms.filter((r: any) => String(r.roomTypeId) === String(roomTypeId));
   }, [rooms, roomTypeId]);
@@ -41,9 +41,16 @@ const ManualBookingModal = ({ closeModel }: { closeModel: () => void}) => {
       const checkInDate = dayjs(checkIn).startOf('day').format('YYYY-MM-DD');
       const checkOutDate = dayjs(checkOut).startOf('day').format('YYYY-MM-DD');
       
-      dispatch(fetchAvailableRooms({ checkInDate, checkOutDate })).unwrap();
+      const fetch = async()=>{
+        try{
+          await fetchAvailableRooms({ checkIn:checkInDate, checkOut:checkOutDate }).unwrap();
+        }catch(err){
+          toast.error(err as string || "something went wrong");
+        }
+      }
+      fetch();
     }
-  }, [checkIn, checkOut, dispatch]);
+  }, [checkIn, checkOut]);
 
   const onSubmit = async (data: ManualBookingData) => {
     setLoader(true);
@@ -53,7 +60,7 @@ const ManualBookingModal = ({ closeModel }: { closeModel: () => void}) => {
         checkInDate: dayjs(data.checkInDate).format('YYYY-MM-DD'),
         checkOutDate: dayjs(data.checkOutDate).format('YYYY-MM-DD'),
       };
-      await dispatch(createManualBooking(payload)).unwrap();
+      await createBooking(payload).unwrap();
       toast.success("Offline booking successful!");
       closeModel();
     } catch (err: any) {
@@ -64,7 +71,7 @@ const ManualBookingModal = ({ closeModel }: { closeModel: () => void}) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[110] flex justify-center items-center bg-slate-900/60 backdrop-blur-sm p-4">
+    <div className="fixed inset-0 z-100 flex justify-center items-center bg-slate-900/60 backdrop-blur-sm p-4">
       <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in duration-200">
         <div className="p-6 bg-slate-50 border-b flex justify-between items-center">
           <h2 className="text-xl font-bold text-slate-800">New Offline Booking</h2>

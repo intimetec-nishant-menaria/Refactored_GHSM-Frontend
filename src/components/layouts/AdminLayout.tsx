@@ -9,16 +9,17 @@ function AdminLayout() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="flex h-screen w-full bg-gray-100  overflow-hidden">
-      {user && (
-        <aside className="md:w-64 lg:w-1/6 h-screen bg-slate-500 shrink-0 z-50">
-          <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
-        </aside>
-      )}
+    <div className="flex flex-col h-screen w-full bg-gray-100 overflow-hidden">
+      <header className="w-full shrink-0 z-50">
+        <Topbar onMenuClick={() => setIsOpen(prev=>!prev)} isMenuOpen={isOpen} />
+      </header>
+      <div className="flex flex-1 overflow-hidden">
 
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        <Topbar onMenuClick={() => setIsOpen(true)} />
-        
+        {user && (
+          <aside className="md:w-64 lg:w-1/6 h-fullshrink-0 z-40">
+            <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
+          </aside>
+        )}
         <main className="flex-1 px-4 md:px-8 py-6 overflow-y-auto overflow-x-hidden">
           <Outlet />
         </main>

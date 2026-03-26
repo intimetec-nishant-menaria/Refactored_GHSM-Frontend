@@ -1,18 +1,17 @@
 import { useState, type ChangeEvent } from "react";
 import Input from "../../common/input/Input";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { addRoom, fetchRooms } from "@/app/asyncThunk/room";
 import toast from "react-hot-toast";
+import { useAddRoomMutation } from "@/app/Api's/room";
 
 const numberRegex = /^\d*$/;
 
 function AddRoomForm({ closeModel }:{closeModel:()=>void}) {
-  const dispatch = useAppDispatch();
 
   const [roomNumber, setRoomNumber] = useState("");
   const [roomTypeId, setRoomTypeId] = useState(1);
   const [numberError, setNumberError] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [addRoom] = useAddRoomMutation();
 
   async function handleOnSubmit(e: ChangeEvent) {
     e.preventDefault(); 
@@ -25,17 +24,11 @@ function AddRoomForm({ closeModel }:{closeModel:()=>void}) {
     if (!numberError) {
       setIsSubmitting(true);
       try {
-        const resultAction = await dispatch(addRoom({ roomNumber, roomTypeId }));
-        
-        if (addRoom.fulfilled.match(resultAction)) {
-          toast.success("Room added successfully!");
-          await dispatch(fetchRooms({currentPage:1 , pageSize:5 , roomStatusFilter:0 , roomTypeFilter:0}));
-          closeModel();
-        } else {
-          toast.error((resultAction.payload as string) || "Failed to add room");
-        }
+        await addRoom({ roomNumber, roomTypeId }).unwrap();
+        toast.success("Room added successfully!");
+        closeModel();
       } catch (error) {
-        toast.error("Something went wrong");
+        toast.error(error?.data.message || "Something went wrong");
       } finally {
         setIsSubmitting(false);
       }

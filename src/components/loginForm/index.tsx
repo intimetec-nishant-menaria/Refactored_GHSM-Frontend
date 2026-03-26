@@ -7,14 +7,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import type { LoginInput } from "@/utils/schemas/login";
 import { loginSchema } from "@/utils/schemas/login";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "@/app/store/store";
-import { loginUser } from "@/app/asyncThunk/auth";
 import { useEffect } from "react";
+import { useGetUserDetailsQuery, useLoginUserMutation } from "@/app/Api's/auth";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { setUser } from "@/app/slices/auth";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useAppDispatch();
+  const [loginUser] = useLoginUserMutation();
+  const {data : user} = useGetUserDetailsQuery();
   const {
     register,
     handleSubmit,
@@ -42,14 +44,16 @@ const LoginForm = () => {
       localStorage.removeItem("rememberedEmail");
     }
     
-    const resultAction = await dispatch(loginUser(data));
-    if (loginUser.fulfilled.match(resultAction)) {
+    try{
+      await loginUser(data).unwrap();
+      dispatch(setUser(user));
       toast.success("Welcome back!");
       navigate("/", { replace: true });
-    } else {
-      toast.error(resultAction.payload as string || "Invalid credentials");
+    }catch(err:any){
+      toast.error(err?.data.message || "Invalid credentials");
     }
-  };
+  }
+  
 
   return (
     <div className="w-full max-w-md mx-auto p-6 pt-0 bg-white rounded-xl ">

@@ -1,8 +1,4 @@
 import { useEffect, useState, type ChangeEvent } from "react";
-import { useSelector } from "react-redux";
-import { fetchUsers, deleteUser } from "@/app/asyncThunk/user";
-import type { RootState } from "@/app/store/store";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
 import Button from "@/components/common/button/Button";
 import deleteIcon from "@/assets/deleteIcon.png";
 import editIcon from "@/assets/editIcon.png";
@@ -14,13 +10,9 @@ import PagingController from "../common/paging/PagingController";
 import Modal from "../common/modal";
 import CreateUserForm from "./createUserForm";
 import UpdateUserForm from "./updateUserForm";
+import { useDeleteUserMutation, useFetchAllUsersQuery } from "@/app/Api's/user";
 
 const UserManagement = () => {
-  const dispatch = useAppDispatch();
-  const { users, paging, loading, error } = useSelector(
-    (state: RootState) => state.user,
-  );
-
   const {user} = useAppSelector(state=>state.auth); 
 
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
@@ -29,24 +21,32 @@ const UserManagement = () => {
   const [userId , setUserId] = useState<number | null>(null);
   const [searchUser , setSearchUser] = useState("");
   const [currentPage , setCurrentPage ] = useState(1);
-  const [pageSize , setPageSize] = useState(5);
+  const [pageSize ] = useState(5);
+  const [debounceSearch , setDebounceSearch] = useState("");
+
+  const {data : users , isLoading , isError ,error} = useFetchAllUsersQuery({
+    currentPage,
+    pageSize,
+    searchUser:debounceSearch
+  })
+  const [deleteUser] = useDeleteUserMutation();
 
   useEffect(() => {
     let id = setTimeout(()=>{
-      dispatch(fetchUsers({currentPage , pageSize , searchUser}));
+      setDebounceSearch(searchUser);
     },500)
 
     return ()=>clearTimeout(id);
-  }, [dispatch,currentPage,searchUser]);
+  }, [currentPage,searchUser]);
 
   function goToNext(){
-    if(paging.hasNext){
+    if(users?.metaData.hasNext){
       setCurrentPage(currentPage+1);
     }
   }
 
   function goToPrev(){
-    if(paging.hasPrev){
+    if(users?.metaData.hasPrev){
       setCurrentPage(currentPage-1);
     }
   }
@@ -65,14 +65,13 @@ const UserManagement = () => {
       toast.error("Admin cannot delete himself.");
       return;
     }
-      await dispatch(deleteUser(userId));
-      await dispatch(fetchUsers({currentPage , pageSize , searchUser}));
+      await deleteUser(userId);
       setUserId(null);
       setConfirmationModel(false);
   };
 
-  if (loading) return <p className="p-6 text-center">Loading users...</p>;
-  if (error) return <p className="p-6 text-center text-red-500">{error}</p>;
+  if (isLoading) return <p className="p-6 text-center">Loading users...</p>;
+  if (isError) return <p className="p-6 text-center text-red-500">{error as string}</p>;
 
   return (
     <div className="p-4 md:p-6 bg-gray-100 min-h-screen">
@@ -85,7 +84,7 @@ const UserManagement = () => {
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setSearchUser(e.target.value)
             }
-            className="border p-2 rounded focus:ring-2 focus:ring-blue-500 flex-grow sm:w-64 outline-none bg-white shadow-sm"
+            className="border p-2 rounded focus:ring-2 focus:ring-blue-500 sm:w-64 outline-none bg-white shadow-sm"
           />
         <Button
           onClick={openCreateForm}
@@ -94,7 +93,7 @@ const UserManagement = () => {
         />
       </div>
       <div className="grid grid-cols-1 gap-4 md:hidden">
-        {users.map((user) => (
+        {users?.data.map((user) => (
           <div
             key={user.id}
             className="bg-white p-4 rounded-lg shadow-sm border border-gray-200"
@@ -150,7 +149,7 @@ const UserManagement = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {users.map((user) => (
+            {users?.data.map((user) => (
               <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                 <td className="py-3 px-4">{user.name}</td>
                 <td className="py-3 px-4 text-gray-600">{user.email}</td>
@@ -188,7 +187,7 @@ const UserManagement = () => {
       </div>
       <div className="mt-4 flex justify-center md:justify-end">
         <PagingController
-          dataLength={paging.totalCount}
+          dataLength={users?.metaData.totalCount ?? 0}
           currentPage={currentPage}
           itemPerPage={pageSize}
           goToPrevious={goToPrev}
@@ -208,9 +207,9 @@ const UserManagement = () => {
         isOpen={editingUser}
         closeModal={closeUpdateForm}
         >
-          <UpdateUserForm closeModel={closeUpdateForm} data={editingUser}/>
+          <UpdateUserForm closeModel={closeUpdateForm} data={editingUser!}/>
       </Modal>
-      {isConfirmationModelOpen && <ConfirmationModel label="Are you sure you want to delete this user?" isConfirmationModelOpen={setConfirmationModel} submitAction={()=>handleDelete(userId)}/>}
+      {isConfirmationModelOpen && <ConfirmationModel label="Are you sure you want to delete this user?" isConfirmationModelOpen={setConfirmationModel} submitAction={()=>handleDelete(userId!)}/>}
     </div>
   );
 };

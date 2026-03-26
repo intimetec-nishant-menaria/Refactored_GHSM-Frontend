@@ -1,23 +1,25 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { fetchAvailableRooms } from "@/app/asyncThunk/availableRoom";
 import dayjs, { Dayjs } from "dayjs";
 import DateRangePicker from "../common/DateRangePicker/DateRangePicker";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { fetchRoomType } from "@/app/asyncThunk/roomType";
 import RoomCard from "../common/card/Card";
 import Button from "../common/button/Button";
 import LoginModel from "./authRequiredModel";
 import BookingSummary from "./bookingSummary/bookingSummary";
 import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
-import { createBooking } from "@/app/asyncThunk/booking";
 import toast from "react-hot-toast";
+import { useGetAllAvailableRoomsMutation } from "@/app/Api's/availableRoom";
+import { useCreateBookingMutation } from "@/app/Api's/booking";
+import { useFetchAllRoomTypesQuery } from "@/app/Api's/roomType";
 
 function Bookings() {
   const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  const { roomTypes } = useAppSelector((state) => state.roomType);
-  const { rooms, loading } = useAppSelector((state) => state.availableRooms);
+
+  const [fetchAvailableRooms , {data:rooms ,  isLoading} ] = useGetAllAvailableRoomsMutation();
+  const { data:roomTypes } = useFetchAllRoomTypesQuery();
+  const [createBooking ] = useCreateBookingMutation();
 
   const [filter, setFilter] = useState(0);
   const [checkIn, setCheckIn] = useState<Dayjs | null>(null);
@@ -26,25 +28,28 @@ function Bookings() {
   const [bookingStep, setBookingStep] = useState(1);
   const [isRedirectToLoginModelOpen, setLoginModel] = useState(false);
 
-  useEffect(() => {
-    dispatch(fetchRoomType());
-  }, [dispatch]);
-
   const availableRooms = useMemo(() => {
+    if(!rooms)
+      return [];
     if (filter === 0) return rooms;
-    return rooms.filter((room) => room.roomTypeId === filter);
+    return rooms.filter((room:RoomTypesPayload) => room.roomTypeId === filter);
   }, [filter, rooms]);
 
   useEffect(() => {
     if (!checkIn || !checkOut) return;
-
-    dispatch(
-      fetchAvailableRooms({
-        checkInDate: dayjs(checkIn).format("YYYY-MM-DD"),
-        checkOutDate: dayjs(checkOut).format("YYYY-MM-DD"),
-      }),
-    );
-  }, [checkIn, checkOut, dispatch]);
+      const fetch = async()=>{
+        try{
+          await fetchAvailableRooms({
+            checkIn: dayjs(checkIn).format("YYYY-MM-DD"),
+            checkOut: dayjs(checkOut).format("YYYY-MM-DD"),
+          }).unwrap();
+        }catch(err){
+            toast.error(err as string || "something went wrong");
+        }
+      }
+      
+      fetch();
+  }, [checkIn, checkOut,fetchAvailableRooms, dispatch]);
 
   const handleDateClick = (newValue: Dayjs | null) => {
     if (!newValue) return;
@@ -71,32 +76,29 @@ function Bookings() {
   }
 
   async function onConfirmBooking() {
-    try {
       if (!selectedRoom || !user || !checkIn || !checkOut) return;
-      await dispatch(
-        createBooking({
+      try{
+        await createBooking({
           roomId: selectedRoom.id,
           guestId: user.id,
           guestEmail : user.email,
           checkInDate: dayjs(checkIn).format("YYYY-MM-DD"),
           checkOutDate: dayjs(checkOut).format("YYYY-MM-DD"),
-        }),
-      ).unwrap();
-
-      toast.success("Booking confirmed successfully!");
+      }).unwrap();  
+        toast.success("Booking confirmed successfully!");
+      }catch(err){
+        toast.error(err as string || "something went wrong");
+      }
       setBookingStep(1);
       setSelectedRoom(null);
       setCheckIn(null);
       setCheckOut(null);
-    } catch (error: any) {
-      toast.error(error?.message || "Booking failed.");
-    }
   }
 
-  const continueDisabled = !checkIn || !checkOut || !selectedRoom || loading;
+  const continueDisabled = !checkIn || !checkOut || !selectedRoom || isLoading;
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-24 md:pb-8 pt-6 px-4">
+    <div className="min-h-screen pb-24 md:pb-8 pt-6 px-4">
       <div className="max-w-6xl mx-auto space-y-6">
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
@@ -153,7 +155,7 @@ function Bookings() {
                       className="w-full border px-4 py-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white outline-none"
                     >
                       <option value={0}>All Room Types</option>
-                      {roomTypes.map((rt) => (
+                      {roomTypes?.map((rt) => (
                         <option key={rt.id} value={rt.id}>
                           {rt.roomTypeName}
                         </option>
@@ -173,7 +175,7 @@ function Bookings() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {loading ? (
+              {isLoading ? (
                 <div className="col-span-full py-20 text-center">
                   <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-4"></div>
                   <p className="text-gray-500 font-medium">
@@ -190,7 +192,7 @@ function Bookings() {
                   </p>
                 </div>
               ) : (
-                availableRooms.map((room) => (
+                availableRooms.map((room : RoomTypesPayload) => (
                   <RoomCard
                     key={room.id}
                     room={room}
