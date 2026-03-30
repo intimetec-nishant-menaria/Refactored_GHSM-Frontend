@@ -1,5 +1,4 @@
-import type { RoomAvailabilityRequest } from "@/utils/interfaces/room";
-import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
+import type { RoomAvailabilityRequest, RoomData } from "@/utils/interfaces/room";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const availableRoomApi = createApi({
@@ -10,15 +9,14 @@ export const availableRoomApi = createApi({
     }),
     tagTypes : ["avaiableRooms"],
     endpoints : (builder)=>({
-        getAllAvailableRooms : builder.mutation<RoomTypesPayload[],RoomAvailabilityRequest>({
+        getAllAvailableRooms : builder.query<RoomData[],RoomAvailabilityRequest>({
             query: (data)=>({
-                url:"/availability",
-                method : "POST",
-                body : data,
+                url:`/availability?gender=${data.gender}&checkIn=${data.checkIn}&checkOut=${data.checkOut}`,
+                method : "GET"
             }),
-            invalidatesTags:["avaiableRooms"]
+            providesTags : ["avaiableRooms"],
         })
     })
 })
 
-export const { useGetAllAvailableRoomsMutation } = availableRoomApi
+export const { useLazyGetAllAvailableRoomsQuery } = availableRoomApi

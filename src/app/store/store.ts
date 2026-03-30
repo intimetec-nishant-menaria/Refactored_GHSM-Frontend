@@ -8,6 +8,7 @@ import { roomTypeApi } from "../Api's/roomType";
 import { guestApi } from "../Api's/guest";
 import { amenitiesApi } from "../Api's/amenities";
 import { authAPi } from "../Api's/auth";
+import { auditApi } from "../Api's/auditLog";
 
 export const store = configureStore({
   reducer: {
@@ -19,7 +20,8 @@ export const store = configureStore({
     [availableRoomApi.reducerPath]:availableRoomApi.reducer,
     [bookingApi.reducerPath]:bookingApi.reducer,
     [amenitiesApi.reducerPath]:amenitiesApi.reducer,
-    [guestApi.reducerPath] : guestApi.reducer
+    [guestApi.reducerPath] : guestApi.reducer,
+    [auditApi.reducerPath] : auditApi.reducer
   },
     middleware : (getDefaultMiddleware)=>
         getDefaultMiddleware().concat(
@@ -30,7 +32,8 @@ export const store = configureStore({
           roomTypeApi.middleware,
           guestApi.middleware,
           amenitiesApi.middleware,
-          authAPi.middleware
+          authAPi.middleware,
+          auditApi.middleware
         ),
 });
 

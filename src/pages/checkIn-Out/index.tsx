@@ -1,29 +1,32 @@
-import {useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import PagingController from "@/components/common/paging/PagingController";
 import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker"; 
-import ManualBookingModal from "./manualBookingModel"; 
 import toast from "react-hot-toast";
 import dayjs from "dayjs";
 import ConfirmationModel from "@/components/common/confirmationModel/confirmationModel";
 import { useCheckInMutation, useCheckOutMutation, useFetchBookingByRangeQuery } from "@/app/Api's/booking";
+import { useAppSelector } from "@/hooks/useAppSelector";
 
 const CheckInOutManagement = () => {
+  const { user } = useAppSelector(state => state.auth);
   const [activeTab, setActiveTab] = useState<"checkin" | "checkout">("checkin");
-  const [isManualModalOpen, setIsManualModalOpen] = useState(false);
   const [searchUser, setSearchUser] = useState("");
   const [roomFilter, setRoomFilter] = useState("");
-  const [ isConfirmationModelOpen , setConfirmationModel] = useState(false);
-  const [bookingId , setBookingId] = useState<number | null>(null);
+  const [isConfirmationModelOpen, setConfirmationModel] = useState(false);
+  const [bookingId, setBookingId] = useState<number | null>(null);
   
   const [dateRange, setDateRange] = useState({
     startDate: dayjs().startOf("month"),
     endDate: dayjs().endOf("month"),
   });
 
-  const {data:bookings , isLoading ,isError} = useFetchBookingByRangeQuery({
-      startDate: dateRange.startDate.format("YYYY-MM-DD"),
-      endDate: dateRange.endDate.format("YYYY-MM-DD"),
-  })
+  const { data: bookings, isLoading, isError } = useFetchBookingByRangeQuery({
+    startDate: dateRange.startDate.format("YYYY-MM-DD"),
+    endDate: dateRange.endDate.format("YYYY-MM-DD"),
+  },{
+    refetchOnFocus : true,
+  });
+  
   const [checkIn] = useCheckInMutation();
   const [checkOut] = useCheckOutMutation();
 
@@ -31,15 +34,12 @@ const CheckInOutManagement = () => {
   const [itemsPerPage] = useState(5);
 
   const filteredBookings = useMemo(() => {
-    if(!bookings) return [];
-
+    if (!bookings) return [];
     return bookings.filter((b) => {
       const matchesStatus = activeTab === "checkin" ? b.status === 1 : b.status === 2;
-      
       const matchesUser = searchUser !== "" 
-        ? (b.guestName?.toLowerCase().includes(searchUser.toLowerCase()))
+        ? b.guestName?.toLowerCase().includes(searchUser.toLowerCase())
         : true;
-      
       const matchesRoom = roomFilter !== "" 
         ? b.roomNumber.toString().includes(roomFilter) 
         : true;
@@ -57,27 +57,27 @@ const CheckInOutManagement = () => {
   }, [filteredBookings, currentPage, itemsPerPage]);
 
   const handleAction = async () => {
-    if(!bookingId) return;
-      try {
-        if (activeTab === "checkin") {
-          await checkIn(bookingId).unwrap();
-        } else {
-          await checkOut(bookingId).unwrap();
-        }
-        toast.success(`${activeTab} successful`);
-      } catch (error: any) {
-        toast.error(error?.data.message || "Operation failed");
+    if (!bookingId) return;
+    try {
+      if (activeTab === "checkin") {
+        await checkIn(bookingId).unwrap();
+      } else {
+        await checkOut(bookingId).unwrap();
       }
-      setBookingId(null);
-      setConfirmationModel(false);
+      toast.success(`${activeTab === 'checkin' ? 'Check-In' : 'Check-Out'} successful`);
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Operation failed");
+    }
+    setBookingId(null);
+    setConfirmationModel(false);
   };
 
   const handleDateChange = (date: dayjs.Dayjs | null) => {
     if (!date) return;
-    if(date.isBefore(dateRange.startDate)){
-      setDateRange({startDate:date , endDate : dateRange.endDate});
-    }else{
-      setDateRange({startDate:dateRange.startDate , endDate : date});
+    if (date.isBefore(dateRange.startDate)) {
+      setDateRange({ startDate: date, endDate: dateRange.endDate });
+    } else {
+      setDateRange({ startDate: dateRange.startDate, endDate: date });
     }
   };
 
@@ -96,158 +96,136 @@ const CheckInOutManagement = () => {
     );
   };
 
-  if(isError) return <div>Error</div>
+  if (isError) return <div className="p-8 text-red-500 font-bold">Error loading bookings. Please try again.</div>;
 
   return (
-    <div className="p-4 md:p-8 min-h-screen w-full font-sans">
+    <div className="p-4 md:p-8 min-h-screen w-full font-sans ">
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-6">
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Front Desk Operations</h1>
           <p className="text-slate-500 text-sm">
-            Current Period: <span className="font-bold text-slate-700">{dateRange.startDate.format("MMM DD")} — {dateRange.endDate.format("MMM DD")}</span>
+            Manage arrivals and departures for <span className="font-bold text-slate-700">{dateRange.startDate.format("MMM DD")} — {dateRange.endDate.format("MMM DD")}</span>
           </p>
         </div>
         
-        <div className="flex flex-wrap items-center gap-4 w-full xl:w-auto">
-          <div className="flex bg-white p-1 rounded-2xl shadow-sm border border-slate-200">
-            <button 
-              onClick={() => setActiveTab("checkin")} 
-              className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === "checkin" ? "bg-blue-600 text-white shadow-lg shadow-blue-200" : "text-slate-400 hover:bg-slate-50"}`}
-            >
-              Check-In List
-            </button>
-            <button 
-              onClick={() => setActiveTab("checkout")} 
-              className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === "checkout" ? "bg-blue-600 text-white shadow-lg shadow-blue-200" : "text-slate-400 hover:bg-slate-50"}`}
-            >
-              Check-Out List
-            </button>
-          </div>
-
+        <div className="flex bg-white p-1 rounded-2xl shadow-sm border border-slate-200">
           <button 
-            onClick={() => setIsManualModalOpen(true)} 
-            className="px-6 py-3 bg-indigo-600 text-white rounded-2xl text-xs font-bold shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all hover:-translate-y-0.5 active:translate-y-0"
+            onClick={() => setActiveTab("checkin")} 
+            className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === "checkin" ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" : "text-slate-400 hover:bg-slate-50"}`}
           >
-            + New Booking
+            Check-In 
+          </button>
+          <button 
+            onClick={() => setActiveTab("checkout")} 
+            className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === "checkout" ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" : "text-slate-400 hover:bg-slate-50"}`}
+          >
+            Check-Out 
           </button>
         </div>
       </div>
-      
-      <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mb-8 flex flex-col lg:flex-row items-center gap-6">
-        <div className="w-full lg:w-auto">
+      {user?.role !== "Guard" && (
+        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mb-8 flex flex-col lg:flex-row items-center gap-6">
           <DateRangePicker 
             checkIn={dateRange.startDate} 
             checkOut={dateRange.endDate} 
             handleDateClick={handleDateChange} 
             allowPast={true}
           />
-        </div>
-        
-        <div className="h-10  bg-slate-100 hidden lg:block" />
-
-        <div className="flex flex-wrap gap-4 w-full lg:w-auto">
-          <input
-            type="text"
-            placeholder="Search by Guest Name"
-            value={searchUser}
-            onChange={(e) => setSearchUser(e.target.value)}
-            className="border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-blue-50 outline-none text-sm transition-all bg-slate-50/30"
-          />
-          <input
-            type="text"
-            placeholder="Room #"
-            value={roomFilter}
-            onChange={(e) => setRoomFilter(e.target.value)}
-            className="w-28 border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-blue-50 outline-none text-sm transition-all text-center font-bold"
-          />
-        </div>
-      </div>
-
-      {isLoading && bookings?.length === 0 ? (
-        <div className="py-32 text-center">
-          <div className="inline-block animate-bounce mb-4 text-blue-600 font-black text-2xl">...</div>
-          <p className="text-slate-400 font-medium tracking-wide">Retrieving records from database...</p>
-        </div>
-      ) : (
-         <div className="md:block overflow-x-auto bg-white rounded-lg shadow-md mb-6">
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-left">
-            <thead className="bg-gray-200 text-gray-600 border-b text-xs uppercase border-slate-100">
-                <tr key={0}>
-                  <th className="py-5 px-8">Guest Name</th>
-                  <th className="py-5 px-8">Room</th>
-                  <th className="py-5 px-8">Stay Period</th>
-                  <th className="py-5 px-8">Status</th>
-                  <th className="py-5 px-8 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {currentItems.length > 0 ? currentItems.map((b) => (
-                  <tr key={b.id} className="hover:bg-blue-50/20 transition-colors group">
-                    <td className="py-5 px-8">
-                      <div className="font-semibold text-slate-800 group-hover:text-blue-700 transition-colors">{b.guestName}</div>
-                    </td>
-                    <td className="py-5 px-8">
-                        Room {b.roomNumber}
-                    </td>
-                    <td className="py-5 px-8 text-xs text-slate-500 font-medium">
-                      <div className="flex items-center gap-2">
-                         <span>{dayjs(b.checkInDate).format("DD MMM")}</span>
-                         <span className="text-slate-300">→</span>
-                         <span>{dayjs(b.checkOutDate).format("DD MMM")}</span>
-                      </div>
-                    </td>
-                    <td className="py-5 px-8">{getStatusBadge(b.status)}</td>
-                    <td className="py-5 px-8 text-right">
-                      <button 
-                        onClick={() => {
-                          setBookingId(b.id)
-                          setConfirmationModel(true);
-                        }} 
-                        className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-white transition-all shadow-md active:scale-95 ${activeTab === 'checkin' ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-100' : 'bg-orange-500 hover:bg-orange-600 shadow-orange-100'}`}
-                      >
-                        Confirm {activeTab === 'checkin' ? 'Arrival' : 'Departure'}
-                      </button>
-                    </td>
-                  </tr>
-                )) : (
-                  <tr>
-                    <td colSpan={5} className="py-32 text-center">
-                      <div className="text-slate-300 italic text-sm mb-1">No bookings match these filters.</div>
-                      <div className="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Try adjusting the date range or search terms.</div>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+        <div className="h-10 bg-slate-100 hidden lg:block" />
+        <div className="flex flex-wrap gap-4 flex-1 w-full">
+            <input
+              type="text"
+              placeholder="Search by Guest Name"
+              value={searchUser}
+              onChange={(e) => setSearchUser(e.target.value)}
+              className="flex-1 border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-blue-50 outline-none text-sm transition-all bg-slate-50/30"
+            />
+            <input
+              type="text"
+              placeholder="Room #"
+              value={roomFilter}
+              onChange={(e) => setRoomFilter(e.target.value)}
+              className="w-28 border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-blue-50 outline-none text-sm transition-all text-center font-bold"
+            />
           </div>
         </div>
       )}
-
-      <div className="flex justify-center mt-10">
-        <PagingController 
-          dataLength={filteredBookings.length} 
-          itemPerPage={itemsPerPage} 
-          currentPage={currentPage} 
-          goToPrevious={() => setCurrentPage(p => Math.max(1, p - 1))} 
-          goToNext={() => setCurrentPage(p => p + 1)} 
-          goToSpecificPage={setCurrentPage} 
-        />
+      <div className="overflow-hidden bg-white rounded-3xl border border-slate-100 shadow-sm mb-6">
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left">
+            <thead className="bg-slate-50 text-slate-500 border-b text-[10px] uppercase font-bold tracking-widest">
+              <tr>
+                <th className="py-5 px-8">Guest</th>
+                <th className="py-5 px-8">Room</th>
+                <th className="py-5 px-8">Check-In Date</th>
+                <th className="py-5 px-8">Check-Out Date</th>
+                <th className="py-5 px-8">Status</th>
+                <th className="py-5 px-8 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {isLoading ? (
+                <tr>
+                   <td colSpan={6} className="py-20 text-center text-blue-600 font-bold animate-pulse">Loading Records...</td>
+                </tr>
+              ) : currentItems.length > 0 ? currentItems.map((b) => (
+                <tr key={b.id} className="hover:bg-blue-50/20 transition-colors group">
+                  <td className="py-5 px-8 font-semibold text-slate-800">{b.guestName}</td>
+                  <td className="py-5 px-8 font-medium text-slate-600">Room {b.roomNumber}</td>
+                  <td className="py-5 px-8">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-700">{dayjs(b.checkInDate).format("DD MMM YYYY")}</span>
+                      <span className="text-[10px] text-slate-400">Scheduled Arrival</span>
+                    </div>
+                  </td>
+                  <td className="py-5 px-8">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-bold text-slate-700">{dayjs(b.checkOutDate).format("DD MMM YYYY")}</span>
+                      <span className="text-[10px] text-slate-400">Scheduled Departure</span>
+                    </div>
+                  </td>
+                  <td className="py-5 px-8">{getStatusBadge(b.status)}</td>
+                  <td className="py-5 px-8 text-right">
+                    <button 
+                      onClick={() => { setBookingId(b.id); setConfirmationModel(true); }} 
+                      className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-white shadow-md transition-all active:scale-95 ${activeTab === 'checkin' ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-100' : 'bg-orange-500 hover:bg-orange-600 shadow-orange-100'}`}
+                    >
+                      Confirm {activeTab}
+                    </button>
+                  </td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan={6} className="py-20 text-center text-slate-400 italic">No pending {activeTab}s found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {isManualModalOpen && (
-        <ManualBookingModal 
-          closeModel={() => { 
-            setIsManualModalOpen(false);
-          }} 
+      <div className="flex justify-center mt-10">
+        {filteredBookings.length !==0  && (
+          <PagingController 
+            dataLength={filteredBookings.length} 
+            itemPerPage={itemsPerPage} 
+            currentPage={currentPage} 
+            goToPrevious={() => setCurrentPage(p => Math.max(1, p - 1))} 
+            goToNext={() => setCurrentPage(p => p + 1)} 
+            goToSpecificPage={setCurrentPage} 
+          />
+        )}  
+      </div>
+
+      {isConfirmationModelOpen && (
+        <ConfirmationModel 
+          label={`Confirm ${activeTab} for ${filteredBookings.find(b => b.id === bookingId)?.guestName}?`}
+          isConfirmationModelOpen={setConfirmationModel} 
+          actionText={activeTab }
+          submitAction={handleAction}
+          classname={activeTab === "checkin" ? "bg-emerald-500! hover:bg-emerald-600! shadow-emerald-100!" : 'bg-orange-500! hover:bg-orange-600! shadow-orange-100!'}
         />
       )}
-      {isConfirmationModelOpen && <ConfirmationModel 
-            label={`Are you sure you want to process ${activeTab} for bookingId ${bookingId}?` }
-            isConfirmationModelOpen={setConfirmationModel} 
-            actionText={activeTab}
-            submitAction={handleAction}
-            classname={activeTab === "checkin" ? "bg-emerald-500! hover:bg-emerald-600! shadow-emerald-100!" : 'bg-orange-500! hover:bg-orange-600! shadow-orange-100!'}/>}
     </div>
   );
 };

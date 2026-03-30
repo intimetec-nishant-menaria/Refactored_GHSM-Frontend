@@ -1,6 +1,7 @@
-import type { BookingPayload, CreateBookingPayload, fetchBookingArgs, fetchBookingsByRangeArgs, fetchUserBookingArgs, updateBookingPayload } from "@/utils/interfaces/booking";
+import type { BookingPayload, fetchBookingArgs, fetchBookingsByRangeArgs, fetchUserBookingArgs } from "@/utils/interfaces/booking";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { paging } from "@/utils/interfaces/paging";
+import type { BookingInput } from "@/utils/schemas/addBookings";
 
 export const bookingApi = createApi({
     reducerPath : "bookingApi",
@@ -10,7 +11,7 @@ export const bookingApi = createApi({
     }),
     tagTypes:["booking"],
     endpoints : (builder)=>({
-        createBooking : builder.mutation<void,CreateBookingPayload>({
+        createBooking : builder.mutation<void,BookingInput>({
             query: (data)=>({
                 url: "/createBooking",
                 method : "POST",
@@ -37,7 +38,7 @@ export const bookingApi = createApi({
             }),
             providesTags:["booking"]
         }),
-        updateBooking : builder.mutation<void,updateBookingPayload>({
+        updateBooking : builder.mutation<void,BookingInput>({
             query : (data)=>({
                 url : `/updateBooking/${data.id}`,
                 method: "PUT",

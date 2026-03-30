@@ -95,12 +95,12 @@ const UpdateUserForm = ({ closeModel, data }: UpdateModelProps<User>) => {
               <select
                 id="role"
                 value={role}
-                onChange={(e) => setRole(Number(e.target.value))}
+                onChange={(e) => setRole(e.target.value)}
                 className="border border-slate-200 p-2.5 rounded-xl focus:ring-2 focus:ring-blue-100 bg-white outline-none cursor-pointer"
               >
-                <option value={1}>Admin</option>
-                <option value={2}>Staff</option>
-                <option value={3}>Guest</option>
+                <option value={"Admin"}>Admin</option>
+                <option value={"HR"}>HR</option>
+                <option value={"Guard"}>Guard</option>
               </select>
             </div>
 

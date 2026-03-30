@@ -7,18 +7,20 @@ import { removeuser, setUser } from "./app/slices/auth";
 
 function App() {
   const dispatch = useAppDispatch();
-  const {data ,isLoading} = useGetUserDetailsQuery(undefined, {
+  const {data ,isFetching} = useGetUserDetailsQuery(undefined, {
     refetchOnMountOrArgChange: true, 
   });
 
   useEffect(() => {
-    if(isLoading)return;
+    if(isFetching)return;
     if (data) {
         dispatch(setUser(data));  
     } else {
         dispatch(removeuser());
     }
-  }, [data , isLoading]);
+  }, [data , isFetching]);
+
+  // if(isFetching) return <AppLoader/>
   
   return (
     <>

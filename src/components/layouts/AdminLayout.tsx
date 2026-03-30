@@ -15,7 +15,7 @@ function AdminLayout() {
       </header>
       <div className="flex flex-1 overflow-hidden">
 
-        {user && (
+        {(user?.role === "Admin" || user?.role==="Ops") && (
           <aside className="md:w-64 lg:w-1/6 h-fullshrink-0 z-40">
             <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
           </aside>

@@ -6,7 +6,7 @@ function Modal({
     children
 }:{
     title : string,
-    subTitle:string,
+    subTitle?:string,
     isOpen : boolean,
     closeModal : ()=>void,
     children: React.ReactNode

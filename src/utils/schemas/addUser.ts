@@ -10,10 +10,7 @@ export const addUserSchema = z.object({
     .email("Invalid email address")
     .nonempty("Email is required"),
 
-  role:z.preprocess(
-        (val) => Number(val), 
-        z.number().int().positive().min(1).max(3)
-    ),
+  role:z.string(),
 
   password: z
     .string()

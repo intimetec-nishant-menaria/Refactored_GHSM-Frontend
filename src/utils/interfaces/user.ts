@@ -18,7 +18,7 @@ export interface UserState {
 export interface CreateUserPayload {
   name: string;
   email: string;
-  role: number;
+  role: string;
   password: string;
   isActive: boolean;
 }
@@ -26,7 +26,7 @@ export interface UpdateUserPayload {
   id: number;
   name: string;
   email: string;
-  role: number;
+  role: string;
   isActive: boolean;
 }
 

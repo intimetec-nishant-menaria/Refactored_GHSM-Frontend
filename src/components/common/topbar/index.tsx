@@ -40,10 +40,9 @@ const Topbar = ({ onMenuClick , isMenuOpen}: TopbarProps) => {
 
           <div className="h-8 md:h-10 flex items-center">
             <img
-              className="h-full w-auto object-contain cursor-pointer"
+              className="h-full w-auto object-contain"
               src={logo}
               alt="logo"
-              onClick={() => navigate("/")}
             />
           </div>
         </div>

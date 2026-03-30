@@ -1,218 +1,251 @@
-import { type ChangeEvent,useState } from "react";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { useEffect, useState, type ChangeEvent } from "react";
+import { useNavigate } from "react-router-dom"; // 1. Import useNavigate
 import PagingController from "../common/paging/PagingController.tsx";
 import deleteIcon from "@/assets/deleteIcon.png";
 import editIcon from "@/assets/editIcon.png";
-import Button from "../common/button/Button.tsx";
-import RoomCategoryManagement from "../roomCategoryManagement/index.tsx"
-import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
 import RoomStatusDropDown from "../common/roomStatusDropDown/RoomStatusDropDown.tsx";
 import ConfirmationModel from "../common/confirmationModel/confirmationModel.tsx";
 import Modal from "../common/modal/index.tsx";
 import AddRoomForm from "./addRoomForm/index.tsx";
 import UpdateRoomForm from "./updateRoomForm/index.tsx";
 import { useDeleteRoomMutation, useFetchAllRoomsQuery } from "@/app/Api's/room.ts";
-import { useFetchAllRoomTypesQuery } from "@/app/Api's/roomType.ts";
 import toast from "react-hot-toast";
+import type { RoomData } from "@/utils/interfaces/room.ts";
 
 const RoomManagement = () => {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(5); 
-
-  const [roomTypeFilter, setRoomTypeFilter] = useState(0);
+  const [pageSize] = useState(5);
   const [roomStatusFilter, setRoomStatusFilter] = useState(0);
-  const [isRoomManagementOpen , setIsRoomManagementOpen] = useState(true);
-  const [isConfirmationModelOpen , setConfirmationModel] = useState(false);
-  const [roomId , setRoomId] = useState<number | null>(null);
+  const [isConfirmationModelOpen, setConfirmationModel] = useState(false);
+  const [roomId, setRoomId] = useState<number | null>(null);
+  const [roomNumberFilter, setRoomNumberFilter] = useState("");
+  const [debounceSearch, setDebounceSearch] = useState("");
 
-  const {data:rooms , isLoading , isError ,error} = useFetchAllRoomsQuery({
+  const { data: rooms, isLoading } = useFetchAllRoomsQuery({
     currentPage,
     pageSize,
     roomStatusFilter,
-    roomTypeFilter
-  })
-  const {data : roomTypes , isLoading :roomTypesLoading , isError : roomTypesError  } = useFetchAllRoomTypesQuery();
+    roomNumberFilter: debounceSearch,
+  });
+
   const [deleteRoom] = useDeleteRoomMutation();
-
   const [isCreateRoomFormOpen, setIsCreateFormOpen] = useState(false);
-  const openCreateRoomForm = () => setIsCreateFormOpen(true);
-  const closeCreateRoomForm = () => setIsCreateFormOpen(false);
+  const [editingRoom, setEditingRoom] = useState<RoomData | null>(null);
 
-  const [editingRoom, setEditingRoom] = useState<RoomTypesPayload | null>(null);
-  const openUpdateRoomForm = (room: RoomTypesPayload) => setEditingRoom(room);
-  const closeUpdateRoomForm = () => setEditingRoom(null);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounceSearch(roomNumberFilter), 500);
+    return () => clearTimeout(timer);
+  }, [roomNumberFilter]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debounceSearch, roomStatusFilter]);
 
-  const handleDelete = async (roomid: number) => {
-      try{
-        await deleteRoom(roomid).unwrap();
-        toast.success("room deleted successfully"); 
-      }catch(err){
-        toast.error(err?.data.message || "something went wrong");
-      }
-      setRoomId(null);
-      setConfirmationModel(false);
+  const handleViewHistory = (room: RoomData) => {
+    navigate(`/auditLog?entityName=Room&entityId=${room.id}`);
   };
-  const goToNextPage = () => setCurrentPage(prev => prev + 1);
-  const goToPrevPage = () => setCurrentPage(prev => prev - 1);
-  const goToSpecificPage = (pageNumber: number) => setCurrentPage(pageNumber);
 
-  const getStatusLabel = (status: number) => {
-    switch (status) {
-      case 1: return "Available";
-      case 2: return "Occupied";
-      case 3: return "Maintenance";
-      case 4: return "Out Of Order";
-      default: return "Unknown";
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteRoom(id).unwrap();
+      toast.success("Room deleted successfully");
+    } catch (err: any) {
+      toast.error(err?.data?.message || "Something went wrong");
     }
+    setRoomId(null);
+    setConfirmationModel(false);
   };
 
-  if (isLoading || roomTypesLoading) return <p className="p-6 text-center">Loading...</p>;
-  if (error || roomTypesError) return <p className="p-6 text-center text-red-500">{error || roomTypesError?.data.message}</p>;
+  const getStatusBadge = (status: number) => {
+    const labels: Record<number, string> = { 
+        1: "Available", 2: "Occupied", 3: "Maintenance", 4: "Out Of Order" 
+    };
+    const styles: Record<number, string> = {
+      1: "bg-emerald-50 text-emerald-600 border-emerald-100",
+      2: "bg-blue-50 text-blue-600 border-blue-100",
+      3: "bg-amber-50 text-amber-600 border-amber-100",
+      4: "bg-red-50 text-red-600 border-red-100",
+    };
+
+    return (
+      <span className={`px-2.5 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${styles[status] || "bg-gray-50 text-gray-500"}`}>
+        {labels[status] || "Unknown"}
+      </span>
+    );
+  };
+
+  if (isLoading) return (
+    <div className="py-32 text-center">
+      <div className="animate-bounce text-blue-600 font-black text-2xl">...</div>
+    </div>
+  );
 
   return (
-    <div className="p-4 md:p-6 bg-gray-100 min-h-screen w-full">
-      <div className="h-12 w-full flex justify-center items-center border-b border-gray-200 bg-gray-100 rounded-t-2xl overflow-hidden relative z-10 -mb-px">
+    <div className="p-4 md:p-8 min-h-screen w-full font-sans">
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-6">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Room Management</h1>
+          <p className="text-slate-500 text-sm">Configure floor layouts and track room availability</p>
+        </div>
+        
         <button
-          onClick={() => setIsRoomManagementOpen(true)}
-          className={`w-1/2 h-full flex justify-center items-center text-sm font-medium transition-all duration-150 cursor-pointer ${
-            isRoomManagementOpen
-              ? "bg-gray-100 text-blue-600 border-b-2 border-blue-600 font-semibold"
-              : "bg-gray-200/70 text-gray-600 hover:bg-gray-200 border-b border-gray-200"
-          }`}
+          onClick={() => setIsCreateFormOpen(true)}
+          className="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white rounded-2xl text-xs font-bold shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95"
         >
-          Room Management
-        </button>
-        <button
-          onClick={() => setIsRoomManagementOpen(false)}
-          className={`w-1/2 h-full flex justify-center items-center text-sm font-medium transition-all duration-150 cursor-pointer ${
-            !isRoomManagementOpen
-              ? "bg-gray-100 text-blue-600 border-b-2 border-blue-600 font-semibold"
-              : "bg-gray-200/70 text-gray-600 hover:bg-gray-200 border-b border-gray-200"
-          }`}
-        >
-          Room Category Management
+          + Add New Room
         </button>
       </div>
-      {
-        isRoomManagementOpen ? (
-          <>
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mt-6 mb-6">
-            <div>
-              <h2 className="text-xl font-bold text-gray-800">Room management</h2>
-            </div>
-            <Button
-              onClick={openCreateRoomForm}
-              label="Add Room"
-              className="w-full sm:w-32 h-10 bg-blue-600 text-white font-bold rounded hover:bg-blue-700 transition-all"
-            />
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3 mb-6">
-            <div className="flex-1 flex flex-col gap-2">
-              <label className="text-xs font-semibold text-gray-500 uppercase mb-1 block">Room Type</label>
-              <select 
-                value={roomTypeFilter} 
-                onChange={(e: ChangeEvent<HTMLSelectElement>) => setRoomTypeFilter(Number(e.target.value))}
-               className="w-full border border-slate-200 p-2.5 rounded-xl focus:ring-2 focus:ring-blue-500 bg-white outline-none transition-all cursor-pointer"
-              >
-                <option value={0}>All Types</option>
-                {roomTypes?.map((type) => (
-                  <option key={type.id} value={type.id}>{type.roomTypeName}</option>
-                ))}
-              </select>
-            </div>
-            <RoomStatusDropDown roomStatus={roomStatusFilter}  setRoomStatus={setRoomStatusFilter}/>
-          </div>
-          <div className="grid grid-cols-1 gap-4 md:hidden">
-            {rooms?.data.map((room) => (
-              <div key={room.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-                <div className="flex justify-between items-center mb-3">
-                  <span className="text-lg font-bold text-blue-600">Room {room.roomNumber}</span>
-                  <div className="flex gap-4">
-                    <img src={editIcon} alt="Edit" className="w-5 h-5" onClick={() => openUpdateRoomForm(room)} />
-                    <img src={deleteIcon} alt="Delete" className="w-5 h-5" onClick={() => handleDelete(room.id)} />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-y-3 text-sm">
-                  <p><span className="text-gray-500 block">Type</span> {room.roomTypeName}</p>
-                  <p><span className="text-gray-500 block">Price</span> Rs.{room.pricePerNight}/night</p>
-                  <p><span className="text-gray-500 block">Capacity</span> {room.capacity} Persons</p>
-                  <p><span className="text-gray-500 block">Status</span> 
-                    <span className={`font-semibold ${room.roomStatus === 1 ? 'text-green-600' : 'text-amber-600'}`}>
-                      {getStatusLabel(room.roomStatus)}
+
+      <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mb-8 flex flex-col lg:flex-row items-end gap-6">
+        <div className="flex flex-col gap-2 w-full lg:w-64">
+          <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Room Number</label>
+          <input
+            type="text"
+            placeholder="Search e.g. 101"
+            value={roomNumberFilter}
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setRoomNumberFilter(e.target.value)}
+            className="border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-blue-50 outline-none text-sm transition-all bg-slate-50/30 font-bold"
+          />
+        </div>
+        <div className="w-full lg:w-64">
+           <RoomStatusDropDown roomStatus={roomStatusFilter} setRoomStatus={setRoomStatusFilter} />
+        </div>
+      </div>
+
+      <div className="hidden md:block bg-white rounded-3xl border border-slate-100 shadow-sm mb-6 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left table-auto">
+            <thead className="bg-slate-50 text-slate-500 border-b text-[10px] uppercase font-bold tracking-widest">
+              <tr>
+                <th className="py-5 px-8 whitespace-nowrap">Room Info</th>
+                <th className="py-5 px-8 text-center whitespace-nowrap">Floor Level</th>
+                <th className="py-5 px-8 text-center whitespace-nowrap">Status</th>
+                <th className="py-5 px-8 text-right whitespace-nowrap min-w-[120px]">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-50">
+              {rooms?.data.map((room) => (
+                <tr key={room.id} className="hover:bg-blue-50/20 transition-colors group">
+                  <td className="py-5 px-8 whitespace-nowrap">
+                    <span className="font-bold text-slate-800 text-lg group-hover:text-blue-700 transition-colors">
+                      Room {room.roomNumber}
                     </span>
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="hidden md:block overflow-x-auto bg-white rounded-lg shadow-md mb-6">
-            <table className="min-w-full text-left">
-              <thead className="bg-gray-200 text-gray-700 uppercase text-xs">
-                <tr>
-                  <th className="py-3 px-4">Room No.</th>
-                  <th className="py-3 px-4">Room Type</th>
-                  <th className="py-3 px-4 text-center">Capacity</th>
-                  <th className="py-3 px-4">Price</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-center">Action</th>
+                  </td>
+                  <td className="py-5 px-8 text-center whitespace-nowrap">
+                    <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold">
+                      Floor {room.floor || "0"}
+                    </span>
+                  </td>
+                  <td className="py-5 px-8 text-center whitespace-nowrap">
+                    {getStatusBadge(room.status)}
+                  </td>
+                  <td className="py-5 px-8 text-right whitespace-nowrap">
+                    <div className="flex justify-end items-center gap-4 flex-nowrap shrink-0">
+                      {/* Desktop History Button */}
+                      <button 
+                        onClick={() => handleViewHistory(room)}
+                        title="View Room Logs"
+                        className="p-2 hover:bg-blue-50 rounded-lg transition-all text-blue-400 hover:text-blue-600"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </button>
+
+                      <button 
+                        onClick={() => setEditingRoom(room)} 
+                        className="p-2 hover:bg-white rounded-lg transition-all hover:shadow-sm shrink-0"
+                      >
+                        <img src={editIcon} alt="Edit" className="w-5 h-5 opacity-70 hover:opacity-100" />
+                      </button>
+                      <button
+                        onClick={() => { setRoomId(room.id); setConfirmationModel(true); }}
+                        className="p-2 hover:bg-red-50 rounded-lg transition-all group/del shrink-0"
+                      >
+                        <img src={deleteIcon} alt="Delete" className="w-5 h-5 opacity-40 group-hover/del:opacity-100 transition-opacity grayscale group-hover/del:grayscale-0" />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {rooms?.data.map(room => (
-                  <tr key={room.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="py-4 px-4 font-medium">{room.roomNumber}</td>
-                    <td className="py-4 px-4">{room.roomTypeName}</td>
-                    <td className="py-4 px-4 text-center">{room.capacity}</td>
-                    <td className="py-4 px-4 font-semibold">₹{room.pricePerNight}</td>
-                    <td className="py-4 px-4">
-                      <span className={`px-2 py-1 rounded text-xs font-bold ${
-                        room.roomStatus === 1 ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"
-                      }`}>
-                        {getStatusLabel(room.roomStatus)}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4">
-                      <div className="flex justify-center items-center gap-3">
-                        <img src={editIcon} alt="Edit" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={() => openUpdateRoomForm(room)} />
-                        <span className="text-gray-300">|</span>
-                        <img src={deleteIcon} alt="Delete" className="cursor-pointer w-5 h-5 hover:scale-110" onClick={()=>{
-                          setRoomId(room.id)
-                          setConfirmationModel(true)
-                        }} />
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 md:hidden mb-6">
+        {rooms?.data.map((room) => (
+          <div key={room.id} className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100">
+            <div className="flex justify-between items-start mb-4">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Room Number</p>
+                <h3 className="text-xl font-bold text-slate-900 leading-tight">Room {room.roomNumber}</h3>
+              </div>
+              {getStatusBadge(room.status)}
+            </div>
+            
+            <div className="flex justify-between items-center bg-slate-50 p-4 rounded-2xl">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Floor Level</p>
+                <p className="text-sm font-bold text-slate-700">Level {room.floor || "0"}</p>
+              </div>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => handleViewHistory(room)}
+                  className="p-2.5 bg-white border border-slate-200 rounded-xl shadow-sm shrink-0 text-blue-500"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </button>
+
+                <button onClick={() => setEditingRoom(room)} className="p-2.5 bg-white border border-slate-200 rounded-xl shadow-sm shrink-0">
+                  <img src={editIcon} alt="Edit" className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={() => { setRoomId(room.id); setConfirmationModel(true); }} 
+                  className="p-2.5 bg-white border border-slate-200 rounded-xl shadow-sm shrink-0"
+                >
+                  <img src={deleteIcon} alt="Delete" className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           </div>
-          <div className="mt-4">
-            <PagingController
-              dataLength={rooms?.metaData.totalCount ?? 0}
-              itemPerPage={pageSize}
-              currentPage={currentPage}
-              goToPrevious={goToPrevPage}
-              goToNext={goToNextPage}
-              goToSpecificPage={goToSpecificPage}
-            />
-            <Modal title="Add New Room"
-              subTitle="Register a new unit in the guest house system."
-              isOpen={isCreateRoomFormOpen}
-              closeModal={closeCreateRoomForm}
-              >
-                <AddRoomForm closeModel={closeCreateRoomForm}/>
-            </Modal>
-            <Modal title="Update Room Details" isOpen={editingRoom} closeModal={closeUpdateRoomForm}>
-                <UpdateRoomForm closeModel={closeUpdateRoomForm} data={editingRoom!}/>
-            </Modal>
-          </div>
-        </>
-        ):(
-          <RoomCategoryManagement/>
-        )
-      }
-      {isConfirmationModelOpen && <ConfirmationModel label="Are you sure you want to delete this Room?" isConfirmationModelOpen={setConfirmationModel} submitAction={()=>handleDelete(roomId!)}/>}
+        ))}
+        {!rooms?.data.length && (
+           <p className="text-center py-10 text-slate-400 italic text-sm">No rooms found matching filters.</p>
+        )}
+      </div>
+
+      <div className="flex justify-center mt-10">
+        <PagingController
+          dataLength={rooms?.metaData.totalCount ?? 0}
+          itemPerPage={pageSize}
+          currentPage={currentPage}
+          goToPrevious={() => setCurrentPage(p => Math.max(1, p - 1))}
+          goToNext={() => setCurrentPage(p => p + 1)}
+          goToSpecificPage={setCurrentPage}
+        />
+      </div>
+      
+      <Modal title="Add New Room" isOpen={isCreateRoomFormOpen} closeModal={() => setIsCreateFormOpen(false)}>
+        <AddRoomForm closeModel={() => setIsCreateFormOpen(false)} />
+      </Modal>
+
+      <Modal title="Update Room" isOpen={!!editingRoom} closeModal={() => setEditingRoom(null)}>
+        {editingRoom && <UpdateRoomForm closeModel={() => setEditingRoom(null)} data={editingRoom} />}
+      </Modal>
+
+      {isConfirmationModelOpen && (
+        <ConfirmationModel 
+          label="Are you sure you want to delete this room? This action cannot be undone." 
+          actionText="Delete Room"
+          isConfirmationModelOpen={setConfirmationModel} 
+          submitAction={() => handleDelete(roomId!)}
+          classname="bg-red-500! hover:bg-red-600! shadow-red-100!"
+        />
+      )}
     </div>
   );
 };

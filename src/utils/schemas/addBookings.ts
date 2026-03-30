@@ -1,0 +1,39 @@
+import { z } from "zod";
+import dayjs, { Dayjs } from "dayjs";
+
+export const BookingSchema = z.object({
+  id : z.number().optional(),
+  bugId : z.number().min(1,"Please enter a valid Bug Number"),
+  guestName: z
+    .string()
+    .min(3, "Name must be at least 3 characters")
+    .max(50, "Name is too long"),
+  
+  guestEmail: z
+    .string()
+    .email("Please enter a valid email address"),
+  
+  gender: z
+    .number()
+    .min(1, "Please select a gender"),
+
+  roomId: z
+    .number()
+    .min(1, "Please select an available room from the list"),
+
+  checkInDate: z
+    .custom<Dayjs>((val) => dayjs(val).isValid(), {
+      message: "Check-in date is required",
+    }),
+  
+  checkOutDate: z
+    .custom<Dayjs>((val) => dayjs(val).isValid(), {
+      message: "Check-out date is required",
+    }),
+})
+.refine((data) => data.checkOutDate.isAfter(data.checkInDate), {
+  message: "Check-out date must be after the check-in date",
+  path: ["CheckOutDate"], 
+});
+
+export type BookingInput = z.infer<typeof BookingSchema>;

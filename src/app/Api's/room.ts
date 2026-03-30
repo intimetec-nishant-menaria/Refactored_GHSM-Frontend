@@ -1,7 +1,6 @@
 import type { RoomSummary } from "@/pages/dashboard/dashBoardCards/cardInterfaces";
 import type { paging } from "@/utils/interfaces/paging";
 import type { fetchAllRoomArgs, RoomData, UpdateRoomPayload } from "@/utils/interfaces/room";
-import type { RoomTypesPayload } from "@/utils/interfaces/roomTypes";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const roomAPi = createApi({
@@ -12,9 +11,9 @@ export const roomAPi = createApi({
     }),
     tagTypes : ["room"],
     endpoints : (builder)=>({
-        fetchAllRooms : builder.query<paging<RoomTypesPayload[]> , fetchAllRoomArgs>({
+        fetchAllRooms : builder.query<paging<RoomData[]> , fetchAllRoomArgs>({
             query : (args)=>({
-                url : `/getAllRooms?pageNumber=${args.currentPage}&pageSize=${args.pageSize}&roomStatus=${args.roomStatusFilter}&roomType=${args.roomTypeFilter}`,
+                url : `/getAllRooms?pageNumber=${args.currentPage}&pageSize=${args.pageSize}&roomStatus=${args.roomStatusFilter}&roomNumber=${args.roomNumberFilter}`,
             }),
             providesTags:["room"]
         }),

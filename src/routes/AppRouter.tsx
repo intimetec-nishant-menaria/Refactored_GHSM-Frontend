@@ -1,54 +1,50 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { lazy , Suspense } from "react";
-import AdminOnlyRoutes from "./AdminOnlyRoutes";
+import { lazy, Suspense } from "react";
+import AuthGuard from "./authGard";
 
-const Login = lazy(()=>import("@/pages/login"));
-const Home = lazy(() => import("@/pages/home/home"));
-const SignUp = lazy(() => import("@/pages/SignUp"));
-const ForgotPassword = lazy(() => import("@/pages/forgotPassword"));
-const ResetPassword = lazy(() => import("@/pages/resetPassword"));
-const ChangePassword = lazy(() => import("@/pages/changePassword"));
+const Login = lazy(() => import("@/pages/login"));
+const Dashboard = lazy(() => import("@/pages/dashboard"));
 const UserManagement = lazy(() => import("@/components/userManagement"));
 const RoomManagement = lazy(() => import("@/components/roomManagement"));
-const BookingManagement = lazy(() => import("@/components/bookingManagement"));
-const GuestManagement = lazy(() => import("@/components/guestManagement"));
+const AuditLogPage = lazy(() => import("@/pages/AuditLog/index")); 
+import BookingManagement from "@/components/bookingManagement";
 const CheckInOutManagement = lazy(() => import("@/pages/checkIn-Out"));
-const Dashboard = lazy(() => import("@/pages/dashboard"));
 const AdminLayout = lazy(() => import("@/components/layouts/AdminLayout"));
-const ProtectedRoutes = lazy(() => import("./protectedRoutes"));
-const PublicRoutes = lazy(() => import("./publicRoutes"));
-const MyBookings = lazy(()=> import("@/pages/myBookings"));
+
+const AvailabilityDashboard = lazy(() => import("@/pages/dashboard/AvalabilityDashboard"));
 
 export default function AppRouter() {
   return (
-    <Suspense fallback="loading..." >
+    <Suspense fallback={<div className="p-10 text-center">Loading...</div>}>
       <Routes>
-        <Route element={<PublicRoutes />}>
+        <Route element={<AuthGuard isPublicOnly />}>
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<SignUp/>} />
         </Route>
 
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/change-password" element={<ChangePassword />} />
-        <Route element={<AdminLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route  path="bookings" element={<MyBookings/>}/>
-        </Route>
-
-        <Route element={<ProtectedRoutes />}>
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route element={<AdminOnlyRoutes/>}>
-              <Route path="dashboard" element={<Dashboard />} />
-              <Route path="users" element={<UserManagement />} />
-              <Route path="rooms" element={<RoomManagement />} />
+        <Route element={<AuthGuard />}>
+          <Route element={<AdminLayout />}>
+            
+            <Route element={<AuthGuard allowedRoles={["Admin", "Ops"]} />}>
+              <Route path="/admin/dashboard" element={<Dashboard />} />
+              <Route path="/admin/users" element={<UserManagement />} />
+              <Route path="/admin/rooms" element={<RoomManagement />} />
+              <Route path="/admin/bookings" element={<BookingManagement />} />
+              <Route path="/admin/checkings" element={<CheckInOutManagement />} />
+              <Route path="/auditLog" element={<AuditLogPage />} />
             </Route>
-            <Route path="bookings" element={<BookingManagement />} />
-            <Route path="checkings" element={<CheckInOutManagement />} />
-            <Route path="guests" element={<GuestManagement/>}/>
+
+
+            <Route element={<AuthGuard allowedRoles={["HR"]} />}>
+              <Route path="/hr/availability" element={<AvailabilityDashboard />} />
+            </Route>
+
+            <Route element={<AuthGuard allowedRoles={["Guard"]} />}>
+              <Route path="/guard/bookings" element={<CheckInOutManagement/>} />
+            </Route>
+            
           </Route>
         </Route>
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Suspense>
   );

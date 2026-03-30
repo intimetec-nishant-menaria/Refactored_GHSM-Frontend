@@ -1,16 +1,20 @@
 export interface RoomData{
-    roomNumber : string;
-    roomTypeId : number;
+  id: number;
+  roomNumber:string;
+  floor: number;
+  status :number;
+  CurrentOccupancy? : number;
 }
 
 export interface UpdateRoomPayload{
     id : number;
     roomNumber : string;
-    roomTypeId : number;
-    roomStatus : number;
+    status : number;
+    floor : number;
 }
 
 export interface RoomAvailabilityRequest{
+    gender : number;
     checkIn : string | null; 
     checkOut : string | null;
 }
@@ -19,5 +23,5 @@ export interface fetchAllRoomArgs{
     currentPage:number;
     pageSize:number;
     roomStatusFilter:number;
-    roomTypeFilter:number;
+    roomNumberFilter:string;
 }
