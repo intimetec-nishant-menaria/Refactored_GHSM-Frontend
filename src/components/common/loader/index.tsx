@@ -1,12 +1,15 @@
-export default function AppLoader() {
+const Loader = () => {
   return (
-    <div className="flex items-center gap-3 p-2 animate-pulse">
-    <div className="w-10 h-10 bg-slate-200 rounded-full shadow-sm"></div>
-    
-    <div className="flex flex-col gap-2">
-      <div className="h-3 w-24 bg-slate-200 rounded-md"></div>
-      <div className="h-2 w-32 bg-slate-100 rounded-md"></div>
+    <div className="flex h-screen w-full items-center justify-center bg-gray-50/50">
+      <div className="flex flex-col items-center gap-4">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-blue-500"></div>
+        
+        <p className="text-sm font-medium text-gray-600 animate-pulse">
+          Refreshing data...
+        </p>
+      </div>
     </div>
-  </div>
   );
-}
+};
+
+export default Loader;

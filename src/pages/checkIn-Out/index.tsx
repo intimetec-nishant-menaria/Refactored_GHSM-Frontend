@@ -2,10 +2,16 @@ import { useEffect, useMemo, useState } from "react";
 import PagingController from "@/components/common/paging/PagingController";
 import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker"; 
 import toast from "react-hot-toast";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import ConfirmationModel from "@/components/common/confirmationModel/confirmationModel";
 import { useCheckInMutation, useCheckOutMutation, useFetchBookingByRangeQuery } from "@/app/Api's/booking";
 import { useAppSelector } from "@/hooks/useAppSelector";
+import { date } from "zod";
+
+interface DateRangeState {
+  startDate: Dayjs | null;
+  endDate: Dayjs | null;
+}
 
 const CheckInOutManagement = () => {
   const { user } = useAppSelector(state => state.auth);
@@ -15,15 +21,16 @@ const CheckInOutManagement = () => {
   const [isConfirmationModelOpen, setConfirmationModel] = useState(false);
   const [bookingId, setBookingId] = useState<number | null>(null);
   
-  const [dateRange, setDateRange] = useState({
+  const [dateRange, setDateRange] = useState<DateRangeState>({
     startDate: dayjs().startOf("month"),
     endDate: dayjs().endOf("month"),
   });
 
   const { data: bookings, isLoading, isError } = useFetchBookingByRangeQuery({
-    startDate: dateRange.startDate.format("YYYY-MM-DD"),
-    endDate: dateRange.endDate.format("YYYY-MM-DD"),
+    startDate: dateRange.startDate?.format("YYYY-MM-DD") ?? "",
+    endDate: dateRange.endDate?.format("YYYY-MM-DD") ?? "",
   },{
+    skip : !dateRange.startDate || !dateRange.endDate,
     refetchOnFocus : true,
   });
   
@@ -72,14 +79,25 @@ const CheckInOutManagement = () => {
     setConfirmationModel(false);
   };
 
-  const handleDateChange = (date: dayjs.Dayjs | null) => {
-    if (!date) return;
-    if (date.isBefore(dateRange.startDate)) {
-      setDateRange({ startDate: date, endDate: dateRange.endDate });
-    } else {
-      setDateRange({ startDate: dateRange.startDate, endDate: date });
+  function handleCheckInClick(newDate: Dayjs | null){
+    if(!newDate) return;
+
+    if(dateRange.startDate?.isAfter(dateRange.endDate)){
+      setDateRange({startDate : newDate , endDate : null});
+    }else{
+      setDateRange({startDate : newDate , endDate : dateRange.endDate});
     }
-  };
+  }
+
+  function handleCheckOutClick(newDate: Dayjs | null){
+    if(!newDate) return;
+
+    if(dateRange.endDate?.isBefore(dateRange.startDate)){
+      setDateRange({startDate: newDate , endDate : null});
+    }else{
+       setDateRange({startDate: dateRange.startDate , endDate : newDate});
+    }
+  }
 
   const getStatusBadge = (status: number) => {
     const styles: Record<number, string> = {
@@ -104,7 +122,7 @@ const CheckInOutManagement = () => {
         <div>
           <h1 className="text-2xl font-black text-slate-900 tracking-tight">Front Desk Operations</h1>
           <p className="text-slate-500 text-sm">
-            Manage arrivals and departures for <span className="font-bold text-slate-700">{dateRange.startDate.format("MMM DD")} — {dateRange.endDate.format("MMM DD")}</span>
+            Manage arrivals and departures for <span className="font-bold text-slate-700">{dateRange.startDate?.format("MMM DD")} — {dateRange.endDate?.format("MMM DD")}</span>
           </p>
         </div>
         
@@ -128,7 +146,8 @@ const CheckInOutManagement = () => {
           <DateRangePicker 
             checkIn={dateRange.startDate} 
             checkOut={dateRange.endDate} 
-            handleDateClick={handleDateChange} 
+            handleCheckInClick={handleCheckInClick}
+            handleCheckOutClick={handleCheckOutClick}
             allowPast={true}
           />
         <div className="h-10 bg-slate-100 hidden lg:block" />

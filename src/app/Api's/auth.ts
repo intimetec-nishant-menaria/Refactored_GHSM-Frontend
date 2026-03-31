@@ -5,6 +5,7 @@ import type { ResetPasswordPayload } from "@/utils/interfaces/resetPassword";
 import type { User } from "@/utils/interfaces/user";
 import type { ChangePasswordPayload } from "@/utils/interfaces/changePassword";
 import type { RegisterInput } from "@/utils/schemas/register";
+import { removeuser, setUser } from "../slices/auth";
 
 export const authAPi = createApi({
     reducerPath : "authApi",
@@ -21,6 +22,14 @@ export const authAPi = createApi({
                 body : data
             }),
             invalidatesTags:["user"],
+            async onQueryStarted(_ , {dispatch , queryFulfilled}){
+                try{
+                    const { data } = await queryFulfilled;
+                    dispatch(setUser(data?.user ?? null));
+                }catch(err){
+                    dispatch(removeuser());
+                }
+            }
         }),
         forgotPassword : builder.mutation<void,ForgotPasswordInput>({
             query : (data)=>({

@@ -1,20 +1,46 @@
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "@/hooks/useAppSelector";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
+import { useGetUserDetailsQuery } from "@/app/Api's/auth";
+import { useEffect } from "react";
+import { removeuser, setUser } from "@/app/slices/auth";
+import Loader from "@/components/common/loader";
 
 interface AuthGuardProps {
-  allowedRoles?: string[]; 
-  isPublicOnly?: boolean;  
+  allowedRoles?: string[];
+  isPublicOnly?: boolean;
 }
 
 const AuthGuard = ({ allowedRoles, isPublicOnly }: AuthGuardProps) => {
+  const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  const location = useLocation();
   
-  if (isPublicOnly && user) {
-    return <Navigate to={getHomePathByRole(user.role)} replace />;
+  const hasToken = document.cookie.includes("jwtToken"); 
+
+  const { data, isFetching, isSuccess, isError } = useGetUserDetailsQuery(undefined, {
+    skip: !hasToken, 
+  });
+
+  useEffect(() => {
+    if (!isFetching) {
+      if (isSuccess && data) {
+        dispatch(setUser(data));
+      } else if (isError) {
+        dispatch(removeuser());
+      }
+    }
+  }, [data, isFetching, isSuccess, isError, dispatch]);
+
+  if (hasToken && (isFetching || !user)) {
+    if (!isError) return <Loader />;
   }
-  if (!isPublicOnly && !user) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+
+  if (!hasToken && !isPublicOnly) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user && isPublicOnly) {
+    return <Navigate to={getHomePathByRole(user.role)} replace />;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
@@ -29,9 +55,9 @@ const getHomePathByRole = (role: string | undefined): string => {
     case "Ops":
       return "/admin/dashboard";
     case "HR":
-      return "/hr/availability";
+      return "/hr/dashboard";
     case "Guard":
-      return "/guard/bookings";
+      return "/guard/dashboard";
     default:
       return "/login";
   }

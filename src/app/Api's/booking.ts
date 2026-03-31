@@ -2,6 +2,7 @@ import type { BookingPayload, fetchBookingArgs, fetchBookingsByRangeArgs, fetchU
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { paging } from "@/utils/interfaces/paging";
 import type { BookingInput } from "@/utils/schemas/addBookings";
+import  { HubConnectionBuilder } from "@microsoft/signalr";
 
 export const bookingApi = createApi({
     reducerPath : "bookingApi",
@@ -23,7 +24,33 @@ export const bookingApi = createApi({
             query:(data)=>({
                 url : `/getAllBookings?pageNumber=${data.currentPage}&pageSize=${data.pageSize}&searchUser=${data.searchUser}&roomNumber=${data.roomFilter}&statusFilter=${data.statusFilter}`
             }),
-            providesTags:["booking"]
+            providesTags:["booking"],
+            async onCacheEntryAdded(arg, { updateCachedData, cacheDataLoaded, cacheEntryRemoved }) {
+                const connection = new HubConnectionBuilder()
+                    .withUrl(`${import.meta.env.VITE_API_BASE_URL}/hubs/bookings`)
+                    .withAutomaticReconnect()
+                    .build();
+
+                try {
+                    await cacheDataLoaded;
+                    await connection.start();
+
+                    connection.on("ReceiveBookingUpdate", (newBooking: BookingPayload) => {
+                        updateCachedData((draft) => {
+                            const existingIndex = draft.data.findIndex(b => b.id === newBooking.id);
+                                
+                            if (existingIndex !== -1) {
+                                draft.data[existingIndex] = { ...draft.data[existingIndex], ...newBooking };
+                            } else if (arg.currentPage === 1) {
+                                draft.data.unshift(newBooking);
+                                if (draft.data.length > arg.pageSize) draft.data.pop();
+                            }
+                        });
+                    });
+                } catch {}
+                await cacheEntryRemoved;
+                connection.stop();
+            }
         }),
         cancelBooking : builder.mutation<void , number>({
             query : (id)=>({
@@ -36,7 +63,38 @@ export const bookingApi = createApi({
             query : (dates)=>({
                 url : `/getBookingsByRange?start=${dates.startDate}&end=${dates.endDate}`,
             }),
-            providesTags:["booking"]
+            providesTags:["booking"],
+            async onCacheEntryAdded(arg, { updateCachedData, cacheDataLoaded, cacheEntryRemoved }) {
+                const connection = new HubConnectionBuilder()
+                    .withUrl(`${import.meta.env.VITE_API_BASE_URL}/hubs/bookings`)
+                    .withAutomaticReconnect()
+                    .build();
+
+                try {
+                    await cacheDataLoaded;
+                    await connection.start();
+                    
+                    connection.on("ReceiveBookingUpdate", (newBooking: BookingPayload) => {
+                        updateCachedData((draft) => {
+                            const existingIndex = draft.findIndex(b => b.id === newBooking.id);
+
+                            if (existingIndex !== -1) {
+                                draft[existingIndex] = { ...draft[existingIndex], ...newBooking };
+                            } else {
+                                const bookingDate = new Date(newBooking.checkInDate);
+                                const start = new Date(arg.startDate);
+                                const end = new Date(arg.endDate);
+
+                                if (bookingDate >= start && bookingDate <= end) {
+                                    draft.push(newBooking);
+                                }
+                            }
+                        });
+                    });
+                } catch {}
+                await cacheEntryRemoved;
+                connection.stop();
+            }
         }),
         updateBooking : builder.mutation<void,BookingInput>({
             query : (data)=>({

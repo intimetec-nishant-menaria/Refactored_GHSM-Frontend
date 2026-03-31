@@ -7,25 +7,26 @@ import Box from "@mui/material/Box";
 interface Props {
   checkIn: Dayjs | null;
   checkOut: Dayjs | null;
-  handleDateClick: (date: Dayjs | null) => void;
+  handleCheckInClick: (date: Dayjs | null) => void;
+  handleCheckOutClick: (date: Dayjs | null) => void;
   allowPast?: boolean;
 }
 
-const DateRangePicker = ({ checkIn, checkOut, handleDateClick , allowPast = false }: Props) => {
+const DateRangePicker = ({ checkIn, checkOut, handleCheckInClick , handleCheckOutClick , allowPast = false }: Props) => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box className="flex flex-col md:flex-row gap-4 w-full">
         <DatePicker
           label="Check In"
           value={checkIn}
-          onChange={(newDate) => handleDateClick(newDate)}
+          onChange={(newDate) => handleCheckInClick(newDate)}
           disablePast={!allowPast}
           sx={{ width: { xs: "100%", md: 250 } }}
         />
         <DatePicker
           label="Check Out"
           value={checkOut}
-          onChange={(newDate) => handleDateClick(newDate)}
+          onChange={(newDate) => handleCheckOutClick(newDate)}
           disablePast={!allowPast}
           minDate={checkIn ?? undefined}
           sx={{ width: { xs: "100%", md: 250 } }}

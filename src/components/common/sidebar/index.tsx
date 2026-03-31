@@ -5,6 +5,7 @@ import { authAPi, useLogoutUserMutation } from "@/app/Api's/auth";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { removeuser } from "@/app/slices/auth";
 import { useNavigate } from "react-router-dom";
+import { bookingApi } from "@/app/Api's/booking";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       await logoutUser().unwrap();
       dispatch(removeuser());
       dispatch(authAPi.util.resetApiState());
+      dispatch(bookingApi.util.resetApiState());
       navigate("/");
     } catch (error) {
       console.error("Logout failed", error);

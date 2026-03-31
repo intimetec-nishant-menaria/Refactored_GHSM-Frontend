@@ -3,7 +3,7 @@ export interface RoomData{
   roomNumber:string;
   floor: number;
   status :number;
-  CurrentOccupancy? : number;
+  currentOccupancy? : number;
 }
 
 export interface UpdateRoomPayload{

@@ -142,7 +142,6 @@ const RoomManagement = () => {
                   </td>
                   <td className="py-5 px-8 text-right whitespace-nowrap">
                     <div className="flex justify-end items-center gap-4 flex-nowrap shrink-0">
-                      {/* Desktop History Button */}
                       <button 
                         onClick={() => handleViewHistory(room)}
                         title="View Room Logs"

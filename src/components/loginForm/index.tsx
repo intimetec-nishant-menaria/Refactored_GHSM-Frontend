@@ -8,15 +8,11 @@ import type { LoginInput } from "@/utils/schemas/login";
 import { loginSchema } from "@/utils/schemas/login";
 import toast from "react-hot-toast";
 import { useEffect } from "react";
-import { useGetUserDetailsQuery, useLoginUserMutation } from "@/app/Api's/auth";
-import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { setUser } from "@/app/slices/auth";
+import { useLoginUserMutation } from "@/app/Api's/auth";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
-  const [loginUser] = useLoginUserMutation();
-  const {data : user} = useGetUserDetailsQuery();
+  const [loginUser , {data , isSuccess}] = useLoginUserMutation();
   const {
     register,
     handleSubmit,
@@ -46,9 +42,14 @@ const LoginForm = () => {
     
     try{
       await loginUser(data).unwrap();
-      dispatch(setUser(user));
       toast.success("Welcome back!");
-      navigate("/", { replace: true });
+      if(data?.user.role === "Admin" || data?.user.role === "Ops")
+        navigate("/admin/dashboard", { replace: true });
+      else if(data?.user.role === "HR"){
+        navigate("/hr/dashboard", { replace: true });
+      }
+      else
+        navigate("/guard/dashboard", {replace:true})
     }catch(err:any){
       toast.error(err?.data.message || "Invalid credentials");
     }

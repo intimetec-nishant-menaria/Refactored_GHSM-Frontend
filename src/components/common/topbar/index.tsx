@@ -5,9 +5,10 @@ import { useAppSelector } from "@/hooks/useAppSelector";
 import Button from "../button/Button";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png"
-import { useLogoutUserMutation } from "@/app/Api's/auth";
+import { authAPi, useLogoutUserMutation } from "@/app/Api's/auth";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { removeuser } from "@/app/slices/auth";
+import { bookingApi } from "@/app/Api's/booking";
 
 interface TopbarProps {
   isMenuOpen : boolean;
@@ -20,11 +21,23 @@ const Topbar = ({ onMenuClick , isMenuOpen}: TopbarProps) => {
   const navigate = useNavigate();
   const [logoutUser] = useLogoutUserMutation();
 
+ async function handleLogout() {
+     try {
+       await logoutUser().unwrap();
+       dispatch(removeuser());
+       dispatch(authAPi.util.resetApiState());
+       dispatch(bookingApi.util.resetApiState());
+       navigate("/");
+     } catch (error) {
+       console.error("Logout failed", error);
+     }
+   }
+
   return (
     <div className="h-16 w-full bg-white shadow-sm flex items-center px-4 md:px-6 shrink-0 z-30">
       <div className="flex w-full justify-between items-center">
         <div className="flex items-center gap-3">
-          {user && (
+          {(user?.role !=="Admin" || user?.role !=="Ops")  && (
             <button
               onClick={onMenuClick}
               className="p-2 hover:bg-gray-100 rounded-md md:hidden transition-colors"
@@ -80,20 +93,11 @@ const Topbar = ({ onMenuClick , isMenuOpen}: TopbarProps) => {
                     </span>
                   </div>
                   <div className="p-2">
-                    <button
-                      onClick={() => navigate("/change-password")}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2 cursor-pointer"
-                    >
-                      <span>🔑</span> Change Password
-                    </button>
                     <div className="my-2 border-t border-gray-100"></div>
 
                     <button
                       className="w-full text-left px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium flex items-center gap-2 cursor-pointer"
-                      onClick={async() => {
-                        await logoutUser().unwrap();
-                        dispatch(removeuser());
-                      }}
+                      onClick={handleLogout}
                     >
                       <span>🚪</span> Log Out
                     </button>

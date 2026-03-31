@@ -19,4 +19,4 @@ export const availableRoomApi = createApi({
     })
 })
 
-export const { useLazyGetAllAvailableRoomsQuery } = availableRoomApi
+export const { useLazyGetAllAvailableRoomsQuery , useGetAllAvailableRoomsQuery } = availableRoomApi

@@ -7,6 +7,7 @@ import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker
 import { useCreateBookingMutation } from "@/app/Api's/booking";
 import { useLazyGetAllAvailableRoomsQuery } from "@/app/Api's/availableRoom";
 import { BookingSchema, type BookingInput } from "@/utils/schemas/addBookings";
+import type { Dayjs } from "dayjs";
 
 interface Props {
   closeModel: () => void;
@@ -47,14 +48,26 @@ const AddBookingForm = ({ closeModel }: Props) => {
     }
   }, [selectedGender, checkIn, checkOut, fetchRooms, setValue]);
 
-  const handleDateClick = (date: any) => {
-    if (!checkIn || (checkIn && checkOut)) {
-      setValue("checkInDate", date!, { shouldValidate: true });
-      setValue("checkOutDate", null as any);
-    } else {
-      setValue("checkOutDate", date!, { shouldValidate: true });
-    }
-  };
+  const handleCheckInClick = (newDate: Dayjs | null) => {
+  if (!newDate) return;
+
+  setValue("checkInDate", newDate, { shouldValidate: true });
+
+  if (checkOut && newDate.isAfter(checkOut)) {
+    setValue("checkOutDate", null as any, { shouldValidate: true });
+  }
+};
+
+const handleCheckOutClick = (newDate: Dayjs | null) => {
+  if (!newDate) return;
+
+  if (checkIn && newDate.isBefore(checkIn)) {
+    setValue("checkInDate", newDate, { shouldValidate: true });
+    setValue("checkOutDate", null as any, { shouldValidate: true });
+  } else {
+    setValue("checkOutDate", newDate, { shouldValidate: true });
+  }
+};
 
   const onSubmit = async (data: BookingInput) => {
     try {
@@ -77,7 +90,6 @@ const AddBookingForm = ({ closeModel }: Props) => {
         <label className="text-sm font-black uppercase tracking-widest text-slate-400 ml-1">Bug / Reference ID</label>
         <Input 
           {...register("bugId", { valueAsNumber: true }) } 
-          error={!!errors.bugId} 
           placeholder="Enter System Bug ID " 
           className="bg-slate-50/50"
         />
@@ -95,7 +107,6 @@ const AddBookingForm = ({ closeModel }: Props) => {
           <label className="text-sm font-semibold text-slate-700">Guest Name</label>
           <Input 
             {...register("guestName")} 
-            error={!!errors.guestName} 
             placeholder="Full Name" 
           />
           {errors.guestName && (
@@ -109,7 +120,6 @@ const AddBookingForm = ({ closeModel }: Props) => {
           <label className="text-sm font-semibold text-slate-700">Guest Email</label>
           <Input 
             {...register("guestEmail")} 
-            error={!!errors.guestEmail} 
             placeholder="email@example.com" 
           />
           {errors.guestEmail && (
@@ -124,7 +134,8 @@ const AddBookingForm = ({ closeModel }: Props) => {
         <DateRangePicker
           checkIn={checkIn}
           checkOut={checkOut}
-          handleDateClick={handleDateClick}
+          handleCheckInClick={handleCheckInClick}
+          handleCheckOutClick={handleCheckOutClick}
           allowPast={false}
         />
         {errors.checkOutDate && (
