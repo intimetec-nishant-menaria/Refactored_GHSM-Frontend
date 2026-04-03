@@ -28,10 +28,10 @@ const SidebarItem = ({
   return (
     <div
       onClick={handleClick}
-      className={`cursor-pointer px-4 py-2 transition-colors duration-200 hover:bg-gray-200 rounded-l-lg
+      className={`cursor-pointer px-4 py-2 transition-colors duration-200 hover:bg-muted rounded-l-lg
         ${
           isActive
-            ? "text-blue-500 border-r-4 border-blue-500"
+            ? "text-blue-600 border-r-4 border-blue-600"
             : ""
         } ${className}`}
     >

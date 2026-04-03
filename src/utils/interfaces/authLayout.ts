@@ -12,3 +12,8 @@ export interface AuthLayoutProps {
   iconSrc?: string;
   iconAlt?: string;
 }
+
+export interface LoginResponce{
+  message : string;
+  user : User;
+}

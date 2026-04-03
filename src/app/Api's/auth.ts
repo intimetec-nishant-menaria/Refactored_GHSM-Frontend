@@ -6,6 +6,7 @@ import type { User } from "@/utils/interfaces/user";
 import type { ChangePasswordPayload } from "@/utils/interfaces/changePassword";
 import type { RegisterInput } from "@/utils/schemas/register";
 import { removeuser, setUser } from "../slices/auth";
+import type { LoginResponce } from "@/utils/interfaces/authLayout";
 
 export const authAPi = createApi({
     reducerPath : "authApi",
@@ -15,7 +16,7 @@ export const authAPi = createApi({
     }),
     tagTypes:["user"],
     endpoints : (builder)=>({
-        loginUser : builder.mutation<void , LoginInput>({
+        loginUser : builder.mutation<LoginResponce , LoginInput>({
             query : (data)=>({
                 url : "/login",
                 method : "POST",

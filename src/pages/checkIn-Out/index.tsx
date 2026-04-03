@@ -6,7 +6,6 @@ import dayjs, { Dayjs } from "dayjs";
 import ConfirmationModel from "@/components/common/confirmationModel/confirmationModel";
 import { useCheckInMutation, useCheckOutMutation, useFetchBookingByRangeQuery } from "@/app/Api's/booking";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { date } from "zod";
 
 interface DateRangeState {
   startDate: Dayjs | null;
@@ -67,7 +66,7 @@ const CheckInOutManagement = () => {
     if (!bookingId) return;
     try {
       if (activeTab === "checkin") {
-        await checkIn(bookingId).unwrap();
+            await checkIn(bookingId).unwrap();
       } else {
         await checkOut(bookingId).unwrap();
       }

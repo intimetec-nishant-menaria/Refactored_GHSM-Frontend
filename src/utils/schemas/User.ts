@@ -1,14 +1,14 @@
 import {z } from "zod"
 
-export const addUserSchema = z.object({
+export const UserSchema = z.object({
   name: z
     .string()
     .nonempty("Name is Required"),
 
   email: z
     .string()
-    .email("Invalid email address")
-    .nonempty("Email is required"),
+    .nonempty("Email is required")
+    .regex(/^[a-zA-Z0-9._%+-]+@intimetec\.com$/, "Email must be an @intimetec.com address"),
 
   role:z.string(),
 
@@ -21,9 +21,8 @@ export const addUserSchema = z.object({
       /[^A-Za-z0-9]/,
       "Password must contain at least one special character",
     ),
-
     
   isActive: z.boolean(),
 });
 
-export type addUserInput = z.infer<typeof addUserSchema>;
+export type UserInput = z.infer<typeof UserSchema>;

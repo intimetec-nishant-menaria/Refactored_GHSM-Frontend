@@ -54,7 +54,7 @@ const AddBookingForm = ({ closeModel }: Props) => {
   setValue("checkInDate", newDate, { shouldValidate: true });
 
   if (checkOut && newDate.isAfter(checkOut)) {
-    setValue("checkOutDate", null as any, { shouldValidate: true });
+    setValue("checkOutDate", null as unknown as Dayjs, { shouldValidate: true });
   }
 };
 
@@ -63,7 +63,7 @@ const handleCheckOutClick = (newDate: Dayjs | null) => {
 
   if (checkIn && newDate.isBefore(checkIn)) {
     setValue("checkInDate", newDate, { shouldValidate: true });
-    setValue("checkOutDate", null as any, { shouldValidate: true });
+    setValue("checkOutDate", null as unknown as Dayjs, { shouldValidate: true });
   } else {
     setValue("checkOutDate", newDate, { shouldValidate: true });
   }
@@ -71,12 +71,7 @@ const handleCheckOutClick = (newDate: Dayjs | null) => {
 
   const onSubmit = async (data: BookingInput) => {
     try {
-      const payload = {
-        ...data,
-        CheckInDate: data.checkInDate.toISOString(),
-        CheckOutDate: data.checkOutDate.toISOString(),
-      };
-      await createBooking(payload).unwrap();
+      await createBooking(data).unwrap();
       toast.success("Booking created successfully!");
       closeModel();
     } catch (err: any) {
@@ -140,7 +135,7 @@ const handleCheckOutClick = (newDate: Dayjs | null) => {
         />
         {errors.checkOutDate && (
           <span className="text-xs text-red-500 font-medium italic">
-            {errors.checkOutDate.message}
+            {errors.checkOutDate.message as string}
           </span>
         )}
       </div>

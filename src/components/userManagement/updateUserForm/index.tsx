@@ -1,42 +1,39 @@
-import { useState, type ChangeEvent } from "react";
+import { useState} from "react";
 import type { User } from "@/utils/interfaces/user";
 import toast from "react-hot-toast";
 import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
 import { useUpdateUserMutation } from "@/app/Api's/user";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { updateUserSchema, type updateUserInput } from "@/utils/schemas/updateUser";
 
 const UpdateUserForm = ({ closeModel, data }: UpdateModelProps<User>) => {
-  const [name, setName] = useState(data.name);
-  const [email , setEmail] = useState(data.email);
-  const [role, setRole] = useState(data.role);
-  const [isActive, setIsActive] = useState(data.isActive);
-  const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const {
+    register,
+    handleSubmit,
+    formState : {errors}
+  } = useForm<updateUserInput>({
+    resolver : zodResolver(updateUserSchema),
+    defaultValues : {
+      id : data.id,
+      name : data.name,
+      email : data.email,
+      role : data.role,
+      isActive : Boolean(data.isActive)
+    }
+  })
 
   const [updateUser] = useUpdateUserMutation();
 
-  const handleSubmit = async (e: ChangeEvent) => {
-    e.preventDefault();
-    if (name.trim().length < 1) {
-      setError(true);
-      return;
-    }
-    setError(false);
-    if (
-      name === data.name &&
-      email === data.email &&
-      role === data.role  &&
-      isActive === data.isActive
-    ) {
-      closeModel();
-      return;
-    }
-
+  const handleOnSubmit = async (data : updateUserInput) => {
     setLoading(true);
     try {
-      await updateUser({ id: data.id, name, email, role, isActive,}).unwrap();
+      await updateUser(data).unwrap();
       toast.success("User updated successfully");
       closeModel();
-    } catch (err){
+    } catch (err:any){
       toast.error(err?.data.message || "An error occurred");
     } finally {
       setLoading(false);
@@ -44,7 +41,7 @@ const UpdateUserForm = ({ closeModel, data }: UpdateModelProps<User>) => {
   };
 
   return (
-        <form onSubmit={handleSubmit} className="p-8 flex flex-col gap-6">
+        <form onSubmit={handleSubmit(handleOnSubmit)} className="p-8 flex flex-col gap-6">
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="name"
@@ -55,17 +52,16 @@ const UpdateUserForm = ({ closeModel, data }: UpdateModelProps<User>) => {
             <input
               id="name"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              {...register("name")}
               className={`border px-4 py-2.5 rounded-xl outline-none focus:ring-2 transition-all ${
-                error
+                errors.name
                   ? "border-red-400 focus:ring-red-100"
                   : "focus:ring-blue-100 border-slate-200"
               }`}
             />
-            {error && (
+            {errors.name && (
               <p className="text-red-500 text-xs font-medium italic">
-                Name should not be empty
+                {errors.name.message}
               </p>
             )}
           </div>
@@ -79,10 +75,18 @@ const UpdateUserForm = ({ closeModel, data }: UpdateModelProps<User>) => {
             <input
               id="email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="border border-slate-200 px-4 py-2.5 focus:ring-2 focus:ring-blue-100 outline-none rounded-xl"
+              {...register("email")}
+              className={`border px-4 py-2.5 outline-none rounded-xl focus:ring-2 transition-all ${
+                errors.email
+                ? "border-red-400 focus:ring-red-100"
+                : "focus:ring-blue-100 border-slate-200"
+              }`}
             />
+            {errors.email && (
+              <p className="text-red-500 text-xs font-medium italic">
+                {errors.email.message}
+              </p>
+            )}
           </div>
           <div className="flex flex-col lg:flex-row gap-6">
             <div className="flex-1 flex flex-col gap-1.5">
@@ -94,8 +98,7 @@ const UpdateUserForm = ({ closeModel, data }: UpdateModelProps<User>) => {
               </label>
               <select
                 id="role"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
+                {...register("role")}
                 className="border border-slate-200 p-2.5 rounded-xl focus:ring-2 focus:ring-blue-100 bg-white outline-none cursor-pointer"
               >
                 <option value={"Admin"}>Admin</option>
@@ -108,8 +111,7 @@ const UpdateUserForm = ({ closeModel, data }: UpdateModelProps<User>) => {
               <label className="flex items-center gap-3 cursor-pointer p-2 hover:bg-slate-50 rounded-xl transition-colors">
                 <input
                   type="checkbox"
-                  checked={isActive}
-                  onChange={(e) => setIsActive(e.target.checked)}
+                  {...register("isActive")}
                   className="w-5 h-5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm font-semibold text-slate-700">

@@ -42,7 +42,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
         />
       )}
       <div
-        className={`fixed top-16 border-r border-gray-300 left-0 z-50 w-64 h-[calc(100vh-4rem)] bg-white shadow-xl transform transition-transform duration-300 ease-in-out
+        className={`fixed top-16 border-r border-gray-200 left-0 z-50 w-64 h-[calc(100vh-4rem)] bg-surface shadow-xl transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0 md:static md:flex md:flex-col md:w-full md:h-full`}
       >
@@ -60,7 +60,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
         <div className="p-4 border-t border-slate-700 shrink-0">
           <button
             onClick={handleLogout}
-            className="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-md transition-colors font-medium text-sm"
+            className="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-md transition-colors font-medium text-sm cursor-pointer"
           >
             Logout
           </button>

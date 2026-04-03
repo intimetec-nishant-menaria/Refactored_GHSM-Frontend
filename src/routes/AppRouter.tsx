@@ -36,11 +36,13 @@ export default function AppRouter() {
           <Route element={<AuthGuard allowedRoles={["Guard"]} />}>
             <Route path="/guard/dashboard" element={<CheckInOutManagement />} />
           </Route>
-          
         </Route>
       </Route>
 
-      <Route path="*" element={<NotFound />} />
+      
+      <Route element={<AuthGuard />}>
+        <Route path="*" element={<NotFound />} />
+      </Route>
     </Routes>
   );
 }

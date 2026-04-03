@@ -52,7 +52,7 @@ const MyBookings = () => {
         .then(() => {
           toast.success("Booking cancelled successfully.");
         })
-        .catch((error: unknown) => {
+        .catch((error: any) => {
           toast.error(error?.data.message || "Failed to cancel booking.");
         });
 
@@ -90,7 +90,7 @@ const MyBookings = () => {
         Loading bookings...
       </p>
     );
-  if (isError) return <p className="p-6 text-center text-red-500">{error}</p>;
+  if (isError) return <p className="p-6 text-center text-red-500">{error as string}</p>;
 
   return (
     <div className="p-4 md:p-6 bg-gray-100 min-h-screen w-full">

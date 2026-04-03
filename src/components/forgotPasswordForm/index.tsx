@@ -30,7 +30,7 @@ const onSubmit =async (data: ForgotPasswordInput) => {
    try{
       await forgotPassword(data).unwrap();
       toast.success("Reset link sent to your email!");
-   }catch(err){
+   }catch(err:any){
      toast.error(err?.data.message || "Failed to send reset link");
    }
 };

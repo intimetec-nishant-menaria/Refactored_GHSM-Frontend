@@ -1,36 +1,27 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState} from "react";
 import Input from "../../common/input/Input";
 import toast from "react-hot-toast";
 import { useAddRoomMutation } from "@/app/Api's/room";
-
-const numberRegex = /^\d*$/;
+import { useForm } from "react-hook-form";
+import { addRoomSchema, type addRoom } from "@/utils/schemas/addRoom";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 function AddRoomForm({ closeModel }: { closeModel: () => void }) {
-  const [roomNumber, setRoomNumber] = useState("");
-  const [floor, setFloor] = useState("");
-  const [numberError, setNumberError] = useState(false);
-  const [floorError, setFloorError] = useState(false); 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [addRoom] = useAddRoomMutation();
 
-  async function handleOnSubmit(e: FormEvent) {
-    e.preventDefault();
-    const isRoomEmpty = roomNumber.trim() === "";
-    const isFloorEmpty = floor.trim() === "";
+  const {
+    register,
+    handleSubmit,
+    formState : {errors}
+  } = useForm<addRoom>({
+    resolver : zodResolver(addRoomSchema)
+  })
 
-    if (isRoomEmpty || isFloorEmpty) {
-      if (isRoomEmpty) setNumberError(true);
-      if (isFloorEmpty) setFloorError(true);
-      return;
-    }
-
-    if (!numberError && !floorError) {
+  async function handleOnSubmit(data:addRoom) {
       setIsSubmitting(true);
       try {
-        await addRoom({ 
-          roomNumber, 
-          floor: Number(floor) 
-        }).unwrap();
+        await addRoom(data).unwrap();
         
         toast.success("Room added successfully!");
         closeModel();
@@ -39,31 +30,10 @@ function AddRoomForm({ closeModel }: { closeModel: () => void }) {
       } finally {
         setIsSubmitting(false);
       }
-    }
-  }
-
-  function handleRoomChange(e: ChangeEvent<HTMLInputElement>) {
-    const value = e.target.value;
-    if (numberRegex.test(value)) {
-      setNumberError(false);
-      setRoomNumber(value);
-    } else {
-      setNumberError(true);
-    }
-  }
-
-  function handleFloorChange(e: ChangeEvent<HTMLInputElement>) {
-    const value = e.target.value;
-    if (numberRegex.test(value)) {
-      setFloorError(false);
-      setFloor(value);
-    } else {
-      setFloorError(true);
-    }
   }
 
   return (
-    <form onSubmit={handleOnSubmit} className="p-8 flex flex-col gap-6">
+    <form onSubmit={handleSubmit(handleOnSubmit)} className="p-8 flex flex-col gap-6">
       <div className="flex flex-col gap-5">
         
         <div className="flex flex-col gap-2">
@@ -74,11 +44,10 @@ function AddRoomForm({ closeModel }: { closeModel: () => void }) {
             type="text"
             id="RoomNumber"
             placeholder="e.g. 101"
-            value={roomNumber}
-            onChange={handleRoomChange}
-            className={numberError ? "border-red-500 focus:ring-red-100" : ""}
+            {...register("roomNumber")}
+            className={errors.roomNumber ? "border-red-500 focus:ring-red-100" : ""}
           />
-          {numberError && (
+          {errors.roomNumber && (
             <p className="text-red-500 text-xs font-medium italic">
               Room Number must be a valid numeric value.
             </p>
@@ -92,11 +61,10 @@ function AddRoomForm({ closeModel }: { closeModel: () => void }) {
             type="text"
             id="Floor"
             placeholder="e.g. 1"
-            value={floor}
-            onChange={handleFloorChange}
-            className={floorError ? "border-red-500 focus:ring-red-100" : ""}
+            {...register("floor" , {valueAsNumber : true})}
+            className={errors.floor ? "border-red-500 focus:ring-red-100" : ""}
           />
-          {floorError && (
+          {errors.floor && (
             <p className="text-red-500 text-xs font-medium italic">
               Please enter a valid floor number.
             </p>

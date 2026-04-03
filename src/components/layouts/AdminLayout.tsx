@@ -9,7 +9,7 @@ function AdminLayout() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="flex flex-col h-screen w-full bg-gray-100 overflow-hidden">
+    <div className="flex flex-col h-screen w-full bg-layout overflow-hidden">
       <header className="w-full shrink-0 z-50">
         <Topbar onMenuClick={() => setIsOpen(prev=>!prev)} isMenuOpen={isOpen} />
       </header>

@@ -37,7 +37,7 @@ const Topbar = ({ onMenuClick , isMenuOpen}: TopbarProps) => {
     <div className="h-16 w-full bg-white shadow-sm flex items-center px-4 md:px-6 shrink-0 z-30">
       <div className="flex w-full justify-between items-center">
         <div className="flex items-center gap-3">
-          {(user?.role !=="Admin" || user?.role !=="Ops")  && (
+          {(user?.role ==="Admin" || user?.role ==="Ops")  && (
             <button
               onClick={onMenuClick}
               className="p-2 hover:bg-gray-100 rounded-md md:hidden transition-colors"

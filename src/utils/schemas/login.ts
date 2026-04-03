@@ -3,8 +3,9 @@ import { z } from "zod";
 export const loginSchema = z.object({
   email: z
     .string()
-    .email("Invalid email address")
-    .nonempty("Email is required"),
+    .nonempty("Email is required")
+    .regex(/^[a-zA-Z0-9._%+-]+@intimetec\.com$/, "Email must be an @intimetec.com address"),
+
 
   password: z
     .string()

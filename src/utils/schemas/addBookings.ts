@@ -1,5 +1,5 @@
 import { z } from "zod";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 
 export const BookingSchema = z.object({
   id : z.number().optional(),
@@ -11,7 +11,9 @@ export const BookingSchema = z.object({
   
   guestEmail: z
     .string()
-    .email("Please enter a valid email address"),
+    .nonempty("Email is required")
+    .regex(/^[a-zA-Z0-9._%+-]+@intimetec\.com$/, "Email must be an @intimetec.com address"),
+
   
   gender: z
     .number()
@@ -21,15 +23,13 @@ export const BookingSchema = z.object({
     .number()
     .min(1, "Please select an available room from the list"),
 
-  checkInDate: z
-    .custom<Dayjs>((val) => dayjs(val).isValid(), {
-      message: "Check-in date is required",
-    }),
+  checkInDate: z.any().refine((val) => dayjs(val).isValid(), {
+    message: "Check-in date is required",
+  }),
   
-  checkOutDate: z
-    .custom<Dayjs>((val) => dayjs(val).isValid(), {
-      message: "Check-out date is required",
-    }),
+  checkOutDate: z.any().refine((val) => dayjs(val).isValid(), {
+    message: "Check-out date is required",
+  }),
 })
 .refine((data) => data.checkOutDate.isAfter(data.checkInDate), {
   message: "Check-out date must be after the check-in date",

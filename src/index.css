@@ -2,14 +2,34 @@
 
 body {
     font-family: "Inter", sans-serif;
+}
 
+
+@theme {
+  --color-layout: rgb(var(--color-bg-layout));
+  --color-surface: rgb(var(--color-bg-surface));
+  --color-muted: rgb(var(--color-bg-muted));
+
+  --color-text-main: rgb(var(--color-text-main));
+  --color-text-muted: rgb(var(--color-text-muted));
+
+  --color-border: rgb(var(--color-border));
+
+  --color-primary: rgb(var(--color-primary));
+  --color-primary-hover: rgb(var(--color-primary-hover));
+
+  --color-danger: rgb(var(--color-danger));
+  --color-danger-hover: rgb(var(--color-danger-hover));
+
+  --color-success: rgb(var(--color-success));
+  --color-success-hover: rgb(var(--color-success-hover));
 }
 
 @layer base {
   :root {
     --color-bg-layout: 243 244 246;  
-    --color-bg-surface: 255 255 255; 
-    --color-bg-muted: 248 250 252;
+    --color-bg-surface: 255 255 255;
+    --color-bg-muted: 229 231 235;
     
     --color-text-main: 15 23 42;     
     --color-text-muted: 100 116 139; 
@@ -17,7 +37,12 @@ body {
     --color-border: 226 232 240;     
     
     --color-primary: 79 70 229;      
-    --color-danger: 239 68 68;       
-    --color-success: 16 185 129;     
+    --color-primary-hover: 67 56 202;  
+
+    --color-danger: 239 68 68;         
+    --color-danger-hover: 220 38 38;   
+
+    --color-success: 16 185 129;  
+    --color-success-hover: 5 150 105;    
   }
 }

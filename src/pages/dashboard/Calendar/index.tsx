@@ -2,7 +2,7 @@ import { useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import type { DatesSetArg } from "@fullcalendar/core";
+import type { DatesSetArg, EventInput } from "@fullcalendar/core";
 import calendarIcon from "@/assets/calendarIcon.png";
 import crossIcon from "@/assets/crossIcon.png";
 import type { BookingPayload } from "@/utils/interfaces/booking";
@@ -10,7 +10,7 @@ import { useLazyFetchBookingByRangeQuery } from "@/app/Api's/booking";
 
 
 function Calendar() {
-  const [events, setEvents] = useState<unknown[]>([]);
+  const [events, setEvents] = useState<EventInput[]>([]);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [triggerFetchBookingByRange ] = useLazyFetchBookingByRangeQuery();
 
@@ -32,7 +32,7 @@ function Calendar() {
         userId: booking.guestId,
       },
     }));
-    setEvents(formatedData ?? []);
+    setEvents(formatedData);
   };
 
   function getStatusColor(status: number) {

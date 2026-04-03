@@ -8,17 +8,13 @@ import {
   resetPasswordSchema,
   type ResetPasswordInput,
 } from "@/utils/schemas/resetPassword";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "@/app/store/store";
-import { resetPassword } from "@/app/asyncThunk/auth";
 import { useNavigate } from "react-router-dom";
 import { useQueryParams } from "@/hooks/useQueryParams";
-import { useRef } from "react";
+import { useResetPasswordMutation } from "@/app/Api's/auth";
 
 const ResetPasswordForm = () => {
-  const ref = useRef<HTMLButtonElement>(null);
-  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const [resetPassword] = useResetPasswordMutation();
   const { token, email } = useQueryParams<{
     token: string | null;
     email: string | null;
@@ -31,29 +27,25 @@ const ResetPasswordForm = () => {
     resolver: zodResolver(resetPasswordSchema),
   });
 
-  const onSubmit = (data: ResetPasswordInput) => {
+  const onSubmit =async (data: ResetPasswordInput) => {
     if (!token || !email) {
       toast.error("Invalid or expired reset link");
       return;
     }
-    console.log(email ,token);
-    dispatch(
-      resetPassword({
-        email,
-        token,
-        password: data.password,
-        confirmPassword: data.confirmPassword,
-      }),
-    ).then((resultAction) => {
-      if (resetPassword.fulfilled.match(resultAction)) {
+    
+      try{
+        await resetPassword({
+          email,
+          token,
+          password: data.password,
+          confirmPassword: data.confirmPassword,
+        }).unwrap();
         toast.success("Password reset successful!");
         navigate("/", { replace: true });
-      } else {
-        toast.error(
-          (resultAction.payload as string) || "Failed to reset password",
+      }catch(err:any){
+          toast.error(err?.data.message || "Failed to reset password",
         );
       }
-    });
   };
 
   return (
@@ -84,7 +76,7 @@ const ResetPasswordForm = () => {
           </p>
         )}
       </div>
-      <Button type="submit" label="Reset Password" ref={ref}></Button>
+      <Button type="submit" label="Reset Password" ></Button>
     </form>
   );
 };

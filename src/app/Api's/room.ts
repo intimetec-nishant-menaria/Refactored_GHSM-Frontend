@@ -1,6 +1,7 @@
 import type { RoomSummary } from "@/pages/dashboard/dashBoardCards/cardInterfaces";
 import type { paging } from "@/utils/interfaces/paging";
 import type { fetchAllRoomArgs, RoomData, UpdateRoomPayload } from "@/utils/interfaces/room";
+import type { addRoom } from "@/utils/schemas/addRoom";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export const roomAPi = createApi({
@@ -24,7 +25,7 @@ export const roomAPi = createApi({
             }),
             invalidatesTags : ["room"]
         }),
-        addRoom : builder.mutation<void,RoomData>({
+        addRoom : builder.mutation<void,addRoom>({
             query : (data)=>({
                 url : "/createRoom",
                 method : "POST",

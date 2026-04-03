@@ -8,14 +8,14 @@ import { useUpdateBookingMutation } from "@/app/Api's/booking";
 import { useLazyGetAllAvailableRoomsQuery } from "@/app/Api's/availableRoom";
 import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
 import { BookingSchema, type BookingInput } from "@/utils/schemas/addBookings";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import type { RoomData } from "@/utils/interfaces/room";
 import type { BookingPayload } from "@/utils/interfaces/booking";
 
 const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload>) => {
   const [updateBooking] = useUpdateBookingMutation();
   const [fetchRooms, { data: availableRooms, isLoading: loadingRooms }] = useLazyGetAllAvailableRoomsQuery();
-  console.log(data);
+
   const {
     register,
     handleSubmit,
@@ -49,14 +49,27 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
     }
   }, [selectedGender, checkIn, checkOut, fetchRooms]);
 
-  const handleDateClick = (date: any) => {
-    if (!checkIn || (checkIn && checkOut)) {
-      setValue("checkInDate", date!, { shouldValidate: true });
-      setValue("checkOutDate", null as any);
-    } else {
-      setValue("checkOutDate", date!, { shouldValidate: true });
+  const handleCheckInClick = (newDate: Dayjs | null) => {
+    if (!newDate) return;
+  
+    setValue("checkInDate", newDate, { shouldValidate: true });
+  
+    if (checkOut && newDate.isAfter(checkOut)) {
+      setValue("checkOutDate", null as any, { shouldValidate: true });
     }
   };
+  
+  const handleCheckOutClick = (newDate: Dayjs | null) => {
+    if (!newDate) return;
+  
+    if (checkIn && newDate.isBefore(checkIn)) {
+      setValue("checkInDate", newDate, { shouldValidate: true });
+      setValue("checkOutDate", null as any, { shouldValidate: true });
+    } else {
+      setValue("checkOutDate", newDate, { shouldValidate: true });
+    }
+  };
+  
 
   const onSubmit = async (formData: BookingInput) => {
     try {
@@ -80,7 +93,6 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
         </label>
         <Input 
           {...register("bugId")} 
-          error={!!errors.bugId} 
           placeholder="System Bug ID" 
           className="bg-slate-50/50"
         />
@@ -97,7 +109,6 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
           <label className="text-sm font-semibold text-slate-700">Guest Name</label>
           <Input 
             {...register("guestName")} 
-            error={!!errors.guestName} 
             placeholder="Full Name" 
           />
           {errors.guestName && (
@@ -111,7 +122,6 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
           <label className="text-sm font-semibold text-slate-700">Guest Email</label>
           <Input 
             {...register("guestEmail")} 
-            error={!!errors.guestEmail} 
             placeholder="email@example.com" 
           />
           {errors.guestEmail && (
@@ -126,12 +136,13 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
         <DateRangePicker
           checkIn={checkIn}
           checkOut={checkOut}
-          handleDateClick={handleDateClick}
+          handleCheckInClick={handleCheckInClick}
+          handleCheckOutClick={handleCheckOutClick}
           allowPast={false}
         />
         {errors.checkOutDate && (
           <span className="text-xs text-red-500 font-medium italic">
-            {errors.checkOutDate.message}
+            {errors.checkOutDate.message as string}
           </span>
         )}
       </div>
@@ -140,7 +151,7 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
           <label className="text-sm font-semibold text-slate-700">Guest Gender</label>
           <select
             {...register("gender", { valueAsNumber: true })}
-            className="border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all shadow-sm text-sm font-medium h-[46px]"
+            className="border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all shadow-sm text-sm font-medium"
           >
             <option value={0}>-- Select Gender --</option>
             <option value={1}>Female</option>
@@ -157,14 +168,14 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
           <select
             {...register("roomId", { valueAsNumber: true })}
             disabled={loadingRooms}
-            className={`border p-3 rounded-xl outline-none transition-all bg-white shadow-sm text-sm font-medium h-[46px] ${
+            className={`border p-3 rounded-xl outline-none transition-all bg-white shadow-sm text-sm font-medium ${
               errors.roomId ? "border-red-400" : "border-slate-200 focus:ring-2 focus:ring-blue-500"
             }`}
           >
             <option value={0}>-- Select Room --</option>
             {availableRooms?.map((room: RoomData) => (
               <option key={room.id} value={room.id}>
-                Room {room.roomNumber} {room?.CurrentOccupancy ? "(Currently Occupied)" : "(Empty)"}
+                Room {room.roomNumber} {room?.currentOccupancy ? "(Currently Occupied)" : "(Empty)"}
               </option>
             ))}
             {!availableRooms?.find(r => r.id === data.roomId) && (

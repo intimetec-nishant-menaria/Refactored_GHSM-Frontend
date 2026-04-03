@@ -1,8 +1,8 @@
 import { useForm  } from "react-hook-form";
 import {
-  addUserSchema,
-  type addUserInput,
-} from "@/utils/schemas/addUser";
+  UserSchema,
+  type UserInput,
+} from "@/utils/schemas/User";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { useCreateUserMutation } from "@/app/Api's/user";
@@ -13,8 +13,8 @@ const CreateUserForm = ({ closeModel }: {closeModel:()=>void}) => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<addUserInput>({
-    resolver: zodResolver(addUserSchema),
+  } = useForm<UserInput>({
+    resolver: zodResolver(UserSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -24,12 +24,13 @@ const CreateUserForm = ({ closeModel }: {closeModel:()=>void}) => {
     },
   });
 
-  const onSubmit = async (data: addUserInput) => {
+  const onSubmit = async (data: UserInput) => {
     try {
       await createUser(data).unwrap();
       toast.success("User created successfully!");
       closeModel();
-    } catch(err) {
+    } catch(err:any) {
+      console.log(err);
       toast.error(err?.data.message || "An unexpected error occurred");
     }
   };

@@ -12,7 +12,7 @@ import { useLoginUserMutation } from "@/app/Api's/auth";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const [loginUser , {data , isSuccess}] = useLoginUserMutation();
+  const [loginUser , {data : responceUser }] = useLoginUserMutation();
   const {
     register,
     handleSubmit,
@@ -43,9 +43,9 @@ const LoginForm = () => {
     try{
       await loginUser(data).unwrap();
       toast.success("Welcome back!");
-      if(data?.user.role === "Admin" || data?.user.role === "Ops")
+      if(responceUser?.user.role === "Admin" || responceUser?.user.role === "Ops")
         navigate("/admin/dashboard", { replace: true });
-      else if(data?.user.role === "HR"){
+      else if(responceUser?.user.role === "HR"){
         navigate("/hr/dashboard", { replace: true });
       }
       else
@@ -104,12 +104,12 @@ const LoginForm = () => {
             />
             <span className="text-sm text-gray-600 group-hover:text-gray-800 transition-colors">Remember me</span>
           </label>
-          <span
+          {/* <span
             onClick={() => navigate("/forgot-password")}
             className="text-sm text-blue-600 font-medium hover:underline cursor-pointer transition-colors"
           >
             Forgot password?
-          </span>
+          </span> */}
         </div>
 
         <Button 
@@ -119,7 +119,7 @@ const LoginForm = () => {
           label={isSubmitting ? "Signing in..." : "Login"}
         />
 
-        <div className="pt-4 text-center border-t border-gray-100">
+        {/* <div className="pt-4 text-center border-t border-gray-100">
           <p className="text-sm text-gray-600">
             Don't have an account?{" "}
             <span
@@ -129,7 +129,7 @@ const LoginForm = () => {
               Sign up
             </span>
           </p>
-        </div>
+        </div> */}
       </form>
     </div>
   );

@@ -24,7 +24,7 @@ const SignUpForm = () => {
       await registerUser(data).unwrap();
       toast.success("User registered successfully!");
       navigate("/login", { replace: true });
-    }catch(err){
+    }catch(err:any){
       toast.error(err?.data.message || "Registration failed");
     }
   };

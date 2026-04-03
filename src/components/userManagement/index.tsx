@@ -13,7 +13,7 @@ import UpdateUserForm from "./updateUserForm";
 import { useDeleteUserMutation, useFetchAllUsersQuery } from "@/app/Api's/user";
 
 const UserManagement = () => {
-  const navigate = useNavigate(); // 2. Initialize navigate
+  const navigate = useNavigate(); 
   const { user: currentUser } = useAppSelector((state) => state.auth);
 
   const [isCreateFormOpen, setIsCreateFormOpen] = useState(false);
@@ -46,9 +46,8 @@ const UserManagement = () => {
   const handleViewHistory = (user: User) => {
     navigate(`/auditLog?entityName=User&entityId=${user.id}`);
   };
-
   const handleDelete = async (targetUserId: number) => {
-    if (targetUserId === currentUser?.id) {
+    if (targetUserId == currentUser?.id) {
       toast.error("You cannot delete your own administrative account.");
       return;
     }
@@ -137,7 +136,6 @@ const UserManagement = () => {
                   </td>
                   <td className="py-5 px-8 text-right whitespace-nowrap">
                     <div className="flex justify-end items-center gap-3 flex-nowrap shrink-0">
-                      {/* History Button (Desktop) */}
                       <button 
                         onClick={() => handleViewHistory(u)}
                         title="View Activity Logs"
@@ -198,7 +196,6 @@ const UserManagement = () => {
                 </span>
               </div>
               <div className="flex gap-2">
-                {/* History Button (Mobile) */}
                 <button 
                   onClick={() => handleViewHistory(u)} 
                   className="p-2.5 bg-blue-50 text-blue-600 rounded-xl shrink-0"

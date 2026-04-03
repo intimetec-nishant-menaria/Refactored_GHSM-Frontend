@@ -11,8 +11,6 @@ import {
   type ChangePasswordInput,
 } from "@/utils/schemas/changePassword";
 
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "@/app/store/store";
 import { useNavigate } from "react-router-dom";
 import { useChangePasswordMutation } from "@/app/Api's/auth";
 
@@ -34,7 +32,7 @@ const ChangePasswordForm = () => {
       await changePassword({ OldPassword: data.OldPassword,NewPassword: data.NewPassword,}).unwrap();
       toast.success("Password changed successfully!", {duration: 2000})
       navigate("/");
-     }catch(err){
+     }catch(err : any){
        toast.error(err?.data.message || "Failed to change password",)
      }
   };
