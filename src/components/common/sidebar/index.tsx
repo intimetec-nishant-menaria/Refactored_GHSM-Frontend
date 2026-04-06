@@ -37,16 +37,17 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          className="fixed inset-0 bg-text-main/40 backdrop-blur-sm z-40 md:hidden transition-all"
           onClick={() => setIsOpen(false)}
         />
       )}
+
       <div
-        className={`fixed top-16 border-r border-gray-200 left-0 z-50 w-64 h-[calc(100vh-4rem)] bg-surface shadow-xl transform transition-transform duration-300 ease-in-out
+        className={`fixed top-16 border-r border-border left-0 z-50 w-64 h-[calc(100vh-4rem)] bg-surface shadow-2xl md:shadow-none transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0 md:static md:flex md:flex-col md:w-full md:h-full`}
       >
-        <nav className="flex-1 w-full overflow-y-auto p-4 pr-0 space-y-1">
+        <nav className="flex-1 w-full overflow-y-auto p-4 pr-0 space-y-2">
           {menuItems.map((item) => (
             <SidebarItem
               key={item.path}
@@ -57,10 +58,10 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-slate-700 shrink-0">
+        <div className="p-4 border-t border-muted bg-layout/10 shrink-0">
           <button
             onClick={handleLogout}
-            className="w-full bg-red-600 hover:bg-red-700 py-2.5 rounded-md transition-colors font-medium text-sm cursor-pointer"
+            className="w-full bg-danger text-surface hover:bg-danger-hover py-3 rounded-xl transition-all font-bold text-xs uppercase tracking-widest shadow-lg shadow-danger/20 active:scale-95 cursor-pointer"
           >
             Logout
           </button>

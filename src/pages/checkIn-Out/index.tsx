@@ -78,135 +78,123 @@ const CheckInOutManagement = () => {
     setConfirmationModel(false);
   };
 
-  function handleCheckInClick(newDate: Dayjs | null){
+  const handleDateChange = (type: 'start' | 'end', newDate: Dayjs | null) => {
     if(!newDate) return;
-
-    if(dateRange.startDate?.isAfter(dateRange.endDate)){
-      setDateRange({startDate : newDate , endDate : null});
-    }else{
-      setDateRange({startDate : newDate , endDate : dateRange.endDate});
-    }
-  }
-
-  function handleCheckOutClick(newDate: Dayjs | null){
-    if(!newDate) return;
-
-    if(dateRange.endDate?.isBefore(dateRange.startDate)){
-      setDateRange({startDate: newDate , endDate : null});
-    }else{
-       setDateRange({startDate: dateRange.startDate , endDate : newDate});
-    }
-  }
+    setDateRange(prev => ({
+        ...prev,
+        [type === 'start' ? 'startDate' : 'endDate']: newDate
+    }));
+  };
 
   const getStatusBadge = (status: number) => {
     const styles: Record<number, string> = {
-      1: "bg-blue-50 text-blue-600 border-blue-100",
-      2: "bg-emerald-50 text-emerald-600 border-emerald-100",
-      3: "bg-slate-50 text-slate-500 border-slate-100",
-      4: "bg-red-50 text-red-600 border-red-100",
+      1: "bg-primary/10 text-primary border-primary/20",
+      2: "bg-success/10 text-success border-success/20",
+      3: "bg-muted text-text-muted border-border",
+      4: "bg-danger/10 text-danger border-danger/20",
     };
     const labels: Record<number, string> = { 1: "Booked", 2: "In House", 3: "Completed", 4: "Cancelled" };
     return (
-      <span className={`px-2.5 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider ${styles[status]}`}>
+      <span className={`px-2.5 py-0.5 rounded-full border text-[10px] font-black uppercase tracking-wider ${styles[status]}`}>
         {labels[status]}
       </span>
     );
   };
 
-  if (isError) return <div className="p-8 text-red-500 font-bold">Error loading bookings. Please try again.</div>;
+  if (isError) return <div className="p-8 text-danger font-black bg-layout min-h-screen">Error loading bookings. Please try again.</div>;
 
   return (
-    <div className="p-4 md:p-8 min-h-screen w-full font-sans ">
+    <div className="p-4 md:p-8 min-h-screen w-full font-sans bg-layout">
       <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-6">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Front Desk Operations</h1>
-          <p className="text-slate-500 text-sm">
-            Manage arrivals and departures for <span className="font-bold text-slate-700">{dateRange.startDate?.format("MMM DD")} — {dateRange.endDate?.format("MMM DD")}</span>
+          <h1 className="text-2xl font-black text-text-main tracking-tight uppercase">Front Desk Operations</h1>
+          <p className="text-text-muted text-sm font-medium">
+            Manage arrivals and departures for <span className="font-black text-text-main underline decoration-primary/30">{dateRange.startDate?.format("MMM DD")} — {dateRange.endDate?.format("MMM DD")}</span>
           </p>
         </div>
         
-        <div className="flex bg-white p-1 rounded-2xl shadow-sm border border-slate-200">
+        <div className="flex bg-surface p-1.5 rounded-2xl shadow-sm border border-border">
           <button 
             onClick={() => setActiveTab("checkin")} 
-            className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === "checkin" ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" : "text-slate-400 hover:bg-slate-50"}`}
+            className={`px-8 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "checkin" ? "bg-primary text-surface shadow-lg shadow-primary/20" : "text-text-muted hover:bg-layout"}`}
           >
-            Check-In 
+            Arrivals
           </button>
           <button 
             onClick={() => setActiveTab("checkout")} 
-            className={`px-6 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === "checkout" ? "bg-indigo-600 text-white shadow-lg shadow-indigo-100" : "text-slate-400 hover:bg-slate-50"}`}
+            className={`px-8 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "checkout" ? "bg-primary text-surface shadow-lg shadow-primary/20" : "text-text-muted hover:bg-layout"}`}
           >
-            Check-Out 
+            Departures
           </button>
         </div>
       </div>
       {user?.role !== "Guard" && (
-        <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mb-8 flex flex-col lg:flex-row items-center gap-6">
+        <div className="bg-surface p-6 rounded-3xl shadow-sm border border-border mb-8 flex flex-col lg:flex-row items-center gap-6">
           <DateRangePicker 
             checkIn={dateRange.startDate} 
             checkOut={dateRange.endDate} 
-            handleCheckInClick={handleCheckInClick}
-            handleCheckOutClick={handleCheckOutClick}
+            handleCheckInClick={(d) => handleDateChange('start', d)}
+            handleCheckOutClick={(d) => handleDateChange('end', d)}
             allowPast={true}
           />
-        <div className="h-10 bg-slate-100 hidden lg:block" />
+        <div className="h-10 w-px bg-border hidden lg:block" />
         <div className="flex flex-wrap gap-4 flex-1 w-full">
             <input
               type="text"
-              placeholder="Search by Guest Name"
+              placeholder="Filter by Guest Name..."
               value={searchUser}
               onChange={(e) => setSearchUser(e.target.value)}
-              className="flex-1 border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-blue-50 outline-none text-sm transition-all bg-slate-50/30"
+              className="flex-1 border border-border p-3 rounded-xl focus:ring-4 focus:ring-primary/5 outline-none text-sm font-bold transition-all bg-layout/30 text-text-main"
             />
             <input
               type="text"
               placeholder="Room #"
               value={roomFilter}
               onChange={(e) => setRoomFilter(e.target.value)}
-              className="w-28 border border-slate-200 p-3 rounded-xl focus:ring-4 focus:ring-blue-50 outline-none text-sm transition-all text-center font-bold"
+              className="w-28 border border-border p-3 rounded-xl focus:ring-4 focus:ring-primary/5 outline-none text-sm transition-all text-center font-black bg-layout/30 text-text-main"
             />
           </div>
         </div>
       )}
-      <div className="overflow-hidden bg-white rounded-3xl border border-slate-100 shadow-sm mb-6">
+      <div className="overflow-hidden bg-surface rounded-3xl border border-border shadow-sm mb-6">
         <div className="overflow-x-auto">
-          <table className="min-w-full text-left">
-            <thead className="bg-slate-50 text-slate-500 border-b text-[10px] uppercase font-bold tracking-widest">
+          <table className="min-w-full text-left table-auto">
+            <thead className="bg-muted text-text-muted border-b border-border text-[10px] uppercase font-black tracking-widest">
               <tr>
-                <th className="py-5 px-8">Guest</th>
-                <th className="py-5 px-8">Room</th>
-                <th className="py-5 px-8">Check-In Date</th>
-                <th className="py-5 px-8">Check-Out Date</th>
+                <th className="py-5 px-8">Guest Identity</th>
+                <th className="py-5 px-8">Unit</th>
+                <th className="py-5 px-8">Arrival</th>
+                <th className="py-5 px-8">Departure</th>
                 <th className="py-5 px-8">Status</th>
-                <th className="py-5 px-8 text-right">Action</th>
+                <th className="py-5 px-8 text-right">Operation</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-muted">
               {isLoading ? (
                 <tr>
-                   <td colSpan={6} className="py-20 text-center text-blue-600 font-bold animate-pulse">Loading Records...</td>
+                   <td colSpan={6} className="py-20 text-center text-primary font-black animate-pulse uppercase tracking-widest text-xs">Synchronizing Records...</td>
                 </tr>
               ) : currentItems.length > 0 ? currentItems.map((b) => (
-                <tr key={b.id} className="hover:bg-blue-50/20 transition-colors group">
-                  <td className="py-5 px-8 font-semibold text-slate-800">{b.guestName}</td>
-                  <td className="py-5 px-8 font-medium text-slate-600">Room {b.roomNumber}</td>
+                <tr key={b.id} className="hover:bg-primary/5 transition-colors group">
+                  <td className="py-5 px-8 font-bold text-text-main text-sm">{b.guestName}</td>
+                  <td className="py-5 px-8 font-black text-text-muted text-xs uppercase tracking-tighter">Room {b.roomNumber}</td>
                   <td className="py-5 px-8">
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-700">{dayjs(b.checkInDate).format("DD MMM YYYY")}</span>
-                      <span className="text-[10px] text-slate-400">Scheduled Arrival</span>
+                      <span className="text-sm font-black text-text-main">{dayjs(b.checkInDate).format("DD MMM YYYY")}</span>
+                      <span className="text-[9px] font-bold text-text-muted uppercase tracking-wider">Scheduled</span>
                     </div>
                   </td>
                   <td className="py-5 px-8">
                     <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-700">{dayjs(b.checkOutDate).format("DD MMM YYYY")}</span>
-                      <span className="text-[10px] text-slate-400">Scheduled Departure</span>
+                      <span className="text-sm font-black text-text-main">{dayjs(b.checkOutDate).format("DD MMM YYYY")}</span>
+                      <span className="text-[9px] font-bold text-text-muted uppercase tracking-wider">Scheduled</span>
                     </div>
                   </td>
                   <td className="py-5 px-8">{getStatusBadge(b.status)}</td>
                   <td className="py-5 px-8 text-right">
                     <button 
                       onClick={() => { setBookingId(b.id); setConfirmationModel(true); }} 
-                      className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-white shadow-md transition-all active:scale-95 ${activeTab === 'checkin' ? 'bg-emerald-500 hover:bg-emerald-600 shadow-emerald-100' : 'bg-orange-500 hover:bg-orange-600 shadow-orange-100'}`}
+                      className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest text-white shadow-lg transition-all active:scale-95 ${activeTab === 'checkin' ? 'bg-success hover:bg-success-hover shadow-success/20' : 'bg-orange-500 hover:bg-orange-600 shadow-orange-500/20'}`}
                     >
                       Confirm {activeTab}
                     </button>
@@ -214,16 +202,15 @@ const CheckInOutManagement = () => {
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={6} className="py-20 text-center text-slate-400 italic">No pending {activeTab}s found.</td>
+                  <td colSpan={6} className="py-20 text-center text-text-muted italic font-medium text-sm">No pending {activeTab} operations found for this range.</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
       </div>
-
       <div className="flex justify-center mt-10">
-        {filteredBookings.length !==0  && (
+        {filteredBookings.length !== 0 && (
           <PagingController 
             dataLength={filteredBookings.length} 
             itemPerPage={itemsPerPage} 
@@ -234,14 +221,13 @@ const CheckInOutManagement = () => {
           />
         )}  
       </div>
-
       {isConfirmationModelOpen && (
         <ConfirmationModel 
-          label={`Confirm ${activeTab} for ${filteredBookings.find(b => b.id === bookingId)?.guestName}?`}
+          label={`Are you ready to process the ${activeTab === 'checkin' ? 'Arrival' : 'Departure'} for ${filteredBookings.find(b => b.id === bookingId)?.guestName}?`}
           isConfirmationModelOpen={setConfirmationModel} 
-          actionText={activeTab }
+          actionText={activeTab === 'checkin' ? 'Check-In' : 'Check-Out'}
           submitAction={handleAction}
-          classname={activeTab === "checkin" ? "bg-emerald-500! hover:bg-emerald-600! shadow-emerald-100!" : 'bg-orange-500! hover:bg-orange-600! shadow-orange-100!'}
+          classname={activeTab === "checkin" ? "bg-success! hover:bg-success-hover! shadow-success/20!" : 'bg-orange-500! hover:bg-orange-600! shadow-orange-500/20!'}
         />
       )}
     </div>

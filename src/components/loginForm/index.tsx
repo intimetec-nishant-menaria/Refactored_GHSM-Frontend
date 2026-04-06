@@ -12,7 +12,8 @@ import { useLoginUserMutation } from "@/app/Api's/auth";
 
 const LoginForm = () => {
   const navigate = useNavigate();
-  const [loginUser , {data : responceUser }] = useLoginUserMutation();
+  const [loginUser, { data: responceUser }] = useLoginUserMutation();
+  
   const {
     register,
     handleSubmit,
@@ -40,100 +41,91 @@ const LoginForm = () => {
       localStorage.removeItem("rememberedEmail");
     }
     
-    try{
+    try {
       await loginUser(data).unwrap();
       toast.success("Welcome back!");
-      if(responceUser?.user.role === "Admin" || responceUser?.user.role === "Ops")
+      
+      if (responceUser?.user.role === "Admin" || responceUser?.user.role === "Ops")
         navigate("/admin/dashboard", { replace: true });
-      else if(responceUser?.user.role === "HR"){
+      else if (responceUser?.user.role === "HR") {
         navigate("/hr/dashboard", { replace: true });
       }
       else
-        navigate("/guard/dashboard", {replace:true})
-    }catch(err:any){
+        navigate("/guard/dashboard", { replace: true })
+        
+    } catch (err: any) {
       toast.error(err?.data.message || "Invalid credentials");
     }
   }
-  
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 pt-0 bg-white rounded-xl ">
+    <div className="w-full max-w-md mx-auto p-6 pt-0 bg-surface rounded-xl">
       <div className="mb-8 text-center">
-        <h2 className="text-3xl font-bold  text-gray-800">Welcome Back</h2>
+        <h2 className="text-3xl font-bold text-text-main tracking-tight">Welcome Back</h2>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <div className="space-y-1.5">
-          <Label htmlFor="email" className="text-sm font-semibold text-gray-700">Email Address</Label>
+          <Label htmlFor="email" className="text-sm font-semibold text-text-main">Email Address</Label>
           <Input
             id="email"
             type="email"
             placeholder="name@example.com"
-            className={`w-full transition-all duration-200 ${errors.email ? 'border-red-500 focus:ring-red-200' : 'focus:ring-blue-200'}`}
+            className={`w-full transition-all duration-200 bg-layout/10 ${
+              errors.email 
+                ? 'border-danger focus:ring-danger/10' 
+                : 'border-border focus:ring-primary/10'
+            }`}
             {...register("email")}
           />
           {errors.email && (
-            <p className="text-red-500 text-xs font-medium mt-1 animate-in fade-in slide-in-from-top-1">
+            <p className="text-danger text-xs font-medium mt-1 animate-in fade-in slide-in-from-top-1 italic">
               {errors.email.message}
             </p>
           )}
         </div>
+
         <div className="space-y-1.5">
-          <Label htmlFor="password" className="text-sm font-semibold text-gray-700">Password</Label>
+          <Label htmlFor="password" className="text-sm font-semibold text-text-main">Password</Label>
           <Input
             id="password"
             type="password"
             placeholder="••••••••"
-            className={`w-full transition-all duration-200 ${errors.password ? 'border-red-500 focus:ring-red-200' : 'focus:ring-blue-200'}`}
+            className={`w-full transition-all duration-200 bg-layout/10 ${
+              errors.password 
+                ? 'border-danger focus:ring-danger/10' 
+                : 'border-border focus:ring-primary/10'
+            }`}
             {...register("password")}
           />
           {errors.password && (
-            <p className="text-red-500 text-xs font-medium mt-1 animate-in fade-in slide-in-from-top-1">
+            <p className="text-danger text-xs font-medium mt-1 animate-in fade-in slide-in-from-top-1 italic">
               {errors.password.message}
             </p>
           )}
         </div>
 
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 cursor-pointer group">
+          <label className="flex items-center gap-2 cursor-pointer group p-1 rounded-lg hover:bg-layout transition-colors">
             <input 
               id="rememberMe" 
               type="checkbox" 
-              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+              className="w-4 h-4 rounded border-border text-primary focus:ring-primary/30 cursor-pointer"
               {...register("rememberMe")} 
             />
-            <span className="text-sm text-gray-600 group-hover:text-gray-800 transition-colors">Remember me</span>
+            <span className="text-sm text-text-muted group-hover:text-text-main transition-colors font-medium">Remember me</span>
           </label>
-          {/* <span
-            onClick={() => navigate("/forgot-password")}
-            className="text-sm text-blue-600 font-medium hover:underline cursor-pointer transition-colors"
-          >
-            Forgot password?
-          </span> */}
         </div>
 
         <Button 
           type="submit" 
           disabled={isSubmitting}
-          className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors shadow-md active:transform active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+          className="w-full py-3 bg-primary hover:bg-primary-hover text-surface font-bold rounded-xl transition-all shadow-lg shadow-primary/20 active:transform active:scale-[0.98] disabled:bg-primary/40 disabled:cursor-not-allowed"
           label={isSubmitting ? "Signing in..." : "Login"}
         />
-
-        {/* <div className="pt-4 text-center border-t border-gray-100">
-          <p className="text-sm text-gray-600">
-            Don't have an account?{" "}
-            <span
-              onClick={() => navigate("/register")}
-              className="text-blue-600 font-semibold hover:underline cursor-pointer"
-            >
-              Sign up
-            </span>
-          </p>
-        </div> */}
       </form>
     </div>
   );
 };
-
 
 export default LoginForm;

@@ -31,7 +31,7 @@ export const BookingSchema = z.object({
     message: "Check-out date is required",
   }),
 })
-.refine((data) => data.checkOutDate.isAfter(data.checkInDate), {
+.refine((data) => data.checkOutDate >= data.checkInDate, {
   message: "Check-out date must be after the check-in date",
   path: ["CheckOutDate"], 
 });

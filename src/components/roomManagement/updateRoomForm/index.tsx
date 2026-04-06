@@ -14,23 +14,23 @@ function UpdateRoomForm({ data, closeModel }: UpdateModelProps<RoomData>) {
   const {
     register,
     handleSubmit,
-    formState : {errors}
+    formState: { errors }
   } = useForm<updateRoom>({
-    resolver : zodResolver(updateRoomSchema),
-    defaultValues :{
-      id : data.id,
-      floor : data.floor,
-      roomNumber : data.roomNumber,
-      status : data.status
+    resolver: zodResolver(updateRoomSchema),
+    defaultValues: {
+      id: data.id,
+      floor: data.floor,
+      roomNumber: data.roomNumber,
+      status: data.status
     }
   })
   
   const [updateRoom] = useUpdateRoomMutation();
 
-  async function handleOnSubmit(data : updateRoom) {
+  async function handleOnSubmit(formData: updateRoom) {
       setIsSubmitting(true);
       try {
-        await updateRoom(data).unwrap();
+        await updateRoom(formData).unwrap();
         toast.success("Room updated successfully!");
         closeModel();
       } catch (error: any) {
@@ -41,40 +41,42 @@ function UpdateRoomForm({ data, closeModel }: UpdateModelProps<RoomData>) {
   }
 
   return (
-    <form onSubmit={handleSubmit(handleOnSubmit)} className="p-8 flex flex-col gap-6">
+    <form onSubmit={handleSubmit(handleOnSubmit)} className="p-8 flex flex-col gap-6 bg-surface">
       <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
-          <label htmlFor="RoomNumber" className="text-sm font-semibold text-slate-700">
+          <label htmlFor="RoomNumber" className="text-sm font-semibold text-text-main">
             Room Number
           </label>
           <Input
             type="text"
             id="RoomNumber"
             {...register("roomNumber")}
-            className={errors.roomNumber ? "border-red-500" : ""}
+            className={`bg-layout/10 text-text-main ${errors.roomNumber ? "border-danger focus:ring-danger/10" : "border-border focus:ring-primary/10"}`}
           />
-          {errors.roomNumber && <p className="text-red-500 text-xs italic">Numeric room number required.</p>}
+          {errors.roomNumber && <p className="text-danger text-xs font-medium italic">Numeric room number required.</p>}
         </div>
+
         <div className="flex flex-col gap-2">
-          <label htmlFor="Floor" className="text-sm font-semibold text-slate-700">
+          <label htmlFor="Floor" className="text-sm font-semibold text-text-main">
             Room Floor
           </label>
           <Input
             type="text"
             id="Floor"
-            {...register("floor" , {valueAsNumber : true})}
-            className={errors.floor ? "border-red-500" : ""}
+            {...register("floor", { valueAsNumber: true })}
+            className={`bg-layout/10 text-text-main ${errors.floor ? "border-danger focus:ring-danger/10" : "border-border focus:ring-primary/10"}`}
           />
-          {errors.floor && <p className="text-red-500 text-xs italic">Enter a valid floor number.</p>}
+          {errors.floor && <p className="text-danger text-xs font-medium italic">Enter a valid floor number.</p>}
         </div>
+
         <div className="flex flex-col gap-2">
-          <label htmlFor="Status" className="text-sm font-semibold text-slate-700">
+          <label htmlFor="Status" className="text-sm font-semibold text-text-main">
             Room Status
           </label>
           <select
             id="Status"
-            {...register("status" , {valueAsNumber:true})}
-            className="w-full px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-700"
+            {...register("status", { valueAsNumber: true })}
+            className="w-full px-4 py-2.5 border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/10 bg-layout/10 text-text-main font-medium cursor-pointer transition-all"
           >
             <option value={1}>Available</option>
             <option value={2}>Occupied</option>
@@ -82,21 +84,20 @@ function UpdateRoomForm({ data, closeModel }: UpdateModelProps<RoomData>) {
             <option value={4}>Out Of Order</option>
           </select>
         </div>
-
       </div>
 
-      <div className="flex items-center gap-3 pt-4 border-t border-slate-50">
+      <div className="flex items-center gap-3 pt-4 border-t border-muted">
         <button
           type="button"
           onClick={closeModel}
-          className="flex-1 px-4 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl"
+          className="flex-1 px-4 py-3 bg-muted text-text-muted font-bold rounded-xl hover:bg-border transition-all"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isSubmitting || !!errors.roomNumber || !!errors.floor}
-          className="flex-1 px-4 py-3 bg-blue-600 text-white font-bold rounded-xl disabled:bg-blue-400"
+          className="flex-1 px-4 py-3 bg-primary text-surface font-bold rounded-xl shadow-lg shadow-primary/20 hover:bg-primary-hover transition-all active:scale-95 disabled:bg-primary/40 disabled:cursor-not-allowed"
         >
           {isSubmitting ? "Updating..." : "Update Room"}
         </button>

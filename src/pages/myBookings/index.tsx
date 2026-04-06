@@ -70,7 +70,7 @@ const MyBookings = () => {
     const styles = {
       1: "bg-blue-100 text-blue-700 border border-blue-200",
       2: "bg-emerald-100 text-emerald-700 border border-emerald-200",
-      3: "bg-slate-100 text-slate-600 border border-slate-200",
+      3: "bg-slate-100 text-slate-600 border border-border",
       4: "bg-red-100 text-red-700 border border-red-200",
     };
     const label = labels[status as keyof typeof labels] || "Unknown";
@@ -97,7 +97,7 @@ const MyBookings = () => {
       <h1 className="text-xl md:text-2xl font-bold mb-6 text-gray-800">
         Booking Management
       </h1>
-      <div className="bg-white rounded-2xl p-4 flex flex-col lg:flex-row gap-4 mb-6">
+      <div className="bg-surface rounded-2xl p-4 flex flex-col lg:flex-row gap-4 mb-6">
         <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
           <input
             type="text"
@@ -106,7 +106,7 @@ const MyBookings = () => {
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setRoomFilter(e.target.value)
             }
-            className="border p-2 rounded focus:ring-2 focus:ring-blue-500 w-full sm:w-32 outline-none bg-white shadow-sm"
+            className="border p-2 rounded focus:ring-2 focus:ring-blue-500 w-full sm:w-32 outline-none bg-surface shadow-sm"
           />
         </div>
         <select
@@ -114,7 +114,7 @@ const MyBookings = () => {
           onChange={(e: ChangeEvent<HTMLSelectElement>) =>
             setStatusFilter(Number(e.target.value))
           }
-          className="border p-2 rounded focus:ring-2 focus:ring-blue-500 bg-white outline-none w-full lg:w-48 shadow-sm"
+          className="border p-2 rounded focus:ring-2 focus:ring-blue-500 bg-surface outline-none w-full lg:w-48 shadow-sm"
         >
           <option value={0}>All Status</option>
           <option value={1}>Booked</option>
@@ -126,7 +126,7 @@ const MyBookings = () => {
       <div className="grid grid-cols-1 gap-4 md:hidden">
         {bookings?.data.length ?? 0 > 0 ? (
           bookings?.data.map((b) => (
-            <div key={b.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+            <div key={b.id} className="bg-surface p-4 rounded-lg shadow-sm border border-gray-200">
               <div className="flex justify-between items-start mb-3">
                 <div className="max-w-[70%]">
                   <span className="text-[10px] font-bold text-gray-400 uppercase">ID: #{b.id}</span>
@@ -159,12 +159,12 @@ const MyBookings = () => {
             </div>
           ))
         ) : (
-          <div className="bg-white p-8 text-center rounded-lg text-gray-400">
+          <div className="bg-surface p-8 text-center rounded-lg text-gray-400">
             No bookings found matching your filters.
           </div>
         )}
       </div>
-      <div className="hidden md:block overflow-x-auto bg-white rounded-lg shadow-md mb-6">
+      <div className="hidden md:block overflow-x-auto bg-surface rounded-lg shadow-md mb-6">
         <table className="min-w-full text-left border-collapse">
           <thead className="bg-gray-200 text-gray-600 uppercase text-xs">
             <tr>
@@ -209,7 +209,7 @@ const MyBookings = () => {
                           setBookingId(b.id);
                           setConfirmationModel(true);
                         }}
-                        className="bg-red-500 hover:bg-red-600 hover:text-white text-red-600 px-4 py-1 rounded-full transition-all text-xs font-bold border border-red-200"
+                        className="bg-danger hover:bg-danger-hover hover:text-white text-red-600 px-4 py-1 rounded-full transition-all text-xs font-bold border border-red-200"
                       />
                     ) : (
                       <span className="text-gray-300 text-xs italic">N/A</span>

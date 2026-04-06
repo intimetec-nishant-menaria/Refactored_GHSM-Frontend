@@ -17,16 +17,16 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     ref,
   ) => {
     const baseStyles =
-      "rounded-lg border px-4 py-2 text-sm focus:outline-none focus:ring-2 transition";
+      "rounded-xl border px-4 py-2.5 text-sm font-medium focus:outline-none focus:ring-4 transition-all bg-layout/10 text-text-main placeholder:text-text-muted/50";
 
     const variants = {
-      default: "border-gray-300 focus:ring-blue-500 focus:border-blue-500",
-      error: "border-red-500 focus:ring-red-500 focus:border-red-500",
+      default: "border-border focus:ring-primary/10 focus:border-primary",
+      error: "border-danger focus:ring-danger/10 focus:border-danger",
     };
 
-    const checkboxStyles = "w-4 h-4 accent-blue-600 border-gray-300";
+    const checkboxStyles = "w-5 h-5 accent-primary border-border rounded-lg cursor-pointer";
 
-    const disabledStyles = disabled ? "opacity-50 cursor-not-allowed" : "";
+    const disabledStyles = disabled ? "opacity-40 cursor-not-allowed grayscale" : "";
 
     return (
       <input

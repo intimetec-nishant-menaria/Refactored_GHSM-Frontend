@@ -30,7 +30,7 @@ const SignUpForm = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-6 bg-white rounded-xl ">
+    <div className="w-full max-w-md mx-auto p-6 bg-surface rounded-xl ">
       <div className="mb-8 text-center">
         <h2 className="text-2xl font-bold text-gray-800">Create an Account</h2>
         <p className="text-gray-500 mt-2">Join our Guest House Management system</p>

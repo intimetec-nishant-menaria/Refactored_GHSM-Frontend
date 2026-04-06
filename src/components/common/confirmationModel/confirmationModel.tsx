@@ -1,40 +1,49 @@
 function ConfirmationModel({
   label,
   actionText,
-  classname ="",
+  classname = "",
   isConfirmationModelOpen,
   submitAction,
 }: {
-    label: string;
-    actionText? : string;
-    classname? : string;
-    isConfirmationModelOpen: (x: boolean) => void;
-    submitAction: () => void;
+  label: string;
+  actionText?: string;
+  classname?: string;
+  isConfirmationModelOpen: (x: boolean) => void;
+  submitAction: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-x-hidden overflow-y-auto outline-none focus:outline-none">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 outline-none focus:outline-none transition-all">
       <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity" 
+        className="fixed inset-0 bg-text-main/40 backdrop-blur-sm transition-opacity" 
+        onClick={() => isConfirmationModelOpen(false)}
       />
-      <div className="relative w-full max-w-md p-6 mx-auto bg-white rounded-2xl shadow-2xl transform transition-all">
+      
+      <div className="relative w-full max-w-md p-8 mx-auto bg-surface rounded-[2rem] shadow-2xl border border-border transform transition-all animate-in zoom-in duration-200">
         <div className="text-center">
-          <h3 className="text-lg font-semibold text-gray-900">Confirm Action</h3>
-          <p className="mt-2 text-sm text-gray-500">
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-danger/10 mb-4">
+            <span className="text-danger text-xl font-bold">!</span>
+          </div>
+          
+          <h3 className="text-xl font-black text-text-main tracking-tight">
+            Confirm Action
+          </h3>
+          <p className="mt-3 text-sm font-medium text-text-muted leading-relaxed">
             {label}
           </p>
         </div>
-        <div className="flex gap-3 mt-6">
+
+        <div className="flex flex-col sm:flex-row gap-3 mt-8">
           <button
             onClick={() => isConfirmationModelOpen(false)}
-            className="flex-1 px-4 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors focus:ring-4 focus:ring-gray-300"
+            className="flex-1 px-4 py-3 text-xs font-black uppercase tracking-widest text-text-muted bg-muted rounded-xl hover:bg-border transition-all active:scale-95"
           >
             Cancel
           </button>
           <button
             onClick={submitAction}
-            className={`flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors focus:ring-4 focus:ring-red-300 shadow-md ${classname}`}
+            className={`flex-1 px-4 py-3 text-xs font-black uppercase tracking-widest text-surface bg-danger rounded-xl hover:bg-danger-hover transition-all shadow-lg shadow-danger/20 active:scale-95 ${classname}`}
           >
-            Confirm {actionText!=null ? actionText : "Delete"}
+             {actionText ? actionText : "Confirm Delete"}
           </button>
         </div>
       </div>

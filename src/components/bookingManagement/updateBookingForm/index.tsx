@@ -51,9 +51,7 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
 
   const handleCheckInClick = (newDate: Dayjs | null) => {
     if (!newDate) return;
-  
     setValue("checkInDate", newDate, { shouldValidate: true });
-  
     if (checkOut && newDate.isAfter(checkOut)) {
       setValue("checkOutDate", null as any, { shouldValidate: true });
     }
@@ -61,7 +59,6 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
   
   const handleCheckOutClick = (newDate: Dayjs | null) => {
     if (!newDate) return;
-  
     if (checkIn && newDate.isBefore(checkIn)) {
       setValue("checkInDate", newDate, { shouldValidate: true });
       setValue("checkOutDate", null as any, { shouldValidate: true });
@@ -69,7 +66,6 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
       setValue("checkOutDate", newDate, { shouldValidate: true });
     }
   };
-  
 
   const onSubmit = async (formData: BookingInput) => {
     try {
@@ -86,53 +82,55 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="p-6 flex flex-col gap-5">
+    <form onSubmit={handleSubmit(onSubmit)} className="p-6 flex flex-col gap-5 bg-surface">
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-black uppercase tracking-widest text-slate-400 ml-1">
+        <label className="text-[11px] font-black uppercase tracking-widest text-text-muted/60 ml-1">
           Bug / Reference ID
         </label>
         <Input 
           {...register("bugId")} 
           placeholder="System Bug ID" 
-          className="bg-slate-50/50"
+          className="bg-layout/10"
         />
         {errors.bugId && (
-          <span className="text-xs text-red-500 font-medium italic">
+          <span className="text-xs text-danger font-medium italic">
             {errors.bugId.message}
           </span>
         )}
       </div>
 
-      <hr className="border-slate-100 my-1" />
+      <hr className="border-muted my-1" />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-semibold text-slate-700">Guest Name</label>
+          <label className="text-sm font-semibold text-text-main">Guest Name</label>
           <Input 
             {...register("guestName")} 
             placeholder="Full Name" 
+            className="bg-layout/10"
           />
           {errors.guestName && (
-            <span className="text-xs text-red-500 font-medium italic">
+            <span className="text-xs text-danger font-medium italic">
               {errors.guestName.message}
             </span>
           )}
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-semibold text-slate-700">Guest Email</label>
+          <label className="text-sm font-semibold text-text-main">Guest Email</label>
           <Input 
             {...register("guestEmail")} 
             placeholder="email@example.com" 
+            className="bg-layout/10"
           />
           {errors.guestEmail && (
-            <span className="text-xs text-red-500 font-medium italic">
+            <span className="text-xs text-danger font-medium italic">
               {errors.guestEmail.message}
             </span>
           )}
         </div>
       </div>
       <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-semibold text-slate-700">Booking Dates</label>
+        <label className="text-sm font-semibold text-text-main">Booking Dates</label>
         <DateRangePicker
           checkIn={checkIn}
           checkOut={checkOut}
@@ -141,17 +139,17 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
           allowPast={false}
         />
         {errors.checkOutDate && (
-          <span className="text-xs text-red-500 font-medium italic">
+          <span className="text-xs text-danger font-medium italic">
             {errors.checkOutDate.message as string}
           </span>
         )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-semibold text-slate-700">Guest Gender</label>
+          <label className="text-sm font-semibold text-text-main">Guest Gender</label>
           <select
             {...register("gender", { valueAsNumber: true })}
-            className="border border-slate-200 p-3 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white transition-all shadow-sm text-sm font-medium"
+            className="border border-border p-3 rounded-xl focus:ring-4 focus:ring-primary/5 outline-none bg-layout/10 text-text-main transition-all text-sm font-bold cursor-pointer"
           >
             <option value={0}>-- Select Gender --</option>
             <option value={1}>Female</option>
@@ -161,21 +159,21 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-semibold text-slate-700 flex justify-between">
+          <label className="text-sm font-semibold text-text-main flex justify-between">
             Available Room 
-            {loadingRooms && <span className="text-[10px] text-blue-500 animate-pulse uppercase">Updating...</span>}
+            {loadingRooms && <span className="text-[10px] text-primary animate-pulse font-black uppercase">Updating...</span>}
           </label>
           <select
             {...register("roomId", { valueAsNumber: true })}
             disabled={loadingRooms}
-            className={`border p-3 rounded-xl outline-none transition-all bg-white shadow-sm text-sm font-medium ${
-              errors.roomId ? "border-red-400" : "border-slate-200 focus:ring-2 focus:ring-blue-500"
+            className={`border p-3 rounded-xl outline-none transition-all bg-layout/10 text-text-main text-sm font-bold cursor-pointer shadow-sm ${
+              errors.roomId ? "border-danger" : "border-border focus:ring-4 focus:ring-primary/5"
             }`}
           >
             <option value={0}>-- Select Room --</option>
             {availableRooms?.map((room: RoomData) => (
               <option key={room.id} value={room.id}>
-                Room {room.roomNumber} {room?.currentOccupancy ? "(Currently Occupied)" : "(Empty)"}
+                Room {room.roomNumber} {room?.currentOccupancy ? "(Occupied)" : "(Empty)"}
               </option>
             ))}
             {!availableRooms?.find(r => r.id === data.roomId) && (
@@ -183,24 +181,24 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
             )}
           </select>
           {errors.roomId && (
-            <span className="text-xs text-red-500 font-medium italic">
+            <span className="text-xs text-danger font-medium italic">
               {errors.roomId.message}
             </span>
           )}
         </div>
       </div>
-      <div className="flex items-center gap-3 pt-6 mt-4 border-t border-slate-100">
+      <div className="flex items-center gap-3 pt-6 mt-4 border-t border-muted">
         <button
           type="button"
           onClick={closeModel}
-          className="flex-1 px-4 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-colors"
+          className="flex-1 px-4 py-3 bg-muted text-text-muted font-bold rounded-xl hover:bg-border transition-all active:scale-95"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isSubmitting || loadingRooms}
-          className="flex-1 px-4 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all active:scale-95 disabled:bg-indigo-300"
+          className="flex-1 px-4 py-3 bg-primary text-surface font-bold rounded-xl hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:bg-primary/40 disabled:cursor-not-allowed"
         >
           {isSubmitting ? "Saving..." : "Update Booking"}
         </button>

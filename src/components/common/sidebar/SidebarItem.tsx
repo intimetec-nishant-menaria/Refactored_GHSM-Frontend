@@ -16,7 +16,7 @@ const SidebarItem = ({
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isActive = location.pathname.startsWith(path);
+  const isActive = location.pathname === path || (path !== "/" && location.pathname.startsWith(path));
 
   const handleClick = () => {
     if (location.pathname !== path) {
@@ -28,12 +28,15 @@ const SidebarItem = ({
   return (
     <div
       onClick={handleClick}
-      className={`cursor-pointer px-4 py-2 transition-colors duration-200 hover:bg-muted rounded-l-lg
+      className={`
+        cursor-pointer px-4 py-3 transition-all duration-200 rounded-l-2xl font-bold text-sm
         ${
           isActive
-            ? "text-blue-600 border-r-4 border-blue-600"
-            : ""
-        } ${className}`}
+            ? "text-primary bg-primary/5 border-r-4 border-primary shadow-sm"
+            : "text-text-muted hover:bg-layout hover:text-text-main"
+        } 
+        ${className}
+      `}
     >
       {label}
     </div>

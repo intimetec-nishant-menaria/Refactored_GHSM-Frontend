@@ -1,11 +1,10 @@
 import { Navigate, Outlet } from "react-router-dom";
+
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useGetUserDetailsQuery } from "@/app/Api's/auth";
 import { useEffect } from "react";
 import { removeuser, setUser } from "@/app/slices/auth";
-import Loader from "@/components/common/loader";
-
 interface AuthGuardProps {
   allowedRoles?: string[];
   isPublicOnly?: boolean;
@@ -32,7 +31,7 @@ const AuthGuard = ({ allowedRoles, isPublicOnly }: AuthGuardProps) => {
   }, [data, isFetching, isSuccess, isError, dispatch]);
 
   if (hasToken && (isFetching || !user)) {
-    if (!isError) return <Loader />;
+    if (!isError) return <div>Loading...</div>;
   }
 
   if (!hasToken && !isPublicOnly) {
