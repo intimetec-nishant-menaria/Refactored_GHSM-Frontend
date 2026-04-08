@@ -1,10 +1,10 @@
 import { Navigate, Outlet } from "react-router-dom";
-
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { useGetUserDetailsQuery } from "@/app/Api's/auth";
-import { useEffect } from "react";
-import { removeuser, setUser } from "@/app/slices/auth";
+import { useRefreshMutation } from "@/app/Api's/auth"; 
+import { useEffect, useState } from "react";
+import { logOut } from "@/app/slices/auth";
+
 interface AuthGuardProps {
   allowedRoles?: string[];
   isPublicOnly?: boolean;
@@ -12,34 +12,42 @@ interface AuthGuardProps {
 
 const AuthGuard = ({ allowedRoles, isPublicOnly }: AuthGuardProps) => {
   const dispatch = useAppDispatch();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, token } = useAppSelector((state) => state.auth);
   
-  const hasToken = document.cookie.includes("jwtToken"); 
-
-  const { data, isFetching, isSuccess, isError } = useGetUserDetailsQuery(undefined, {
-    skip: !hasToken, 
-  });
+  const [isRefreshing, setIsRefreshing] = useState(!token);
+  const [refresh] = useRefreshMutation();
 
   useEffect(() => {
-    if (!isFetching) {
-      if (isSuccess && data) {
-        dispatch(setUser(data));
-      } else if (isError) {
-        dispatch(removeuser());
+    const initializeAuth = async () => {
+      if (!token) {
+        try {
+          await refresh().unwrap();
+        } catch (err) {
+          dispatch(logOut());
+        } finally {
+          setIsRefreshing(false);
+        }
+      } else {
+        setIsRefreshing(false);
       }
+    };
+
+    initializeAuth();
+  }, [token, refresh, dispatch]);
+
+  if (isRefreshing) {
+    return <div>Loading session...</div>;
+  }
+
+  if (isPublicOnly) {
+    if (user) {
+      return <Navigate to={getHomePathByRole(user.role)} replace />;
     }
-  }, [data, isFetching, isSuccess, isError, dispatch]);
-
-  if (hasToken && (isFetching || !user)) {
-    if (!isError) return <div>Loading...</div>;
+    return <Outlet />;
   }
 
-  if (!hasToken && !isPublicOnly) {
+  if (!user) {
     return <Navigate to="/login" replace />;
-  }
-
-  if (user && isPublicOnly) {
-    return <Navigate to={getHomePathByRole(user.role)} replace />;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
@@ -48,6 +56,7 @@ const AuthGuard = ({ allowedRoles, isPublicOnly }: AuthGuardProps) => {
 
   return <Outlet />;
 };
+
 const getHomePathByRole = (role: string | undefined): string => {
   switch (role) {
     case "Admin":

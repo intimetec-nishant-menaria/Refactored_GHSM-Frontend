@@ -38,7 +38,7 @@ const AddBookingForm = ({ closeModel }: Props) => {
   const checkOut = watch("checkOutDate");
 
   useEffect(() => {
-    if (selectedGender && checkIn && checkOut && checkOut.isAfter(checkIn)) {
+    if (selectedGender && checkIn && checkOut) {
       fetchRooms({
         gender: selectedGender,
         checkIn: checkIn.toISOString(),

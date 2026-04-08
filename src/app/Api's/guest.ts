@@ -1,14 +1,12 @@
 import type { fetchAllGuestsAgrs, GuestState, UpdateGuest } from "@/utils/interfaces/guest";
 import type { paging } from "@/utils/interfaces/paging";
 import type { addGuestInput } from "@/utils/schemas/addGuest";
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi} from "@reduxjs/toolkit/query/react";
+import baseQueryWithReauth from ".";
 
 export const guestApi = createApi({
     reducerPath : "guestApi",
-    baseQuery : fetchBaseQuery({
-        baseUrl : `${import.meta.env.VITE_API_BASE_URL}/guest`,
-        credentials : "include"
-    }),
+    baseQuery : baseQueryWithReauth,
     tagTypes : ["guest"],
     endpoints : (builder)=>({
         fetchAllGuests : builder.query<paging<GuestState[]>,fetchAllGuestsAgrs>({

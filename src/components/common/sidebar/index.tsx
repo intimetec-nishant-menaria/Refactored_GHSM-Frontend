@@ -3,7 +3,7 @@ import { menuByRole } from "./menuConfig";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { authAPi, useLogoutUserMutation } from "@/app/Api's/auth";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { removeuser } from "@/app/slices/auth";
+import { logOut} from "@/app/slices/auth";
 import { useNavigate } from "react-router-dom";
 import { bookingApi } from "@/app/Api's/booking";
 
@@ -24,7 +24,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
   async function handleLogout() {
     try {
       await logoutUser().unwrap();
-      dispatch(removeuser());
+      dispatch(logOut());
       dispatch(authAPi.util.resetApiState());
       dispatch(bookingApi.util.resetApiState());
       navigate("/");

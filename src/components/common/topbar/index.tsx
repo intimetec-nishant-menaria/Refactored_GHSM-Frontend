@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png"
 import { authAPi, useLogoutUserMutation } from "@/app/Api's/auth";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { removeuser } from "@/app/slices/auth";
+import { logOut } from "@/app/slices/auth";
 import { bookingApi } from "@/app/Api's/booking";
 import ThemeToggle from "@/components/common/themeToggle";
 
@@ -25,7 +25,7 @@ const Topbar = ({ onMenuClick, isMenuOpen }: TopbarProps) => {
   async function handleLogout() {
     try {
       await logoutUser().unwrap();
-      dispatch(removeuser());
+      dispatch(logOut());
       dispatch(authAPi.util.resetApiState());
       dispatch(bookingApi.util.resetApiState());
       navigate("/");

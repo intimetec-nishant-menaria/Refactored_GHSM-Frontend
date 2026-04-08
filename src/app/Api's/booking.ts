@@ -1,20 +1,18 @@
 import type { BookingPayload, fetchBookingArgs, fetchBookingsByRangeArgs, fetchUserBookingArgs } from "@/utils/interfaces/booking";
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import type { paging } from "@/utils/interfaces/paging";
 import type { BookingInput } from "@/utils/schemas/addBookings";
 import  { HubConnectionBuilder } from "@microsoft/signalr";
+import baseQueryWithReauth from ".";
 
 export const bookingApi = createApi({
     reducerPath : "bookingApi",
-    baseQuery : fetchBaseQuery({
-        baseUrl : `${import.meta.env.VITE_API_BASE_URL}/booking`,
-        credentials: "include"
-    }),
+    baseQuery : baseQueryWithReauth,
     tagTypes:["booking"],
     endpoints : (builder)=>({
         createBooking : builder.mutation<void,BookingInput>({
             query: (data)=>({
-                url: "/createBooking",
+                url: "/Booking/createBooking",
                 method : "POST",
                 body : data
             }),
@@ -22,7 +20,7 @@ export const bookingApi = createApi({
         }),
         fetchAllBookings : builder.query<paging<BookingPayload[]>, fetchBookingArgs>({
             query:(data)=>({
-                url : `/getAllBookings?pageNumber=${data.currentPage}&pageSize=${data.pageSize}&searchUser=${data.searchUser}&roomNumber=${data.roomFilter}&statusFilter=${data.statusFilter}`
+                url : `/Booking/getAllBookings?pageNumber=${data.currentPage}&pageSize=${data.pageSize}&searchUser=${data.searchUser}&roomNumber=${data.roomFilter}&statusFilter=${data.statusFilter}`
             }),
             providesTags:["booking"],
             async onCacheEntryAdded(arg, { updateCachedData, cacheDataLoaded, cacheEntryRemoved }) {
@@ -54,14 +52,14 @@ export const bookingApi = createApi({
         }),
         cancelBooking : builder.mutation<void , number>({
             query : (id)=>({
-                url:`/${id}/cancelBooking`,
+                url:`/Booking/${id}/cancelBooking`,
                 method:"POST"
             }),
             invalidatesTags:["booking"]
         }),
         fetchBookingByRange : builder.query<BookingPayload[],fetchBookingsByRangeArgs>({
             query : (dates)=>({
-                url : `/getBookingsByRange?start=${dates.startDate}&end=${dates.endDate}`,
+                url : `/Booking/getBookingsByRange?start=${dates.startDate}&end=${dates.endDate}`,
             }),
             providesTags:["booking"],
             async onCacheEntryAdded(arg, { updateCachedData, cacheDataLoaded, cacheEntryRemoved }) {
@@ -98,7 +96,7 @@ export const bookingApi = createApi({
         }),
         updateBooking : builder.mutation<void,BookingInput>({
             query : (data)=>({
-                url : `/updateBooking/${data.id}`,
+                url : `/Booking/updateBooking/${data.id}`,
                 method: "PUT",
                 body: data,
             }),
@@ -106,7 +104,7 @@ export const bookingApi = createApi({
         }),
         checkIn : builder.mutation<void,number>({
             query : (id)=>({
-                url : `checkIn/${id}`,
+                url : `/Booking/checkIn/${id}`,
                 method : "PUT",
                 body:id,
             }),
@@ -114,7 +112,7 @@ export const bookingApi = createApi({
         }),
         checkOut : builder.mutation<void,number>({
             query : (id)=>({
-                url: `/checkOut/${id}`,
+                url: `Booking/checkOut/${id}`,
                 method : "PUT",
                 body : id,
             }),
@@ -122,7 +120,7 @@ export const bookingApi = createApi({
         }),
         fetchUserBookings : builder.query<paging<BookingPayload[]>,fetchUserBookingArgs>({
             query : (data)=>({
-                url: `/myBookings?pageNumber=${data.currentPage}&pageSize=${data.pageSize}&roomNumber=${data.roomFilter}&statusFilter=${data.statusFilter}`
+                url: `/Booking/myBookings?pageNumber=${data.currentPage}&pageSize=${data.pageSize}&roomNumber=${data.roomFilter}&statusFilter=${data.statusFilter}`
             }),
             providesTags : ["booking"],
         })
