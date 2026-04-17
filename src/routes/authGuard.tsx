@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
-import { useRefreshMutation } from "@/app/Api's/auth"; 
+import { useRefreshMutation } from "@/app/Api/auth"; 
 import { useEffect, useState } from "react";
 import { logOut } from "@/app/slices/auth";
 
@@ -36,7 +36,9 @@ const AuthGuard = ({ allowedRoles, isPublicOnly }: AuthGuardProps) => {
   }, [token, refresh, dispatch]);
 
   if (isRefreshing) {
-    return <div>Loading session...</div>;
+    return (<div className="py-32 text-center bg-layout min-h-screen">
+            <div className="animate-bounce text-primary font-black text-2xl">...</div>
+            </div>)
   }
 
   if (isPublicOnly) {

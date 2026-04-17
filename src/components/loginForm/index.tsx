@@ -8,7 +8,7 @@ import type { LoginInput } from "@/utils/schemas/login";
 import { loginSchema } from "@/utils/schemas/login";
 import toast from "react-hot-toast";
 import { useEffect } from "react";
-import { useLoginUserMutation } from "@/app/Api's/auth";
+import { useLoginUserMutation } from "@/app/Api/auth";
 
 const LoginForm = () => {
   const navigate = useNavigate();

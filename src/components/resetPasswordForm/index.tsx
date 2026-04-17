@@ -10,7 +10,7 @@ import {
 } from "@/utils/schemas/resetPassword";
 import { useNavigate } from "react-router-dom";
 import { useQueryParams } from "@/hooks/useQueryParams";
-import { useResetPasswordMutation } from "@/app/Api's/auth";
+import { useResetPasswordMutation } from "@/app/Api/auth";
 
 const ResetPasswordForm = () => {
   const navigate = useNavigate();

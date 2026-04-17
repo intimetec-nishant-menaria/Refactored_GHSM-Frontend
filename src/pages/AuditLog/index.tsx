@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useFetchAuditLogQuery } from "@/app/Api's/auditLog";
+import { useFetchAuditLogQuery } from "@/app/Api/auditLog";
 import PagingController from "@/components/common/paging/PagingController";
 
 const AuditLogPage = () => {

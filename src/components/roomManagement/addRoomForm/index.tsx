@@ -1,7 +1,7 @@
 import { useState} from "react";
 import Input from "../../common/input/Input";
 import toast from "react-hot-toast";
-import { useAddRoomMutation } from "@/app/Api's/room";
+import { useAddRoomMutation } from "@/app/Api/room";
 import { useForm } from "react-hook-form";
 import { addRoomSchema, type addRoom } from "@/utils/schemas/addRoom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -57,7 +57,16 @@ function AddRoomForm({ closeModel }: { closeModel: () => void }) {
           <label htmlFor="Floor" className="text-sm font-semibold text-slate-700">
             Room Floor
           </label>
-          <Input
+           <select
+            {...register("floor", { valueAsNumber: true })}
+            className="border border-border p-3 rounded-xl focus:ring-4 focus:ring-primary/5 outline-none bg-layout/10 text-text-main transition-all text-sm font-bold cursor-pointer"
+          >
+            <option value={1}>1st Floor</option>
+            <option value={2}>2nd Floor</option>
+            <option value={3}>3rd Floor</option>
+            <option value={4}>4th Floor</option>
+          </select>
+          {/* <Input
             type="text"
             id="Floor"
             placeholder="e.g. 1"
@@ -68,7 +77,7 @@ function AddRoomForm({ closeModel }: { closeModel: () => void }) {
             <p className="text-red-500 text-xs font-medium italic">
               Please enter a valid floor number.
             </p>
-          )}
+          )} */}
         </div>
 
       </div>
@@ -83,7 +92,7 @@ function AddRoomForm({ closeModel }: { closeModel: () => void }) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="flex-1 px-4 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:bg-blue-400 flex justify-center items-center gap-2"
+          className="flex-1 px-4 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 shadow-lg transition-all active:scale-95 disabled:bg-blue-400 flex justify-center items-center gap-2"
         >
           {isSubmitting ? "Adding..." : "Confirm Add"}
           {!isSubmitting && <span className="text-lg">✓</span>}

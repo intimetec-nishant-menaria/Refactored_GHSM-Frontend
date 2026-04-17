@@ -8,14 +8,13 @@ import {
   forgotPasswordSchema,
   type ForgotPasswordInput,
 } from "@/utils/schemas/forgotPassword";
-import {  useSelector } from "react-redux";
 import toast from "react-hot-toast";
-import type { RootState } from "@/app/store/store";
-import { useForgotPasswordMutation } from "@/app/Api's/auth";
+import { useForgotPasswordMutation } from "@/app/Api/auth";
+import { useState } from "react";
 
 const ForgotPasswordForm = () => {
   const navigate = useNavigate();
-  const { loading } = useSelector((state: RootState) => state.auth);
+  const [loading, setLoading] = useState(false);
   const [forgotPassword] = useForgotPasswordMutation(); 
 
   const {
@@ -27,12 +26,14 @@ const ForgotPasswordForm = () => {
   });
 
 const onSubmit =async (data: ForgotPasswordInput) => {
+  setLoading(true);
    try{
       await forgotPassword(data).unwrap();
       toast.success("Reset link sent to your email!");
    }catch(err:any){
      toast.error(err?.data.message || "Failed to send reset link");
    }
+   setLoading(false);
 };
 
   return (

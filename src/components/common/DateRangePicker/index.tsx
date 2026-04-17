@@ -12,7 +12,38 @@ interface Props {
   allowPast?: boolean;
 }
 
-const DateRangePicker = ({ checkIn, checkOut, handleCheckInClick , handleCheckOutClick , allowPast = false }: Props) => {
+const DateRangePicker = ({ checkIn, checkOut, handleCheckInClick, handleCheckOutClick, allowPast = false }: Props) => {
+  
+  const fieldStyles = {
+    width: { xs: "100%", md: 250 },
+    "& .MuiOutlinedInput-root": {
+      backgroundColor: "var(--color-surface)",
+      color: "var(--color-text-main)", 
+      "& fieldset": {
+        borderColor: "var(--color-border)",
+      },
+      "&:hover fieldset": {
+        borderColor: "var(--color-primary-hover)",
+      },
+      "&.Mui-focused fieldset": {
+        borderColor: "var(--color-primary)",
+      },
+      "& .MuiInputBase-input": {
+        color: "var(--color-text-main)",
+        WebkitTextFillColor: "var(--color-text-main)", 
+      },
+    },
+    "& .MuiInputLabel-root": {
+      color: "var(--color-text-muted)",
+      "&.Mui-focused": {
+        color: "var(--color-primary)",
+      },
+    },
+    "& .MuiSvgIcon-root": {
+      color: "var(--color-primary)",
+    }
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Box className="flex flex-col md:flex-row gap-4 w-full">
@@ -21,7 +52,7 @@ const DateRangePicker = ({ checkIn, checkOut, handleCheckInClick , handleCheckOu
           value={checkIn}
           onChange={(newDate) => handleCheckInClick(newDate)}
           disablePast={!allowPast}
-          sx={{ width: { xs: "100%", md: 250 } }}
+          sx={fieldStyles}
         />
         <DatePicker
           label="Check Out"
@@ -29,7 +60,7 @@ const DateRangePicker = ({ checkIn, checkOut, handleCheckInClick , handleCheckOu
           onChange={(newDate) => handleCheckOutClick(newDate)}
           disablePast={!allowPast}
           minDate={checkIn ?? undefined}
-          sx={{ width: { xs: "100%", md: 250 } }}
+          sx={fieldStyles}
         />
       </Box>
     </LocalizationProvider>

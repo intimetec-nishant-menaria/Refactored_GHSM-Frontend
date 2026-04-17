@@ -12,20 +12,20 @@ export const roomAPi = createApi({
     endpoints : (builder)=>({
         fetchAllRooms : builder.query<paging<RoomData[]> , fetchAllRoomArgs>({
             query : (args)=>({
-                url : `/Rooms/getAllRooms?pageNumber=${args.currentPage}&pageSize=${args.pageSize}&roomStatus=${args.roomStatusFilter}&roomNumber=${args.roomNumberFilter}`,
+                url : `/Room?pageNumber=${args.currentPage}&pageSize=${args.pageSize}&roomStatus=${args.roomStatusFilter}&roomNumber=${args.roomNumberFilter}`,
             }),
             providesTags:["room"]
         }),
         deleteRoom : builder.mutation<void,number>({
             query : (id)=>({
-                url : `/Rooms/deleteRoom/${id}`,
+                url : `/Room/${id}`,
                 method : "DELETE"
             }),
             invalidatesTags : ["room"]
         }),
         addRoom : builder.mutation<void,addRoom>({
             query : (data)=>({
-                url : "/Rooms/createRoom",
+                url : "/Room",
                 method : "POST",
                 body : data
             }),
@@ -33,7 +33,7 @@ export const roomAPi = createApi({
         }),
         updateRoom : builder.mutation<void,UpdateRoomPayload>({
             query : (data)=>({
-                url: `/Rooms/updateRoom/${data.id}`,
+                url: `/Room/${data.id}`,
                 method : "PUT",
                 body : data
             }),
@@ -41,7 +41,7 @@ export const roomAPi = createApi({
         }),
         roomSummary : builder.query<RoomSummary,void>({
             query : ()=>({
-                url : "/Rooms/getSummary",
+                url : "/Room/summary",
             }),
             providesTags : ["room"],
         })

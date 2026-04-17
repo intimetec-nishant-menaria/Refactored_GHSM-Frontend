@@ -8,11 +8,11 @@ import baseQueryWithReauth from ".";
 export const bookingApi = createApi({
     reducerPath : "bookingApi",
     baseQuery : baseQueryWithReauth,
-    tagTypes:["booking"],
+    tagTypes:["booking","room"],
     endpoints : (builder)=>({
         createBooking : builder.mutation<void,BookingInput>({
             query: (data)=>({
-                url: "/Booking/createBooking",
+                url: "/Booking",
                 method : "POST",
                 body : data
             }),
@@ -20,7 +20,7 @@ export const bookingApi = createApi({
         }),
         fetchAllBookings : builder.query<paging<BookingPayload[]>, fetchBookingArgs>({
             query:(data)=>({
-                url : `/Booking/getAllBookings?pageNumber=${data.currentPage}&pageSize=${data.pageSize}&searchUser=${data.searchUser}&roomNumber=${data.roomFilter}&statusFilter=${data.statusFilter}`
+                url : `/Booking?pageNumber=${data.currentPage}&pageSize=${data.pageSize}&searchUser=${data.searchUser}&roomNumber=${data.roomFilter}&statusFilter=${data.statusFilter}`
             }),
             providesTags:["booking"],
             async onCacheEntryAdded(arg, { updateCachedData, cacheDataLoaded, cacheEntryRemoved }) {
@@ -52,7 +52,7 @@ export const bookingApi = createApi({
         }),
         cancelBooking : builder.mutation<void , number>({
             query : (id)=>({
-                url:`/Booking/${id}/cancelBooking`,
+                url:`/Booking/${id}/cancel`,
                 method:"POST"
             }),
             invalidatesTags:["booking"]
@@ -96,7 +96,7 @@ export const bookingApi = createApi({
         }),
         updateBooking : builder.mutation<void,BookingInput>({
             query : (data)=>({
-                url : `/Booking/updateBooking/${data.id}`,
+                url : `/Booking/${data.id}`,
                 method: "PUT",
                 body: data,
             }),
@@ -104,19 +104,19 @@ export const bookingApi = createApi({
         }),
         checkIn : builder.mutation<void,number>({
             query : (id)=>({
-                url : `/Booking/checkIn/${id}`,
+                url : `/Booking/${id}/checkIn`,
                 method : "PUT",
                 body:id,
             }),
-            invalidatesTags : ["booking"],
+            invalidatesTags : ["booking","room"],
         }),
         checkOut : builder.mutation<void,number>({
             query : (id)=>({
-                url: `Booking/checkOut/${id}`,
+                url: `Booking/${id}/checkOut`,
                 method : "PUT",
                 body : id,
             }),
-            invalidatesTags: ["booking"]
+            invalidatesTags: ["booking","room"]
         }),
         fetchUserBookings : builder.query<paging<BookingPayload[]>,fetchUserBookingArgs>({
             query : (data)=>({

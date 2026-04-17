@@ -6,7 +6,7 @@ import type { DatesSetArg, EventInput } from "@fullcalendar/core";
 import calendarIcon from "@/assets/calendarIcon.png";
 import crossIcon from "@/assets/crossIcon.png";
 import type { BookingPayload } from "@/utils/interfaces/booking";
-import { useLazyFetchBookingByRangeQuery } from "@/app/Api's/booking";
+import { useLazyFetchBookingByRangeQuery } from "@/app/Api/booking";
 
 function Calendar() {
   const [events, setEvents] = useState<EventInput[]>([]);

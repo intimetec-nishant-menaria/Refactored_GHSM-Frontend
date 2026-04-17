@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import PagingController from "@/components/common/paging/PagingController";
-import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker"; 
+import DateRangePicker from "@/components/common/DateRangePicker"; 
 import toast from "react-hot-toast";
 import dayjs, { Dayjs } from "dayjs";
 import ConfirmationModel from "@/components/common/confirmationModel/confirmationModel";
-import { useCheckInMutation, useCheckOutMutation, useFetchBookingByRangeQuery } from "@/app/Api's/booking";
+import { useCheckInMutation, useCheckOutMutation, useFetchBookingByRangeQuery } from "@/app/Api/booking";
 import { useAppSelector } from "@/hooks/useAppSelector";
 
 interface DateRangeState {

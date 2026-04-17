@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import Button from "@/components/common/button/Button";
 import ConfirmationModel from "@/components/common/confirmationModel/confirmationModel";
 import toast from "react-hot-toast";
-import { useCancelBookingMutation, useFetchUserBookingsQuery } from "@/app/Api's/booking";
+import { useCancelBookingMutation, useFetchUserBookingsQuery } from "@/app/Api/booking";
 
 const MyBookings = () => {
   const [currentPage, setCurrentPage] = useState(1);

@@ -8,7 +8,7 @@ import ConfirmationModel from "../common/confirmationModel/confirmationModel.tsx
 import Modal from "../common/modal/index.tsx";
 import AddRoomForm from "./addRoomForm/index.tsx";
 import UpdateRoomForm from "./updateRoomForm/index.tsx";
-import { useDeleteRoomMutation, useFetchAllRoomsQuery } from "@/app/Api's/room.ts";
+import { useDeleteRoomMutation, useFetchAllRoomsQuery } from "@/app/Api/room.ts";
 import toast from "react-hot-toast";
 import type { RoomData } from "@/utils/interfaces/room.ts";
 

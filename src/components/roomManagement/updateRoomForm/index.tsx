@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Input from "../../common/input/Input";
 import toast from "react-hot-toast";
-import { useUpdateRoomMutation } from "@/app/Api's/room";
+import { useUpdateRoomMutation } from "@/app/Api/room";
 import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
 import type { RoomData } from "@/utils/interfaces/room";
 import { useForm } from "react-hook-form";

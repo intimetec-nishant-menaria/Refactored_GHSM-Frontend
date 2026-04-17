@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { registerSchema, type RegisterInput } from "@/utils/schemas/register";
-import {  useRegisterUserMutation } from "@/app/Api's/auth";
+import {  useRegisterUserMutation } from "@/app/Api/auth";
 
 const SignUpForm = () => {
   const navigate = useNavigate();

@@ -5,19 +5,19 @@ import baseQueryWithReauth from ".";
 
 
 export const userApi = createApi({
-    reducerPath : "userAPi",
+    reducerPath : "userApi",
     baseQuery : baseQueryWithReauth,
     tagTypes : ["user"],
     endpoints: (builder)=>({
         fetchAllUsers : builder.query<paging<User[]>,fetchUsersArgs>({
             query:(data)=>({
-                url : `/UserManagement/getAllUsers?pageNumber=${data.currentPage}&pageSize=${data.pageSize}&searchUser=${data.searchUser}`
+                url : `/User?pageNumber=${data.currentPage}&pageSize=${data.pageSize}&searchUser=${data.searchUser}`
             }),
             providesTags : ["user"]
         }),
         createUser : builder.mutation<void,CreateUserPayload>({
             query : (data)=>({
-                url : "/UserManagement/createUser",
+                url : "/User",
                 method : "POST",
                 body : data 
             }),
@@ -25,14 +25,14 @@ export const userApi = createApi({
         }),
         deleteUser : builder.mutation<void,number>({
             query : (id)=>({
-                url : `/UserManagement/${id}/deleteUser`,
+                url : `/User/${id}`,
                 method: "DELETE",
             }),
             invalidatesTags : ["user"],
         }),
         updateUser : builder.mutation<void , UpdateUserPayload>({
             query : (data)=>({
-                url : `/UserManagement/${data.id}/updateUser`,
+                url : `/User/${data.id}`,
                 method : "PUT",
                 body : data
             }),

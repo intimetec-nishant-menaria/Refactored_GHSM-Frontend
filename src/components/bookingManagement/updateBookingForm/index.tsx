@@ -3,9 +3,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import Input from "../../common/input/Input";
-import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker";
-import { useUpdateBookingMutation } from "@/app/Api's/booking";
-import { useLazyGetAllAvailableRoomsQuery } from "@/app/Api's/availableRoom";
+import DateRangePicker from "@/components/common/DateRangePicker";
+import { useUpdateBookingMutation } from "@/app/Api/booking";
+import { useLazyGetAllAvailableRoomsQuery } from "@/app/Api/availableRoom";
 import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
 import { BookingSchema, type BookingInput } from "@/utils/schemas/addBookings";
 import dayjs, { Dayjs } from "dayjs";
@@ -40,7 +40,7 @@ const UpdateBookingForm = ({ data, closeModel }: UpdateModelProps<BookingPayload
   const checkOut = watch("checkOutDate");
 
   useEffect(() => {
-    if (selectedGender && checkIn && checkOut && checkOut.isAfter(checkIn)) {
+    if (selectedGender && checkIn && checkOut ) {
       fetchRooms({
         gender: selectedGender,
         checkIn: checkIn.toISOString(),

@@ -1,14 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "@/app/slices/auth";
-import { availableRoomApi } from "../Api's/availableRoom";
-import { bookingApi } from "../Api's/booking";
-import { userApi } from "../Api's/user";
-import { roomAPi } from "../Api's/room";
-import { roomTypeApi } from "../Api's/roomType";
-import { guestApi } from "../Api's/guest";
-import { amenitiesApi } from "../Api's/amenities";
-import { authAPi } from "../Api's/auth";
-import { auditApi } from "../Api's/auditLog";
+import { availableRoomApi } from "../Api/availableRoom";
+import { bookingApi } from "../Api/booking";
+import { userApi } from "../Api/user";
+import { roomAPi } from "../Api/room";
+import { roomTypeApi } from "../Api/roomType";
+import { guestApi } from "../Api/guest";
+import { amenitiesApi } from "../Api/amenities";
+import { authAPi } from "../Api/auth";
+import { auditApi } from "../Api/auditLog";
 
 export const store = configureStore({
   reducer: {

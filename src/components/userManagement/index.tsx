@@ -10,7 +10,7 @@ import PagingController from "../common/paging/PagingController";
 import Modal from "../common/modal";
 import CreateUserForm from "./createUserForm";
 import UpdateUserForm from "./updateUserForm";
-import { useDeleteUserMutation, useFetchAllUsersQuery } from "@/app/Api's/user";
+import { useDeleteUserMutation, useFetchAllUsersQuery } from "@/app/Api/user";
 
 const UserManagement = () => {
   const navigate = useNavigate(); 

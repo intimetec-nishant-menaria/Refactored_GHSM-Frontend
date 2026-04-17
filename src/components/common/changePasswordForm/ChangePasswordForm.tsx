@@ -12,7 +12,7 @@ import {
 } from "@/utils/schemas/changePassword";
 
 import { useNavigate } from "react-router-dom";
-import { useChangePasswordMutation } from "@/app/Api's/auth";
+import { useChangePasswordMutation } from "@/app/Api/auth";
 
 const ChangePasswordForm = () => {
   const navigate = useNavigate();

@@ -1,5 +1,5 @@
 import { Routes, Route } from "react-router-dom";
-import AuthGuard from "./authGard";
+import AuthGuard from "./authGuard";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";

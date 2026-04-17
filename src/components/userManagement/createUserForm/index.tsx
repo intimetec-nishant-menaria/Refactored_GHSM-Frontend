@@ -5,7 +5,7 @@ import {
 } from "@/utils/schemas/User";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { useCreateUserMutation } from "@/app/Api's/user";
+import { useCreateUserMutation } from "@/app/Api/user";
 
 const CreateUserForm = ({ closeModel }: { closeModel: () => void }) => {
   const [createUser] = useCreateUserMutation();

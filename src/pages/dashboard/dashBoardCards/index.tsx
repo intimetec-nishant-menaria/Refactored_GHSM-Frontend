@@ -1,4 +1,4 @@
-import { useRoomSummaryQuery } from "@/app/Api's/room";
+import { useRoomSummaryQuery } from "@/app/Api/room";
 
 const RoomStatusDashboard = () => {
   const { data, isLoading, isError, error } = useRoomSummaryQuery();
@@ -53,7 +53,7 @@ const RoomStatusDashboard = () => {
             data?.maintenance ?? 0, 
             'border-amber-500', 
             'text-amber-600', 
-            'hover:bg-amber-50'
+            'hover:bg-amber/5'
         )}
         {renderCard(
             'Out of Order', 

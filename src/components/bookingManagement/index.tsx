@@ -8,7 +8,7 @@ import Modal from "../common/modal/index.tsx";
 import UpdateBookingForm from "./updateBookingForm"; 
 import AddBookingForm from "./addBookingForm/index.tsx"; 
 import editIcon from "@/assets/editIcon.png";
-import { useCancelBookingMutation, useFetchAllBookingsQuery } from "@/app/Api's/booking";
+import { useCancelBookingMutation, useFetchAllBookingsQuery } from "@/app/Api/booking.ts";
 import type { BookingPayload } from "@/utils/interfaces/booking";
 
 const BookingManagement = () => {

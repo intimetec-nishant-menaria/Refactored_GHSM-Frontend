@@ -5,10 +5,10 @@ import { useAppSelector } from "@/hooks/useAppSelector";
 import Button from "../button/Button";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png"
-import { authAPi, useLogoutUserMutation } from "@/app/Api's/auth";
+import { authAPi, useLogoutUserMutation } from "@/app/Api/auth";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { logOut } from "@/app/slices/auth";
-import { bookingApi } from "@/app/Api's/booking";
+import { bookingApi } from "@/app/Api/booking";
 import ThemeToggle from "@/components/common/themeToggle";
 
 interface TopbarProps {

@@ -1,5 +1,5 @@
-import { useGetAllAvailableRoomsQuery } from "@/app/Api's/availableRoom";
-import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker";
+import { useGetAllAvailableRoomsQuery } from "@/app/Api/availableRoom";
+import DateRangePicker from "@/components/common/DateRangePicker";
 import type { RoomData } from "@/utils/interfaces/room";
 import dayjs, { Dayjs } from "dayjs";
 import { useState } from "react";

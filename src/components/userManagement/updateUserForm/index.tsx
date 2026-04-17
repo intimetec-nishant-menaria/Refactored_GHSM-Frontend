@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { User } from "@/utils/interfaces/user";
 import toast from "react-hot-toast";
 import type { UpdateModelProps } from "@/utils/interfaces/updateModel";
-import { useUpdateUserMutation } from "@/app/Api's/user";
+import { useUpdateUserMutation } from "@/app/Api/user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { updateUserSchema, type updateUserInput } from "@/utils/schemas/updateUser";

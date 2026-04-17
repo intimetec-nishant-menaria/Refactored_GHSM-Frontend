@@ -1,11 +1,11 @@
 import SidebarItem from "./SidebarItem";
 import { menuByRole } from "./menuConfig";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { authAPi, useLogoutUserMutation } from "@/app/Api's/auth";
+import { authAPi, useLogoutUserMutation } from "@/app/Api/auth";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { logOut} from "@/app/slices/auth";
 import { useNavigate } from "react-router-dom";
-import { bookingApi } from "@/app/Api's/booking";
+import { bookingApi } from "@/app/Api/booking";
 
 interface SidebarProps {
   isOpen: boolean;

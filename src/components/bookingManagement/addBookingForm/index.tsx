@@ -3,9 +3,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import Input from "../../common/input/Input";
-import DateRangePicker from "@/components/common/DateRangePicker/DateRangePicker";
-import { useCreateBookingMutation } from "@/app/Api's/booking";
-import { useLazyGetAllAvailableRoomsQuery } from "@/app/Api's/availableRoom";
+import DateRangePicker from "@/components/common/DateRangePicker";
+import { useCreateBookingMutation } from "@/app/Api/booking";
+import { useLazyGetAllAvailableRoomsQuery } from "@/app/Api/availableRoom";
 import { BookingSchema, type BookingInput } from "@/utils/schemas/addBookings";
 import type { Dayjs } from "dayjs";
 
